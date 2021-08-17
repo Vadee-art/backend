@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # DEBUG = False
 DEBUG = os.getenv('DEBUG', 0)
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'www.seestan.net', 'www.v1.seestan.net']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'www.vadee.net', 'www.v1.vadee.net']
 ALLOWED_HOSTS_ENV = os.environ.get('ALLOWED_HOSTS')
 if ALLOWED_HOSTS_ENV:
     ALLOWED_HOSTS.extend(ALLOWED_HOSTS_ENV.split(','))
