@@ -3,6 +3,7 @@ from artworks.views import artwork_views as views
 
 
 urlpatterns = [
+    path('getSubcategory/', views.get_subcategory, name='sub_category_list'),
     path('', views.fetchArtWorks, name='artWorks'),
     path('delete/', views.deleteTheArtwork, name='artwork-delete'),
     path('create/', views.createTheArtWork, name='image-create'),

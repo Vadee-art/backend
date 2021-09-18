@@ -7,7 +7,6 @@ from django.forms import Textarea
 
 from .models import (
     Category,
-    Image,
     MyUser,
     Order,
     OrderItem,
@@ -23,7 +22,7 @@ class UserAdminConfig(UserAdmin):
                      'last_name', 'profile_picture')
     list_filter = ('email', 'user_name', 'first_name', 'last_name',
                    'profile_picture', 'is_active', 'is_staff')
-    ordering = ('-start_date',)
+    ordering = ('-created_at',)
     list_display = ('email', 'user_name', 'first_name', 'last_name', 'profile_picture',
                     'is_active', 'is_staff')
     fieldsets = (
@@ -42,6 +41,13 @@ class UserAdminConfig(UserAdmin):
          ),
     )
 
+
+class ArtworkAdminConfig(admin.ModelAdmin):
+    model = Artwork
+    ordering = ('-created_at',)
+    list_display = ['title', 'artist', 'category',
+                    'sub_category', 'price', 'created_at']
+    prepopulated_fields = {'slug': ('title',)}
 
 
 class CategoryAdminConfig(admin.ModelAdmin):
@@ -62,12 +68,13 @@ class OrderItemAdminConfig(admin.ModelAdmin):
 
 # Register your models here.
 admin.site.register(MyUser, UserAdminConfig)
-admin.site.register(Artwork)
+admin.site.register(Artwork, ArtworkAdminConfig)
+admin.site.register(Achievement)
 admin.site.register(Artist)
 admin.site.register(Favorite)
 admin.site.register(Order, OrderAdminConfig)
 admin.site.register(OrderItem, OrderItemAdminConfig)
 admin.site.register(Category, CategoryAdminConfig)
 admin.site.register(SubCategory)
-admin.site.register(Image)
+admin.site.register(Tag)
 admin.site.register(ShippingAddress)

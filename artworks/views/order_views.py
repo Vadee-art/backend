@@ -9,6 +9,7 @@ from rest_framework import status
 from datetime import datetime
 from django.utils import timezone
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def addOrderItems(request):
@@ -24,7 +25,7 @@ def addOrderItems(request):
             user=user,
             paymentMethod=data['paymentMethod'],
             taxPrice=data['taxPrice'],
-            shippingPrice=data['shippingPrice'],
+            shipping_price=data['shipping_price'],
             totalPrice=data['totalCartPrice'],
         )
         # create shipping address
@@ -88,8 +89,8 @@ def fetchMyOrders(request):
 @permission_classes([IsAuthenticated])
 def updateOrderToPaid(request, pk):
     order = Order.objects.get(_id=pk)
-    order.isPaid = True
-    order.paidAt = datetime.now()
+    order.is_paid = True
+    order.paid_at = datetime.now()
     order.save()
     return Response('order was paid')
 

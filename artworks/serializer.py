@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Artwork, Order, OrderItem, ShippingAddress, Artist
+from .models import Artwork, Order, OrderItem, ShippingAddress, Artist, Category, SubCategory, Tag
 
 
 class ArtistSerializer(serializers.ModelSerializer):
@@ -106,10 +106,68 @@ class UserSerializerWithToken(UserSerializer):
         return str(token.access_token)
 
 
+class SubCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubCategory
+        fields = '__all__'
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    sub_categories = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+    # reverse query set
+    def get_sub_categories(self, obj):
+        subCategories = obj.subcategory_set.all()
+        serializer = SubCategorySerializer(subCategories, many=True)
+        return serializer.data
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'
+
+
 class ArtworkSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField(read_only=True)
+    artist = serializers.SerializerMethodField(read_only=True)
+    tags = serializers.SerializerMethodField(read_only=True)
+    category = serializers.SerializerMethodField(read_only=True)
+    sub_category = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Artwork
         fields = '__all__'
+
+    # reverse query set
+    def get_user(self, obj):
+        user = obj.created_by
+        serializer = UserSerializer(user, many=False)
+        return serializer.data
+
+    def get_artist(self, obj):
+        artist = obj.artist
+        serializer = UserSerializer(artist, many=False)
+        return serializer.data
+
+    def get_tags(self, obj):
+        tags = obj.tags
+        serializer = TagSerializer(tags, many=True)
+        return serializer.data
+
+    def get_category(self, obj):
+        category = obj.category
+        serializer = CategorySerializer(category, many=False)
+        return serializer.data
+
+    def get_sub_category(self, obj):
+        sub_category = obj.sub_category
+        serializer = SubCategorySerializer(sub_category, many=False)
+        return serializer.data
 
 
 class ShippingAddressSerializer(serializers.ModelSerializer):
