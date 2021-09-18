@@ -41,7 +41,7 @@ if ALLOWED_HOSTS_ENV:
 INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
-    'artworks.apps.ArtworksConfig',
+    'artworks',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -107,7 +107,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -189,9 +189,11 @@ STATIC_ROOT = BASE_DIR / 'django_static/static'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+# For our custom user model
+AUTH_USER_MODEL = 'artworks.MyUser'
+
 print('-------------------------------------')
 print('base path: ', BASE_DIR)
 print('-------------------------------------')
-
 USE_TZ = True
 TIME_ZONE = 'Asia/Tehran'

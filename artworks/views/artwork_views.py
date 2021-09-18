@@ -10,15 +10,6 @@ from artworks.serializer import UserSerializer
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
-# from ..forms import ClassificationForm
-
-# # form views
-# def formView(request):
-#     context = {}
-#     context['form'] = ClassificationForm()
-#     return Response(context)
-
-
 @api_view(['GET'])
 def fetchArtWorks(request):
     query = request.query_params.get('keyword')
@@ -62,7 +53,7 @@ def createTheArtWork(request):
     artist = Artist.objects.first()
     if user and artist:
         artwork = Artwork.objects.create(
-            accountOwner=user,
+            createdBy=user,
             artist=artist,
             title='Default Title',
             subtitle='Default Subitle',
@@ -85,8 +76,8 @@ def updateTheArtwork(request, pk):
     data = request.data
     artwork = Artwork.objects.get(_id=pk)
     artist = Artist.objects.get(_id=data['artist'])
-    accountOwner = User.objects.get(id=data['accountOwner'])
-    artwork.accountOwner = accountOwner
+    createdBy = User.objects.get(id=data['createdBy'])
+    artwork.createdBy = createdBy
     artwork.artist = artist
     artwork.title = data['title']
     artwork.subtitle = data['subtitle']
