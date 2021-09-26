@@ -6,11 +6,12 @@ urlpatterns = [
     path('login/', views.MyTokenObtainPairView.as_view(),
          name='token_obtain_pair'),
     path('register/', views.registerUser, name='register'),
-    path('profile/', views.fetchUserProfile, name='users-profile'),
-    path('profile/update/', views.updateUserProfile, name='users-profile-update'),
-    path('update/<int:pk>/', views.updateUserById, name='user-update_by_id'),
+    path('profile/', views.fetchUserProfile, name='users_profile'),
+    path('profile/update/', views.updateUserProfile, name='users_profile_update'),
+    path('profile/favorites/', views.fetchFavoriteArtworkList, name='favorite_list'),
+    path('favorite/<int:id>/', views.addFavoriteArtwork, name='favorite_add'),
+    path('update/<int:pk>/', views.updateUserById, name='user_update_by_id'),
     path('', views.fetchUsers, name='users'),
-    path('delete/', views.deleteUser, name='user-delete'),
+    path('delete/', views.deleteUser, name='user_delete'),
     path('<int:pk>/', views.fetchUsersById, name='user_by_id'),
-
 ]

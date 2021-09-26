@@ -56,7 +56,6 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
-    favorites = models.ManyToManyField(Favorite, blank=True)
 
     objects = MyUserManager()
 
@@ -92,6 +91,8 @@ class Artist(models.Model):
     biography = models.TextField(blank=True)
     cv = models.TextField(blank=True)
     achievements = models.ManyToManyField(Achievement, blank=True)
+    favorites = models.ManyToManyField(
+        MyUser, related_name='favorite_artist', default=None, blank=True)
 
 
 class Tag(models.Model):
@@ -149,8 +150,6 @@ class Artwork(models.Model):
         return str((date.today().year))
 
     _id = models.AutoField(primary_key=True, editable=False)
-    created_by = models.ForeignKey(
-        MyUser, on_delete=models.SET_NULL, null=True)
     artist = models.ForeignKey(
         Artist, on_delete=models.SET_NULL, null=True)
     category = models.ForeignKey(
@@ -184,8 +183,12 @@ class Artwork(models.Model):
     quantity = models.IntegerField(null=False, default=1)
     tags = models.ManyToManyField(Tag, blank=True)
     price = models.DecimalField(max_digits=255, decimal_places=2)
+    favorites = models.ManyToManyField(
+        MyUser, related_name='favorite_artworks', default=None, blank=True)
     in_stock = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
+    created_by = models.ForeignKey(
+        MyUser, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     objects = ArtworkManager()
 
@@ -199,12 +202,6 @@ class Artwork(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class Favorite(models.Model):
-    _id = models.AutoField(primary_key=True, editable=False)
-    user = models.ForeignKey(MyUser, on_delete=models.SET_NULL, null=True)
-    artwork = models.ForeignKey(Artwork, on_delete=models.SET_NULL, null=True)
 
 
 class Order(models.Model):

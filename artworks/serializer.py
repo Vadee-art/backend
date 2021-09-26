@@ -1,7 +1,6 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Artwork, Order, OrderItem, ShippingAddress, Artist, Category, SubCategory, Tag
+from .models import MyUser,Artwork, Order, OrderItem, ShippingAddress, Artist, Category, SubCategory, Tag
 
 
 class ArtistSerializer(serializers.ModelSerializer):
@@ -11,7 +10,7 @@ class ArtistSerializer(serializers.ModelSerializer):
     isAdmin = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        model = User
+        model = MyUser
         fields = ['id', '_id', 'firstName', 'lastName', 'isAdmin']
 
     # for changing id to _id and keeping the same convention
@@ -39,7 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
     isAdmin = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        model = User
+        model = MyUser
         fields = ['id', '_id', 'username', 'email',
                   'firstName', 'lastName', 'isAdmin']
 
@@ -96,7 +95,7 @@ class UserSerializerWithToken(UserSerializer):
     token = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        model = User
+        model = MyUser
         fields = ['id', '_id', 'username', 'email',
                   'firstName', 'lastName', 'isAdmin', 'token']
 
@@ -151,7 +150,7 @@ class ArtworkSerializer(serializers.ModelSerializer):
 
     def get_artist(self, obj):
         artist = obj.artist
-        serializer = UserSerializer(artist, many=False)
+        serializer = ArtistSerializer(artist, many=False)
         return serializer.data
 
     def get_tags(self, obj):

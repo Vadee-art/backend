@@ -1,11 +1,12 @@
-from django.shortcuts import render
+from django.http.response import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from artworks.serializer import ArtworkSerializer, UserSerializer, UserSerializerWithToken
 from django.contrib.auth.models import User
-from artworks.models import Artwork, Artist
+from artworks.models import Artwork, Artist, MyUser
 from rest_framework import status
 
 # Create your views here.
@@ -13,13 +14,14 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.hashers import make_password
 
-
 #  Customizing token claims with JWT / overriding
+
+
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         # Add custom claims, meaning when token decrypted more data is available check jwt.io
-        token['username'] = user.username
+        token['username'] = user.user_name
         token['message'] = 'hello world'
         return token
 
@@ -44,10 +46,10 @@ class MyTokenObtainPairView(TokenObtainPairView):
 def registerUser(request):
     data = request.data
     try:
-        user = User.objects.create(
+        user = MyUser.objects.create(
             first_name=data['firstName'],
             last_name=data['lastName'],
-            username=data['email'],
+            user_name=data['email'],
             email=data['email'],
             password=make_password(data['password'])
 
@@ -88,6 +90,7 @@ def fetchUserProfile(request):
     user = request.user
     serializer = UserSerializer(user, many=False)
     return Response(serializer.data)
+
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
@@ -132,3 +135,23 @@ def deleteUser(request):
         userDeleting = User.objects.get(id=id)
         userDeleting.delete()
     return Response('users were deleted')
+
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def addFavoriteArtwork(request, id):
+    artwork = get_object_or_404(Artwork, id=id)
+    if artwork.favorites.filter(id=request.user.id).exists():
+        artwork.favorites.remove(request.user)
+    else:
+        artwork.favorites.add(request.user)
+    # HTTP_REFERER – The referring page, if any.
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def fetchFavoriteArtworkList(request):
+    artworks = Artwork.objects.filter(favorites=request.user)
+    serializer = ArtworkSerializer(artworks, many=True)
+    return Response({'favorites': serializer.data})
