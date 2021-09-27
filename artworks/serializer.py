@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import MyUser,Artwork, Order, OrderItem, ShippingAddress, Artist, Category, SubCategory, Tag
+from .models import MyUser, Artwork, Order, OrderItem, ShippingAddress, Artist, Category, SubCategory, Tag
 
 
 class ArtistSerializer(serializers.ModelSerializer):
@@ -33,6 +33,11 @@ class ArtistSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     firstName = serializers.SerializerMethodField(read_only=True)
     lastName = serializers.SerializerMethodField(read_only=True)
+    country = serializers.SerializerMethodField(read_only=True)
+    city = serializers.SerializerMethodField(read_only=True)
+    phoneNumber = serializers.SerializerMethodField(read_only=True)
+    postalCode = serializers.SerializerMethodField(read_only=True)
+    address = serializers.SerializerMethodField(read_only=True)
     username = serializers.SerializerMethodField(read_only=True)
     _id = serializers.SerializerMethodField(read_only=True)
     isAdmin = serializers.SerializerMethodField(read_only=True)
@@ -40,7 +45,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyUser
         fields = ['id', '_id', 'username', 'email',
-                  'firstName', 'lastName', 'isAdmin']
+                  'firstName', 'lastName', 'country', 'city', 'phoneNumber', 'postalCode', 'address', 'isAdmin']
 
     # for changing id to _id and keeping the same convention
     def get__id(self, obj):
@@ -57,6 +62,21 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_lastName(self, obj):
         return obj.last_name
+
+    def get_country(self, obj):
+        return obj.country
+
+    def get_city(self, obj):
+        return obj.city
+
+    def get_phoneNumber(self, obj):
+        return obj.phone_number
+
+    def get_postalCode(self, obj):
+        return obj.postal_code
+
+    def get_address(self, obj):
+        return obj.address
 
 
 class ArtistSerializer(serializers.ModelSerializer):

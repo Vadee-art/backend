@@ -5,7 +5,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from artworks.serializer import ArtworkSerializer, UserSerializer, UserSerializerWithToken
-from django.contrib.auth.models import User
 from artworks.models import Artwork, Artist, MyUser
 from rest_framework import status
 
@@ -62,7 +61,6 @@ def registerUser(request):
 
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
 def updateUserProfile(request):
     user = request.user
 
@@ -95,7 +93,7 @@ def fetchUserProfile(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def fetchUsers(request):
-    users = User.objects.all()
+    users = MyUser.objects.all()
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
 
@@ -103,7 +101,7 @@ def fetchUsers(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def fetchUsersById(request, pk):
-    user = User.objects.get(id=pk)
+    user = MyUser.objects.get(id=pk)
     serializer = UserSerializer(user, many=False)
     return Response(serializer.data)
 
@@ -111,7 +109,7 @@ def fetchUsersById(request, pk):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updateUserById(request, pk):
-    user = User.objects.get(id=pk)
+    user = MyUser.objects.get(id=pk)
 
     data = request.data
     user.first_name = data['firstName']
@@ -132,25 +130,30 @@ def deleteUser(request):
     data = request.data
     selectedUsers = data['selectedUsers']
     for id in selectedUsers:
-        userDeleting = User.objects.get(id=id)
+        userDeleting = MyUser.objects.get(id=id)
         userDeleting.delete()
     return Response('users were deleted')
 
 
 @api_view(['PUT'])
-@permission_classes([IsAdminUser])
-def addFavoriteArtwork(request, id):
-    artwork = get_object_or_404(Artwork, id=id)
-    if artwork.favorites.filter(id=request.user.id).exists():
-        artwork.favorites.remove(request.user)
-    else:
-        artwork.favorites.add(request.user)
-    # HTTP_REFERER – The referring page, if any.
-    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+@permission_classes([IsAuthenticated])
+def addFavoriteArtwork(request, pk):
+    try:
+        artwork = get_object_or_404(Artwork, _id=pk)
+        if artwork.favorites.filter(id=request.user.id).exists():
+            artwork.favorites.remove(request.user)
+        else:
+            artwork.favorites.add(request.user)
+            message = {'detail: We could not make any changes!'}
+
+        return Response(artwork._id)
+    except:
+        message = {'detail: We could not make any changes!'}
+        return Response(message, status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['PUT'])
-@permission_classes([IsAdminUser])
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def fetchFavoriteArtworkList(request):
     artworks = Artwork.objects.filter(favorites=request.user)
     serializer = ArtworkSerializer(artworks, many=True)
