@@ -92,6 +92,7 @@ class Artist(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,)
     photo = models.ImageField(null=True, default='/defaultImage.png')
     birthday = models.DateField(default=date.today)
+    nationality = models.CharField(max_length=255, db_index=True)
     biography = models.TextField(blank=True)
     cv = models.TextField(blank=True)
     achievements = models.ManyToManyField(Achievement, blank=True)

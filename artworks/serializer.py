@@ -4,30 +4,38 @@ from .models import MyUser, Artwork, Order, OrderItem, ShippingAddress, Artist, 
 
 
 class ArtistSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField(read_only=True)
     firstName = serializers.SerializerMethodField(read_only=True)
     lastName = serializers.SerializerMethodField(read_only=True)
-    _id = serializers.SerializerMethodField(read_only=True)
-    isAdmin = serializers.SerializerMethodField(read_only=True)
+    photo = serializers.SerializerMethodField(read_only=True)
+    userId = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        model = MyUser
-        fields = ['id', '_id', 'firstName', 'lastName', 'isAdmin']
+        model = Artist
+        fields = '__all__'
 
-    # for changing id to _id and keeping the same convention
-    def get__id(self, obj):
-        return obj.id
-
-    def get_isAdmin(self, obj):
-        return obj.is_staff
+    def get_userId(self, obj):
+        user = obj.user
+        userId = user.id
+        return userId
 
     def get_username(self, obj):
-        return obj.email
+        user = obj.user
+        email = user.email
+        return email
 
     def get_firstName(self, obj):
-        return obj.first_name
+        user = obj.user
+        firstName = user.first_name
+        return firstName
 
     def get_lastName(self, obj):
-        return obj.last_name
+        user = obj.user
+        lastName = user.last_name
+        return lastName
+
+    def get_photo(self, obj):
+        return obj.photo.url
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -77,38 +85,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_address(self, obj):
         return obj.address
-
-
-class ArtistSerializer(serializers.ModelSerializer):
-    username = serializers.SerializerMethodField(read_only=True)
-    firstName = serializers.SerializerMethodField(read_only=True)
-    lastName = serializers.SerializerMethodField(read_only=True)
-    userId = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = Artist
-        fields = ['userId', '_id', 'username',
-                  'firstName', 'lastName']
-
-    def get_userId(self, obj):
-        user = obj.user
-        userId = user.id
-        return userId
-
-    def get_username(self, obj):
-        user = obj.user
-        email = user.email
-        return email
-
-    def get_firstName(self, obj):
-        user = obj.user
-        firstName = user.first_name
-        return firstName
-
-    def get_lastName(self, obj):
-        user = obj.user
-        lastName = user.last_name
-        return lastName
 
 
 class UserSerializerWithToken(UserSerializer):
