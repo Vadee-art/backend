@@ -4,5 +4,5 @@ from artworks.views import artist_views as views
 
 urlpatterns = [
     path('', views.fetchArtists, name='artists'),
-    path('<int:pk>/', views.fetchArtist, name='artist'),
+    path('<int:pk>/artworks/', views.fetchArtistArtworks, name='artist_artworks'),
 ]

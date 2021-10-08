@@ -99,6 +99,9 @@ class Artist(models.Model):
     favorites = models.ManyToManyField(
         MyUser, related_name='favorite_artist', default=None, blank=True)
 
+    class Meta:
+        verbose_name = 'artist'
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=255, db_index=True)
@@ -198,7 +201,8 @@ class Artwork(models.Model):
     objects = ArtworkManager()
 
     class Meta:
-        verbose_name_plural = 'Artworks'
+        verbose_name = 'artwork'
+        verbose_name_plural = 'artworks'
         ordering = ('-created_at',)
 
     # e.g in django template,get URL links for all products by calling this
