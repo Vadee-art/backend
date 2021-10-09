@@ -9,9 +9,9 @@ from rest_framework import status
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def fetchArtists(request, pk):
+def fetchArtistList(request):
     artist = Artist.objects.all()
-    serializer = ArtistSerializer(artist, many=False)
+    serializer = ArtistSerializer(artist, many=True)
     return Response(serializer.data)
 
 

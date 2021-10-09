@@ -190,7 +190,7 @@ class Artwork(models.Model):
     art_location = models.TextField(blank=True)
     quantity = models.IntegerField(null=False, default=1)
     tags = models.ManyToManyField(Tag, blank=True)
-    price = models.DecimalField(max_digits=255, decimal_places=2)
+    price = models.IntegerField(null=False)
     favorites = models.ManyToManyField(
         MyUser, related_name='favorite_artworks', default=None, blank=True)
     in_stock = models.BooleanField(default=True)

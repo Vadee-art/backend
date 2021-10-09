@@ -4,7 +4,6 @@ from .models import MyUser, Artwork, Order, OrderItem, ShippingAddress, Artist, 
 
 
 class ArtistSerializer(serializers.ModelSerializer):
-    username = serializers.SerializerMethodField(read_only=True)
     firstName = serializers.SerializerMethodField(read_only=True)
     lastName = serializers.SerializerMethodField(read_only=True)
     photo = serializers.SerializerMethodField(read_only=True)
@@ -18,11 +17,6 @@ class ArtistSerializer(serializers.ModelSerializer):
         user = obj.user
         userId = user.id
         return userId
-
-    def get_username(self, obj):
-        user = obj.user
-        email = user.email
-        return email
 
     def get_firstName(self, obj):
         user = obj.user
