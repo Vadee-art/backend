@@ -102,6 +102,9 @@ class Artist(models.Model):
     class Meta:
         verbose_name = 'artist'
 
+    def __str__(self):
+        return self.user.first_name
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=255, db_index=True)
