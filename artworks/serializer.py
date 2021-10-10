@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import MyUser, Artwork, Order, OrderItem, ShippingAddress, Artist, Category, SubCategory, Tag
+from .models import Article, MyUser, Artwork, Order, OrderItem, Origin, ShippingAddress, Artist, Category, SubCategory, Tag
 
 
 class ArtistSerializer(serializers.ModelSerializer):
@@ -115,6 +115,12 @@ class CategorySerializer(serializers.ModelSerializer):
         return serializer.data
 
 
+class OriginSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = Origin
+        fields = '__all__'
+
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
@@ -205,3 +211,9 @@ class OrderSerializer(serializers.ModelSerializer):
         serializer = UserSerializer(user, many=False)
 
         return serializer.data
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Article
+        fields = '__all__'

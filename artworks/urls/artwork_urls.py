@@ -4,7 +4,9 @@ from artworks.views import artwork_views as views
 
 urlpatterns = [
     path('getSubcategory/', views.get_subcategory, name='sub_category_list'),
-    path('', views.fetchArtWorks, name='artworks'),
+    path('categories/', views.categories, name='category_list'),
+    path('', views.fetchArtworkList, name='artworks'),
+    path('origins/', views.fetchOriginList, name='origins'),
     path('delete/', views.deleteTheArtwork, name='artwork-delete'),
     path('create/', views.createTheArtWork, name='image-create'),
     path('upload/', views.uploadImage, name='artwork-upload'),

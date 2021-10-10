@@ -25,6 +25,7 @@ urlpatterns = [
     path('api/v1/artworks/', include('artworks.urls.artwork_urls')),
     path('api/v1/users/', include('artworks.urls.user_urls')),
     path('api/v1/artists/', include('artworks.urls.artist_urls')),
+    path('api/v1/articles/', include('artworks.urls.article_urls')),
     path('api/v1/orders/', include('artworks.urls.order_urls')),
 
 ]

@@ -26,7 +26,7 @@ class UserAdminConfig(UserAdmin):
     list_display = ('email', 'user_name', 'first_name', 'last_name', 'profile_picture',
                     'is_active', 'is_staff')
     fieldsets = (
-        (None, {'fields': ('email', 'user_name','country', 'city', 'phone_number', 'postal_code', 'address',
+        (None, {'fields': ('email', 'user_name', 'country', 'city', 'phone_number', 'postal_code', 'address',
          'first_name', 'last_name', 'profile_picture')}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
         ('Personal', {'fields': ('about',)}),
@@ -45,7 +45,7 @@ class UserAdminConfig(UserAdmin):
 class ArtworkAdminConfig(admin.ModelAdmin):
     model = Artwork
     ordering = ('-created_at',)
-    list_display = ['title', 'artist', 'category',
+    list_display = ['title', 'artist', 'category', 'origin',
                     'sub_category', 'price', 'created_at']
     prepopulated_fields = {'slug': ('title',)}
 
@@ -77,3 +77,5 @@ admin.site.register(Category, CategoryAdminConfig)
 admin.site.register(SubCategory)
 admin.site.register(Tag)
 admin.site.register(ShippingAddress)
+admin.site.register(Article)
+admin.site.register(Origin)

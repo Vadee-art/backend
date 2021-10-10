@@ -143,6 +143,15 @@ class SubCategory(models.Model):
         return self.name
 
 
+class Origin(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
+    country = models.CharField(max_length=255, db_index=True, default='')
+    city = models.CharField(max_length=255, db_index=True, default='')
+
+    def __str__(self):
+        return self.country
+
+
 class ArtworkManager(models.Manager):
     def get_queryset(self):
         return super(ArtworkManager, self).get_queryset().filter(is_active=True)
@@ -190,7 +199,7 @@ class Artwork(models.Model):
     isPrice = models.BooleanField(null=False, default=False)
     price = models.DecimalField(max_digits=12, decimal_places=0)
     about_work = models.TextField(blank=True)
-    art_location = models.TextField(blank=True)
+    origin = models.ForeignKey(Origin, on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(null=False, default=1)
     tags = models.ManyToManyField(Tag, blank=True)
     price = models.IntegerField(null=False)
@@ -269,3 +278,12 @@ class ShippingAddress(models.Model):
 
     def __str__(self):
         return self.address
+
+
+class Article(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
+    title = models.CharField(max_length=200, null=True, blank=True)
+    content = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.title

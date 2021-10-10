@@ -2,9 +2,9 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from artworks.serializer import ArtworkSerializer
+from artworks.serializer import ArtworkSerializer, OriginSerializer
 from django.contrib.auth.models import User
-from artworks.models import Artwork, Artist, SubCategory
+from artworks.models import Artwork, Artist, Category, MyUser, Origin, SubCategory
 from rest_framework import status
 from artworks.serializer import CategorySerializer
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -15,6 +15,7 @@ import json
 # for admin and change_form.html
 
 
+@api_view(['GET'])
 def get_subcategory(request):
     id = request.GET.get('id', '')
     result = list(SubCategory.objects.filter(
@@ -23,52 +24,82 @@ def get_subcategory(request):
 
 
 @api_view(['GET'])
-def sub_categories(request):
-    sub_categories = SubCategory.objects.all()
-    products = Artwork.objects.all()
-    serializer = CategorySerializer(sub_categories, many=True)
-
-    return Response({'categories': serializer.data})
+def categories(request):
+    categories = Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
-def fetchArtWorks(request):
+def fetchOriginList(request):
+    origins = Origin.objects.all()
+    serializer = OriginSerializer(origins, many=True)
+    return Response({'origins': serializer.data})
+
+
+@api_view(['GET'])
+def fetchArtworkList(request):
     query = request.query_params.get('keyword')
-    if query == None:
-        query = ''
-    # we could use any value instead of title
-    artworks = Artwork.objects.filter(
-        title__icontains=query).order_by('created_at')
-
-    # pagination
     page = request.query_params.get('page')
-    p = Paginator(artworks, 8)
+    query_region = request.query_params.get('regions')
+    query_artist = request.query_params.get('artist')
+    query_category = request.query_params.get('category')
 
-    try:
-        artworks = p.page(page)
-    except PageNotAnInteger:  # first render we have no page
-        artworks = p.page(1)
-    except EmptyPage:  # page does not exist return the last page
-        artworks = p.page(p.num_pages)
+    if query_category:
+        category = Category.objects.get(id=query_category)
+        artworks = Artwork.objects.filter(
+            category=category).order_by('created_at')
+        serializer = ArtworkSerializer(artworks, many=True)
+        return Response({'artworks': serializer.data})
 
-    if page == None:
-        page = 1
+    if query_artist:
+        artist = Artist.objects.get(_id=query_artist)
+        artworks = Artwork.objects.filter(
+            artist=artist).order_by('created_at')
+        serializer = ArtworkSerializer(artworks, many=True)
+        return Response({'artworks': serializer.data})
 
-    page = int(page)
+    elif query_region:
+        origin = Origin.objects.filter(
+            country__icontains=query_region).first()
+        artworks = Artwork.objects.filter(
+            origin=origin).order_by('created_at')
+        serializer = ArtworkSerializer(artworks, many=True)
+        return Response({'artworks': serializer.data})
 
-    serializer = ArtworkSerializer(artworks, many=True)
-    return Response({'artworks': serializer.data, 'page': page, 'pages': p.num_pages})
+    elif query == None:
+        query = ''
+        # we could use any value instead of title
+        artworks = Artwork.objects.filter(
+            title__icontains=query).order_by('created_at')
+        # pagination
+        p = Paginator(artworks, 8)
+
+        try:
+            artworks = p.page(page)
+        except PageNotAnInteger:  # first render we have no page
+            artworks = p.page(1)
+        except EmptyPage:  # page does not exist return the last page
+            artworks = p.page(p.num_pages)
+
+        if page == None:
+            page = 1
+
+        page = int(page)
+
+        serializer = ArtworkSerializer(artworks, many=True)
+        return Response({'artworks': serializer.data, 'page': page, 'pages': p.num_pages})
 
 
-@api_view(['GET'])
+@ api_view(['GET'])
 def fetchTheArtWork(request, pk):
     artwork = Artwork.objects.get(_id=pk)
     serializer = ArtworkSerializer(artwork, many=False)
     return Response(serializer.data)
 
 
-@api_view(['POST'])
-@permission_classes([IsAdminUser])
+@ api_view(['POST'])
+@ permission_classes([IsAdminUser])
 def createTheArtWork(request):
     user = request.user
     artist = Artist.objects.first()
@@ -91,13 +122,13 @@ def createTheArtWork(request):
         return Response('هیچ هنرمندی وچود ندارد')
 
 
-@api_view(['PUT'])
-@permission_classes([IsAdminUser])
+@ api_view(['PUT'])
+@ permission_classes([IsAdminUser])
 def updateTheArtwork(request, pk):
     data = request.data
     artwork = Artwork.objects.get(_id=pk)
     artist = Artist.objects.get(_id=data['artist'])
-    created_by = User.objects.get(id=data['created_by'])
+    created_by = MyUser.objects.get(_id=data['created_by'])
     artwork.created_by = created_by
     artwork.artist = artist
     artwork.title = data['title']
@@ -129,8 +160,8 @@ def updateTheArtwork(request, pk):
     return Response(serializer.data)
 
 
-@api_view(['DELETE'])
-@permission_classes([IsAdminUser])
+@ api_view(['DELETE'])
+@ permission_classes([IsAdminUser])
 def deleteTheArtwork(request):
     data = request.data
     selectedArtworks = data['selectedArtworks']
@@ -140,7 +171,7 @@ def deleteTheArtwork(request):
     return Response('artworks were deleted')
 
 
-@api_view(['POST'])
+@ api_view(['POST'])
 # @permission_classes([IsAdminUser])
 def uploadImage(request):
     data = request.data
