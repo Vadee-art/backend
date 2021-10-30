@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from artworks.serializer import ArtworkSerializer, UserSerializer, UserSerializerWithToken
+from artworks.serializer import ArtistSerializer, ArtworkSerializer, UserSerializer, UserSerializerWithToken
 from artworks.models import Artwork, Artist, MyUser
 from rest_framework import status
 
@@ -135,6 +135,7 @@ def deleteUser(request):
     return Response('users were deleted')
 
 
+# remove or add artwork to your favorites
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def addFavoriteArtwork(request, pk):
@@ -157,4 +158,30 @@ def addFavoriteArtwork(request, pk):
 def fetchFavoriteArtworkList(request):
     artworks = Artwork.objects.filter(favorites=request.user)
     serializer = ArtworkSerializer(artworks, many=True)
+    return Response({'favorites': serializer.data})
+
+
+# remove or add artists to your favorites
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def addFavoriteArtist(request, pk):
+    try:
+        artist = get_object_or_404(Artist, _id=pk)
+        if artist.favorites.filter(id=request.user.id).exists():
+            artist.favorites.remove(request.user)
+        else:
+            artist.favorites.add(request.user)
+            message = {'detail: We could not make any changes!'}
+
+        return Response(artist._id)
+    except:
+        message = {'detail: We could not make any changes!'}
+        return Response(message, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def fetchFavoriteArtistList(request):
+    artists = Artist.objects.filter(favorites=request.user)
+    serializer = ArtistSerializer(artists, many=True)
     return Response({'favorites': serializer.data})

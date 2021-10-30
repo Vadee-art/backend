@@ -117,6 +117,8 @@ class Category(models.Model):
     name = models.CharField(max_length=255, db_index=True)
     slug = models.SlugField(max_length=255, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_featured = models.BooleanField(default=False)
+    image = models.ImageField(null=True, default='/defaultImage.png')
 
     class Meta:
         ordering = ('-created_at', )
@@ -207,6 +209,7 @@ class Artwork(models.Model):
         MyUser, related_name='favorite_artworks', default=None, blank=True)
     in_stock = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
+    is_carousel = models.BooleanField(default=False)
     created_by = models.ForeignKey(
         MyUser, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -10,6 +10,12 @@ from rest_framework import status
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def fetchArtistList(request):
+    query_alphabet = request.query_params.get('artist')
+    if query_alphabet:
+        artists = Artist.objects.filter(text__startswith=query_alphabet).all()
+        serializer = ArtistSerializer(artists, many=True)
+        return Response({'artists': serializer.data})
+
     artist = Artist.objects.all()
     serializer = ArtistSerializer(artist, many=True)
     return Response(serializer.data)
