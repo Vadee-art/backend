@@ -3,6 +3,6 @@ from artworks.views import artist_views as views
 
 
 urlpatterns = [
-    path('', views.fetchArtistList, name='artists'),
-    path('<int:pk>/artworks/', views.fetchArtistArtworks, name='artist_artworks'),
+    path('', views.artist_list, name='artists'),
+    path('<int:pk>/', views.artist_by_id, name='artist_by_id'),
 ]

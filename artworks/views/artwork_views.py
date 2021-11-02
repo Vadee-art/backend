@@ -73,7 +73,7 @@ def fetchArtworkList(request):
         artworks = Artwork.objects.filter(
             title__icontains=query).order_by('created_at')
         # pagination
-        p = Paginator(artworks, 8)
+        p = Paginator(artworks, 10)
 
         try:
             artworks = p.page(page)

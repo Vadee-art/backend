@@ -85,27 +85,6 @@ class Achievement(models.Model):
         return self.title
 
 
-# Using settings.AUTH_USER_MODEL will delay the retrieval of the actual model class until all apps are loaded.
-class Artist(models.Model):
-    _id = models.AutoField(primary_key=True, editable=False)
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,)
-    photo = models.ImageField(null=True, default='/defaultImage.png')
-    birthday = models.DateField(default=date.today)
-    nationality = models.CharField(max_length=255, db_index=True)
-    biography = models.TextField(blank=True)
-    cv = models.TextField(blank=True)
-    achievements = models.ManyToManyField(Achievement, blank=True)
-    favorites = models.ManyToManyField(
-        MyUser, related_name='favorite_artist', default=None, blank=True)
-
-    class Meta:
-        verbose_name = 'artist'
-
-    def __str__(self):
-        return self.user.first_name
-
-
 class Tag(models.Model):
     name = models.CharField(max_length=255, db_index=True)
 
@@ -152,6 +131,27 @@ class Origin(models.Model):
 
     def __str__(self):
         return self.country
+
+
+class Artist(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,)
+    photo = models.ImageField(null=True, default='/defaultImage.png')
+    birthday = models.DateField(default=date.today)
+    origin = models.ForeignKey(Origin, on_delete=models.CASCADE, null=False)
+    biography = models.TextField(blank=True)
+    cv = models.TextField(blank=True)
+    achievements = models.ManyToManyField(Achievement, blank=True)
+    is_talent = models.BooleanField(default=False)
+    favorites = models.ManyToManyField(
+        MyUser, related_name='favorite_artist', default=None, blank=True)
+
+    class Meta:
+        verbose_name = 'artist'
+
+    def __str__(self):
+        return self.user.first_name
 
 
 class ArtworkManager(models.Manager):
@@ -248,9 +248,8 @@ class Order(models.Model):
     def __str__(self):
         return str(self.created_at)
 
+
 # cart
-
-
 class OrderItem(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)

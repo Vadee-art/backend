@@ -3,35 +3,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Article, MyUser, Artwork, Order, OrderItem, Origin, ShippingAddress, Artist, Category, SubCategory, Tag
 
 
-class ArtistSerializer(serializers.ModelSerializer):
-    firstName = serializers.SerializerMethodField(read_only=True)
-    lastName = serializers.SerializerMethodField(read_only=True)
-    photo = serializers.SerializerMethodField(read_only=True)
-    userId = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = Artist
-        fields = '__all__'
-
-    def get_userId(self, obj):
-        user = obj.user
-        userId = user.id
-        return userId
-
-    def get_firstName(self, obj):
-        user = obj.user
-        firstName = user.first_name
-        return firstName
-
-    def get_lastName(self, obj):
-        user = obj.user
-        lastName = user.last_name
-        return lastName
-
-    def get_photo(self, obj):
-        return obj.photo.url
-
-
 class UserSerializer(serializers.ModelSerializer):
     firstName = serializers.SerializerMethodField(read_only=True)
     lastName = serializers.SerializerMethodField(read_only=True)
@@ -127,6 +98,39 @@ class TagSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ArtistSerializer(serializers.ModelSerializer):
+    firstName = serializers.SerializerMethodField(read_only=True)
+    lastName = serializers.SerializerMethodField(read_only=True)
+    photo = serializers.SerializerMethodField(read_only=True)
+    userId = serializers.SerializerMethodField(read_only=True)
+    origin = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Artist
+        fields = '__all__'
+
+    def get_userId(self, obj):
+        user = obj.user
+        userId = user.id
+        return userId
+
+    def get_firstName(self, obj):
+        user = obj.user
+        firstName = user.first_name
+        return firstName
+
+    def get_lastName(self, obj):
+        user = obj.user
+        lastName = user.last_name
+        return lastName
+
+    def get_photo(self, obj):
+        return obj.photo.url
+
+    def get_origin(self, obj):
+        return obj.origin.country
+
+
 class ArtworkSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField(read_only=True)
     artist = serializers.SerializerMethodField(read_only=True)
@@ -138,7 +142,6 @@ class ArtworkSerializer(serializers.ModelSerializer):
         model = Artwork
         fields = '__all__'
 
-    # reverse query set
     def get_user(self, obj):
         user = obj.created_by
         serializer = UserSerializer(user, many=False)
