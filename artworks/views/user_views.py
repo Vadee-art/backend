@@ -61,6 +61,7 @@ def registerUser(request):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def updateUserProfile(request):
     user = request.user
 
