@@ -68,6 +68,13 @@ def updateUserProfile(request):
     data = request.data
     user.first_name = data['firstName']
     user.last_name = data['lastName']
+    if 'checked' in data:
+        user.country = data['country']
+        user.city = data['city']
+        user.province = data['province']
+        user.phone_number = data['phoneNumber']
+        user.postal_code = data['postalCode']
+        user.address = data['address']
     if 'email' in data:
         user.email = data['email']
         user.username = data['email']

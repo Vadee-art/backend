@@ -14,6 +14,7 @@ from .models import (
     ShippingAddress,
     SubCategory,
 )
+from admin_searchable_dropdown.filters import AutocompleteFilter
 
 
 class UserAdminConfig(UserAdmin):
@@ -26,7 +27,7 @@ class UserAdminConfig(UserAdmin):
     list_display = ('email', 'user_name', 'first_name', 'last_name', 'profile_picture',
                     'is_active', 'is_staff')
     fieldsets = (
-        (None, {'fields': ('email', 'user_name', 'country', 'city', 'phone_number', 'postal_code', 'address',
+        (None, {'fields': ('email', 'user_name', 'country', 'city', 'province', 'phone_number', 'postal_code', 'address',
          'first_name', 'last_name', 'profile_picture')}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
         ('Personal', {'fields': ('about',)}),
@@ -42,12 +43,24 @@ class UserAdminConfig(UserAdmin):
     )
 
 
+class ArtistAdminConfig(admin.ModelAdmin):
+    model = Artist
+    ordering = ('-_id',)
+    list_display = ['user', '_id']
+    # this is required for django's autocomplete functionality / when adding user to artist
+    # search bar / allow reference autocomplete from ArtworkAdminConfig
+    search_fields = ['_id']
+    autocomplete_fields = ['user']
+
+
 class ArtworkAdminConfig(admin.ModelAdmin):
     model = Artwork
     ordering = ('-created_at',)
     list_display = ['title', 'artist', 'category', 'origin',
-                    'sub_category', 'price', 'created_at']
+                    'sub_category', 'price', 'created_at', '_id']
     prepopulated_fields = {'slug': ('title',)}
+    search_fields = ('title', '_id')
+    autocomplete_fields = ['artist']
 
 
 class CategoryAdminConfig(admin.ModelAdmin):
@@ -70,7 +83,7 @@ class OrderItemAdminConfig(admin.ModelAdmin):
 admin.site.register(MyUser, UserAdminConfig)
 admin.site.register(Artwork, ArtworkAdminConfig)
 admin.site.register(Achievement)
-admin.site.register(Artist)
+admin.site.register(Artist, ArtistAdminConfig)
 admin.site.register(Order, OrderAdminConfig)
 admin.site.register(OrderItem, OrderItemAdminConfig)
 admin.site.register(Category, CategoryAdminConfig)
@@ -79,3 +92,5 @@ admin.site.register(Tag)
 admin.site.register(ShippingAddress)
 admin.site.register(Article)
 admin.site.register(Origin)
+admin.site.register(TheToken)
+admin.site.register(Signature)

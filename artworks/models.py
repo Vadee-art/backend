@@ -5,6 +5,7 @@ from django.conf import settings
 from django.urls import reverse
 from datetime import date
 from django.utils import timezone
+from django.contrib import admin
 
 
 from django.contrib.auth.models import (
@@ -51,6 +52,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=150, blank=True)
     country = models.CharField(max_length=150, blank=True)
     city = models.CharField(max_length=150, blank=True)
+    province = models.CharField(max_length=150, blank=True)
     phone_number = models.CharField(max_length=150, blank=True)
     postal_code = models.CharField(max_length=150, blank=True)
     address = models.CharField(max_length=250, blank=True)
@@ -151,7 +153,36 @@ class Artist(models.Model):
         verbose_name = 'artist'
 
     def __str__(self):
-        return self.user.first_name
+        return self.user.email
+
+
+class TheToken(models.Model):
+    tokenID = models.CharField(
+        max_length=250, null=True, blank=True, unique=True)
+    holder = models.OneToOneField(
+        MyUser, on_delete=models.CASCADE, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    contract = models.CharField(max_length=250, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'NFT'
+
+    def __str__(self):
+        return str(self.tokenID)
+
+
+class Signature(models.Model):
+    token_id = models.IntegerField(default=0, unique=True)
+    price = models.CharField(max_length=350, default="")
+    token_Uri = models.CharField(max_length=350, default="")
+    content = models.CharField(max_length=350, default="")
+    signature = models.CharField(max_length=350, default="")
+
+    class Meta:
+        verbose_name = 'signature'
+
+    def __str__(self):
+        return self.token_Uri
 
 
 class ArtworkManager(models.Manager):
@@ -175,9 +206,9 @@ class Artwork(models.Model):
     artist = models.ForeignKey(
         Artist, on_delete=models.SET_NULL, null=True)
     category = models.ForeignKey(
-        Category, related_name='product_category', on_delete=models.CASCADE)
+        Category, related_name='artwork_category', on_delete=models.CASCADE)
     sub_category = models.ForeignKey(
-        SubCategory, related_name='product_sub_category', on_delete=models.CASCADE)
+        SubCategory, related_name='artwork_sub_category', on_delete=models.CASCADE)
     title = models.CharField(max_length=200, null=True,
                              blank=True, default='no title')
     subtitle = models.CharField(max_length=200, null=True, blank=True)
@@ -207,6 +238,12 @@ class Artwork(models.Model):
     price = models.IntegerField(null=False)
     favorites = models.ManyToManyField(
         MyUser, related_name='favorite_artworks', default=None, blank=True)
+
+    NFT = models.OneToOneField(
+        TheToken, on_delete=models.CASCADE, null=True, blank=True)
+    signer_address = models.CharField(max_length=255, blank=True)
+    signature = models.ForeignKey(
+        Signature, on_delete=models.CASCADE, related_name='artwork_signature', null=True, blank=True)
     in_stock = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     is_carousel = models.BooleanField(default=False)
@@ -220,7 +257,7 @@ class Artwork(models.Model):
         verbose_name_plural = 'artworks'
         ordering = ('-created_at',)
 
-    # e.g in django template,get URL links for all products by calling this
+    # e.g in django template,get URL links for all artworks by calling this
     def get_absolute_url(self):
         return reverse('artworks: artwork_detail', args=[self.slug])
 

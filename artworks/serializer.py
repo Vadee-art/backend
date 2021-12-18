@@ -1,6 +1,7 @@
+from django.db.models import fields
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Article, MyUser, Artwork, Order, OrderItem, Origin, ShippingAddress, Artist, Category, SubCategory, Tag
+from .models import Article, MyUser, Artwork, Order, OrderItem, Origin, ShippingAddress, Artist, Category, Signature, SubCategory, Tag
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -8,6 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
     lastName = serializers.SerializerMethodField(read_only=True)
     country = serializers.SerializerMethodField(read_only=True)
     city = serializers.SerializerMethodField(read_only=True)
+    province = serializers.SerializerMethodField(read_only=True)
     phoneNumber = serializers.SerializerMethodField(read_only=True)
     postalCode = serializers.SerializerMethodField(read_only=True)
     address = serializers.SerializerMethodField(read_only=True)
@@ -18,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyUser
         fields = ['id', '_id', 'username', 'email',
-                  'firstName', 'lastName', 'country', 'city', 'phoneNumber', 'postalCode', 'address', 'isAdmin']
+                  'firstName', 'lastName', 'country', 'city', 'province', 'phoneNumber', 'postalCode', 'address', 'isAdmin']
 
     # for changing id to _id and keeping the same convention
     def get__id(self, obj):
@@ -41,6 +43,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_city(self, obj):
         return obj.city
+
+    def get_province(self, obj):
+        return obj.province
 
     def get_phoneNumber(self, obj):
         return obj.phone_number
@@ -98,6 +103,12 @@ class TagSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SignatureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Signature
+        fields = '__all__'
+
+
 class ArtistSerializer(serializers.ModelSerializer):
     firstName = serializers.SerializerMethodField(read_only=True)
     lastName = serializers.SerializerMethodField(read_only=True)
@@ -137,6 +148,7 @@ class ArtworkSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField(read_only=True)
     category = serializers.SerializerMethodField(read_only=True)
     sub_category = serializers.SerializerMethodField(read_only=True)
+    signature = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Artwork
@@ -165,6 +177,11 @@ class ArtworkSerializer(serializers.ModelSerializer):
     def get_sub_category(self, obj):
         sub_category = obj.sub_category
         serializer = SubCategorySerializer(sub_category, many=False)
+        return serializer.data
+
+    def get_signature(self, obj):
+        signature = obj.signature
+        serializer = SignatureSerializer(signature ,many=False)
         return serializer.data
 
 

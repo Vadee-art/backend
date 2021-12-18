@@ -31,7 +31,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # DEBUG = False
 DEBUG = os.getenv('DEBUG', 0)
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'www.vadee.net', 'www.v1.vadee.net', '192.168.1.36']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1',
+                 'www.vadee.net', 'www.v1.vadee.net', '192.168.1.36']
 ALLOWED_HOSTS_ENV = os.environ.get('ALLOWED_HOSTS')
 if ALLOWED_HOSTS_ENV:
     ALLOWED_HOSTS.extend(ALLOWED_HOSTS_ENV.split(','))
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'artworks',
+    'admin_searchable_dropdown',
 
     'django.contrib.admin',
     'django.contrib.auth',
