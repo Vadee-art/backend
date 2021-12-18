@@ -20,7 +20,7 @@ from admin_searchable_dropdown.filters import AutocompleteFilter
 class UserAdminConfig(UserAdmin):
     model = MyUser
     search_fields = ('email', 'user_name', 'first_name',
-                     'last_name', 'profile_picture')
+                     'last_name')
     list_filter = ('email', 'user_name', 'first_name', 'last_name',
                    'profile_picture', 'is_active', 'is_staff')
     ordering = ('-created_at',)
@@ -43,6 +43,11 @@ class UserAdminConfig(UserAdmin):
     )
 
 
+class ArtworkArtistFilter(AutocompleteFilter):
+    title = 'Artist'  # display title
+    field_name = 'artist'  # name of the foreign key field
+
+
 class ArtistAdminConfig(admin.ModelAdmin):
     model = Artist
     ordering = ('-_id',)
@@ -59,7 +64,7 @@ class ArtworkAdminConfig(admin.ModelAdmin):
     list_display = ['title', 'artist', 'category', 'origin',
                     'sub_category', 'price', 'created_at', '_id']
     prepopulated_fields = {'slug': ('title',)}
-    search_fields = ('title', '_id')
+    list_filter = [ArtworkArtistFilter]
     autocomplete_fields = ['artist']
 
 
