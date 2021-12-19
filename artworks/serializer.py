@@ -1,7 +1,13 @@
 from django.db.models import fields
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Article, MyUser, Artwork, Order, OrderItem, Origin, ShippingAddress, Artist, Category, Signature, SubCategory, Tag
+from .models import Article, MyUser, Artwork, Order, OrderItem, Origin, ShippingAddress, Artist, Category, TheMarketPlace, Voucher, SubCategory, Tag
+
+
+class MarketPlaceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TheMarketPlace
+        fields = '__all__'
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -13,6 +19,8 @@ class UserSerializer(serializers.ModelSerializer):
     phoneNumber = serializers.SerializerMethodField(read_only=True)
     postalCode = serializers.SerializerMethodField(read_only=True)
     address = serializers.SerializerMethodField(read_only=True)
+    wallet_address = serializers.SerializerMethodField(read_only=True)
+    store_address = serializers.SerializerMethodField(read_only=True)
     username = serializers.SerializerMethodField(read_only=True)
     _id = serializers.SerializerMethodField(read_only=True)
     isAdmin = serializers.SerializerMethodField(read_only=True)
@@ -20,7 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyUser
         fields = ['id', '_id', 'username', 'email',
-                  'firstName', 'lastName', 'country', 'city', 'province', 'phoneNumber', 'postalCode', 'address', 'isAdmin']
+                  'firstName', 'lastName', 'country', 'city', 'province', 'phoneNumber', 'postalCode', 'address', 'isAdmin','wallet_address', 'store_address']
 
     # for changing id to _id and keeping the same convention
     def get__id(self, obj):
@@ -56,6 +64,11 @@ class UserSerializer(serializers.ModelSerializer):
     def get_address(self, obj):
         return obj.address
 
+    def get_wallet_address(self, obj):
+        return obj.wallet_address
+        
+    def get_store_address(self, obj):
+        return obj.store_address
 
 class UserSerializerWithToken(UserSerializer):
     token = serializers.SerializerMethodField(read_only=True)
@@ -103,9 +116,9 @@ class TagSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SignatureSerializer(serializers.ModelSerializer):
+class VoucherSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Signature
+        model = Voucher
         fields = '__all__'
 
 
@@ -148,7 +161,7 @@ class ArtworkSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField(read_only=True)
     category = serializers.SerializerMethodField(read_only=True)
     sub_category = serializers.SerializerMethodField(read_only=True)
-    signature = serializers.SerializerMethodField(read_only=True)
+    voucher = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Artwork
@@ -179,9 +192,9 @@ class ArtworkSerializer(serializers.ModelSerializer):
         serializer = SubCategorySerializer(sub_category, many=False)
         return serializer.data
 
-    def get_signature(self, obj):
-        signature = obj.signature
-        serializer = SignatureSerializer(signature ,many=False)
+    def get_voucher(self, obj):
+        voucher = obj.voucher
+        serializer = VoucherSerializer(voucher, many=False)
         return serializer.data
 
 

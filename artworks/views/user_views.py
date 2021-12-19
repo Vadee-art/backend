@@ -193,3 +193,31 @@ def fetchFavoriteArtistList(request):
     artists = Artist.objects.filter(favorites=request.user)
     serializer = ArtistSerializer(artists, many=True)
     return Response({'favorites': serializer.data})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def fetchMyArtworks(request):
+    try:
+        artist = Artist.objects.get(user=request.user)
+        artworks = Artwork.objects.filter(artist=artist)
+        serializer = ArtworkSerializer(artworks, many=True)
+        return Response({'my_artworks': serializer.data})
+
+    except:
+        message = {'details': 'No Artworks'}
+        return Response(message, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateUserStore(request):
+    user = request.user
+
+    data = request.data
+    user.store_address = data['storeAddress']
+
+    user.save()
+    serializer = UserSerializerWithToken(user, many=False)
+
+    return Response(serializer.data)

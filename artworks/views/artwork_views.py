@@ -2,9 +2,9 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from artworks.serializer import ArtworkSerializer, OriginSerializer
+from artworks.serializer import ArtworkSerializer, OriginSerializer, VoucherSerializer
 from django.contrib.auth.models import User
-from artworks.models import Artwork, Artist, Category, MyUser, Origin, SubCategory
+from artworks.models import Artwork, Artist, Category, MyUser, Origin, SubCategory, Voucher
 from rest_framework import status
 from artworks.serializer import CategorySerializer
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -31,7 +31,7 @@ def categories(request):
 
 
 @api_view(['GET'])
-def fetchOriginList(request):
+def fetch_origin_list(request):
     origins = Origin.objects.all()
     serializer = OriginSerializer(origins, many=True)
     return Response({'origins': serializer.data})
@@ -92,7 +92,7 @@ def fetchArtworkList(request):
 
 
 @ api_view(['GET'])
-def fetchTheArtWork(request, pk):
+def fetch_the_artwork(request, pk):
     artwork = Artwork.objects.get(_id=pk)
     serializer = ArtworkSerializer(artwork, many=False)
     return Response(serializer.data)
@@ -100,7 +100,7 @@ def fetchTheArtWork(request, pk):
 
 @ api_view(['POST'])
 @ permission_classes([IsAdminUser])
-def createTheArtWork(request):
+def create_the_artwork(request):
     user = request.user
     artist = Artist.objects.first()
     if user and artist:
@@ -122,47 +122,37 @@ def createTheArtWork(request):
         return Response('هیچ هنرمندی وچود ندارد')
 
 
-@ api_view(['PUT'])
-@ permission_classes([IsAdminUser])
-def updateTheArtwork(request, pk):
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_the_artwork(request, pk, action):
+    user = request.user
     data = request.data
     artwork = Artwork.objects.get(_id=pk)
-    artist = Artist.objects.get(_id=data['artist'])
-    created_by = MyUser.objects.get(_id=data['created_by'])
-    artwork.created_by = created_by
-    artwork.artist = artist
-    artwork.title = data['title']
-    artwork.subtitle = data['subtitle']
-    artwork.year = data['year']
-    artwork.category = data['category']
-    artwork.medium = data['medium']
-    artwork.condition = data['condition']
-    artwork.classifications = data['classifications']
-    artwork.width = data['width']
-    artwork.height = data['height']
-    artwork.depth = data['depth']
-    artwork.unit = data['unit']
-    artwork.isAnEdition = data['isAnEdition']
-    artwork.editionNum = data['editionNum']
-    artwork.editionSize = data['editionSize']
-    artwork.is_signed = data['is_signed']
-    artwork.is_authenticated = data['is_authenticated']
-    artwork.frame = data['frame']
-    artwork.isPrice = data['isPrice']
-    artwork.price = data['price']
-    artwork.about_work = data['about_work']
-    artwork.provenance = data['provenance']
-    artwork.art_location = data['art_location']
-    artwork.quantity = data['quantity']
 
-    artwork.save()
-    serializer = ArtworkSerializer(artwork, many=False)
-    return Response(serializer.data)
+    # 1 - Action Sign: update product when sign the product
+    if user and action == 'Signing':
+        sellingPrice = hex(int(data['sellingPrice']))
+
+        voucher = Voucher.objects.create(
+            artwork_id=int(data['artworkId']),
+            price=sellingPrice,
+            token_Uri=data['tokenUri'],
+            content=data['content'],
+            signature=data['signature']
+        )
+        voucher.save()
+
+        artwork.voucher = voucher
+        artwork.signer_address = data['sellerAddress']
+        artwork.on_market = True
+        artwork.save()
+        serializer = VoucherSerializer(voucher, many=False)
+        return Response({'voucher': serializer.data})
 
 
 @ api_view(['DELETE'])
 @ permission_classes([IsAdminUser])
-def deleteTheArtwork(request):
+def delete_the_artwork(request):
     data = request.data
     selectedArtworks = data['selectedArtworks']
     for _id in selectedArtworks:
@@ -173,7 +163,7 @@ def deleteTheArtwork(request):
 
 @ api_view(['POST'])
 # @permission_classes([IsAdminUser])
-def uploadImage(request):
+def upload_image(request):
     data = request.data
     artwork_id = data['artworkId']
     artwork = Artwork.objects.get(_id=artwork_id)

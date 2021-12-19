@@ -28,7 +28,7 @@ class UserAdminConfig(UserAdmin):
                     'is_active', 'is_staff')
     fieldsets = (
         (None, {'fields': ('email', 'user_name', 'country', 'city', 'province', 'phone_number', 'postal_code', 'address',
-         'first_name', 'last_name', 'profile_picture')}),
+         'first_name', 'last_name', 'profile_picture', 'wallet_address', 'store_address')}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
         ('Personal', {'fields': ('about',)}),
     )
@@ -97,5 +97,6 @@ admin.site.register(Tag)
 admin.site.register(ShippingAddress)
 admin.site.register(Article)
 admin.site.register(Origin)
+admin.site.register(TheMarketPlace)
 admin.site.register(TheToken)
-admin.site.register(Signature)
+admin.site.register(Voucher)

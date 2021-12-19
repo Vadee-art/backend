@@ -16,6 +16,27 @@ from django.contrib.auth.models import (
 )
 
 
+class TheMarketPlace(models.Model):
+    contract = models.CharField(max_length=250, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Market Place'
+
+    def fetch_transaction_fee(self, price):
+        if(price < 50):
+            transaction_fee = 0.0 * price
+        elif(50 < price < 500):
+            transaction_fee = 0.005 * price
+        else:
+            transaction_fee = 0.01 * price
+
+        return transaction_fee
+
+    def __str__(self):
+        return str(self.created_at)
+
+
 class MyUserManager(BaseUserManager):
     # super user
     def create_superuser(self, email, user_name, first_name, password, **other_fields):
@@ -62,6 +83,8 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+    store_address = models.CharField(max_length=250, blank=True)
+    wallet_address = models.CharField(max_length=250, null=True, blank=True)
 
     objects = MyUserManager()
 
@@ -171,15 +194,15 @@ class TheToken(models.Model):
         return str(self.tokenID)
 
 
-class Signature(models.Model):
-    token_id = models.IntegerField(default=0, unique=True)
+class Voucher(models.Model):
+    artwork_id = models.IntegerField(default=0, unique=True)
     price = models.CharField(max_length=350, default="")
     token_Uri = models.CharField(max_length=350, default="")
     content = models.CharField(max_length=350, default="")
     signature = models.CharField(max_length=350, default="")
 
     class Meta:
-        verbose_name = 'signature'
+        verbose_name = 'voucher'
 
     def __str__(self):
         return self.token_Uri
@@ -241,9 +264,11 @@ class Artwork(models.Model):
 
     NFT = models.OneToOneField(
         TheToken, on_delete=models.CASCADE, null=True, blank=True)
+    is_minted = models.BooleanField(default=False)
+    on_market = models.BooleanField(default=False)
     signer_address = models.CharField(max_length=255, blank=True)
-    signature = models.ForeignKey(
-        Signature, on_delete=models.CASCADE, related_name='artwork_signature', null=True, blank=True)
+    voucher = models.ForeignKey(
+        Voucher, on_delete=models.SET_NULL, related_name='artwork_signature', null=True, blank=True)
     in_stock = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     is_carousel = models.BooleanField(default=False)
