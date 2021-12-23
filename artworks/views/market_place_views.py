@@ -10,7 +10,6 @@ import requests
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def fetch_market_place(request):
     market_place = TheMarketPlace.objects.first()
     serializer = MarketPlaceSerializer(market_place, many=False)
@@ -20,25 +19,22 @@ def fetch_market_place(request):
 @api_view(['GET'])
 def fetch_transaction_fee(request, price):
     response = requests.get(
-        'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=cad')
+        'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')
     data = response.json()
-    ether_price = data['ethereum']['cad']
+    ether_price = data['ethereum']['usd']  # e.g $3950
     market_place = TheMarketPlace.objects.first()
-    oneL_fee_allocation = market_place.oneL_fee_allocation
-    flu_fee_allocation = market_place.flu_fee_allocation
-    chain_fee_allocation = market_place.chain_fee_allocation
 
-    transaction_fee_ether = market_place.fetch_transaction_fee(float(price))
+    transaction_fee_dollar = market_place.fetch_transaction_fee(float(price))
 
-    transaction_fee_dollar = market_place.fetch_transaction_fee(
-        float(int(data['ethereum']['cad']) * float(price)))
+    # e.g ETH 1.5251
+    transaction_fee_ether = (
+        float(1/(int(data['ethereum']['usd'])) * transaction_fee_dollar))
 
     return HttpResponse(json.dumps({
+        'ether_price': str(ether_price),
         'transaction_fee_ether': str(transaction_fee_ether),
-        'transaction_fee_dollar': str(transaction_fee_dollar),
-        'oneL_fee_allocation': str(oneL_fee_allocation),
-        'flu_fee_allocation': str(flu_fee_allocation),
-        'chain_transactchain_fee': str(chain_fee_allocation)}), content_type="application/json")
+        'transaction_fee_dollar': str(transaction_fee_dollar)}),
+        content_type="application/json")
 
 
 @ api_view(['PUT'])

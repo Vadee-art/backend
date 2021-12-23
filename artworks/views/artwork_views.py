@@ -4,13 +4,14 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from artworks.serializer import ArtworkSerializer, OriginSerializer, VoucherSerializer
 from django.contrib.auth.models import User
-from artworks.models import Artwork, Artist, Category, MyUser, Origin, SubCategory, Voucher
+from artworks.models import Artwork, Artist, Category, MyUser, Origin, SubCategory, TheMarketPlace, Voucher
 from rest_framework import status
 from artworks.serializer import CategorySerializer
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework import status
 from django.http import HttpResponse
 import json
+import requests
 
 # for admin and change_form.html
 
@@ -98,30 +99,6 @@ def fetch_the_artwork(request, pk):
     return Response(serializer.data)
 
 
-@ api_view(['POST'])
-@ permission_classes([IsAdminUser])
-def create_the_artwork(request):
-    user = request.user
-    artist = Artist.objects.first()
-    if user and artist:
-        artwork = Artwork.objects.create(
-            created_by=user,
-            artist=artist,
-            title='Default Title',
-            subtitle='Default Subitle',
-            about_work='empty!',
-            provenance='empty!',
-            width=0,
-            height=0,
-            depth=0,
-            price=0,
-        )
-        serializer = ArtworkSerializer(artwork, many=False)
-        return Response(serializer.data)
-    else:
-        return Response('هیچ هنرمندی وچود ندارد')
-
-
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_the_artwork(request, pk, action):
@@ -131,11 +108,10 @@ def update_the_artwork(request, pk, action):
 
     # 1 - Action Sign: update product when sign the product
     if user and action == 'Signing':
-        sellingPrice = hex(int(data['sellingPrice']))
-
         voucher = Voucher.objects.create(
+            title=data['title'],
             artwork_id=int(data['artworkId']),
-            price=sellingPrice,
+            price=data['sellingPrice'],
             token_Uri=data['tokenUri'],
             content=data['content'],
             signature=data['signature']
@@ -143,6 +119,7 @@ def update_the_artwork(request, pk, action):
         voucher.save()
 
         artwork.voucher = voucher
+        artwork.price_eth = data['sellingPrice']
         artwork.signer_address = data['sellerAddress']
         artwork.on_market = True
         artwork.save()
@@ -159,15 +136,3 @@ def delete_the_artwork(request):
         artworkDeleting = Artwork.objects.get(_id=_id)
         artworkDeleting.delete()
     return Response('artworks were deleted')
-
-
-@ api_view(['POST'])
-# @permission_classes([IsAdminUser])
-def upload_image(request):
-    data = request.data
-    artwork_id = data['artworkId']
-    artwork = Artwork.objects.get(_id=artwork_id)
-
-    artwork.image = request.FILES.get('image')
-    artwork.save()
-    return Response('عکس شما در دیتابیس ذخیره شد')

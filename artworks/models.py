@@ -27,9 +27,9 @@ class TheMarketPlace(models.Model):
         if(price < 50):
             transaction_fee = 0.0 * price
         elif(50 < price < 500):
-            transaction_fee = 0.005 * price
+            transaction_fee = 0.02 * price
         else:
-            transaction_fee = 0.01 * price
+            transaction_fee = 0.05 * price
 
         return transaction_fee
 
@@ -195,6 +195,7 @@ class TheToken(models.Model):
 
 
 class Voucher(models.Model):
+    title = models.CharField(max_length=350, default="")
     artwork_id = models.IntegerField(default=0, unique=True)
     price = models.CharField(max_length=350, default="")
     token_Uri = models.CharField(max_length=350, default="")
@@ -259,6 +260,7 @@ class Artwork(models.Model):
     quantity = models.IntegerField(null=False, default=1)
     tags = models.ManyToManyField(Tag, blank=True)
     price = models.IntegerField(null=False)
+    price_eth = models.CharField(max_length=200, null=True, blank=True)
     favorites = models.ManyToManyField(
         MyUser, related_name='favorite_artworks', default=None, blank=True)
 
