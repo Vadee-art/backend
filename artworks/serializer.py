@@ -20,15 +20,15 @@ class UserSerializer(serializers.ModelSerializer):
     postalCode = serializers.SerializerMethodField(read_only=True)
     address = serializers.SerializerMethodField(read_only=True)
     wallet_address = serializers.SerializerMethodField(read_only=True)
-    store_address = serializers.SerializerMethodField(read_only=True)
     username = serializers.SerializerMethodField(read_only=True)
+    artist = serializers.SerializerMethodField(read_only=True)
     _id = serializers.SerializerMethodField(read_only=True)
     isAdmin = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = MyUser
-        fields = ['id', '_id', 'username', 'email',
-                  'firstName', 'lastName', 'country', 'city', 'province', 'phoneNumber', 'postalCode', 'address', 'isAdmin','wallet_address', 'store_address']
+        fields = ['id', '_id', 'artist', 'username', 'email',
+                  'firstName', 'lastName', 'country', 'city', 'province', 'phoneNumber', 'postalCode', 'address', 'isAdmin', 'wallet_address']
 
     # for changing id to _id and keeping the same convention
     def get__id(self, obj):
@@ -66,9 +66,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_wallet_address(self, obj):
         return obj.wallet_address
-        
-    def get_store_address(self, obj):
-        return obj.store_address
+
+        # reverse query set
+    def get_artist(self, obj):
+        artist = obj.artist
+        serializer = ArtistSerializer(artist, many=False)
+        return serializer.data
+
 
 class UserSerializerWithToken(UserSerializer):
     token = serializers.SerializerMethodField(read_only=True)
@@ -123,15 +127,20 @@ class VoucherSerializer(serializers.ModelSerializer):
 
 
 class ArtistSerializer(serializers.ModelSerializer):
+    _id = serializers.SerializerMethodField(read_only=True)
     firstName = serializers.SerializerMethodField(read_only=True)
     lastName = serializers.SerializerMethodField(read_only=True)
     photo = serializers.SerializerMethodField(read_only=True)
     userId = serializers.SerializerMethodField(read_only=True)
     origin = serializers.SerializerMethodField(read_only=True)
+    gallery_address = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Artist
         fields = '__all__'
+
+    def get__id(self, obj):
+        return obj._id
 
     def get_userId(self, obj):
         user = obj.user
@@ -153,6 +162,9 @@ class ArtistSerializer(serializers.ModelSerializer):
 
     def get_origin(self, obj):
         return obj.origin.country
+
+    def get_gallery_address(self, obj):
+        return obj.gallery_address
 
 
 class ArtworkSerializer(serializers.ModelSerializer):

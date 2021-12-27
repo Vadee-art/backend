@@ -111,20 +111,28 @@ def update_the_artwork(request, pk, action):
         voucher = Voucher.objects.create(
             title=data['title'],
             artwork_id=int(data['artworkId']),
-            price=data['sellingPrice'],
+            edition_number=data['editionNumber'],
+            edition=data['edition'],
+            price_wei=data['priceWei'],
+            price_dollar=data['priceDollar'],
             token_Uri=data['tokenUri'],
             content=data['content'],
             signature=data['signature']
         )
         voucher.save()
 
+        artwork.seller = user
+        artwork.owner = user
         artwork.voucher = voucher
-        artwork.price_eth = data['sellingPrice']
-        artwork.signer_address = data['sellerAddress']
         artwork.on_market = True
         artwork.save()
         serializer = VoucherSerializer(voucher, many=False)
         return Response({'voucher': serializer.data})
+
+    # 2 - Action Redeem and Mint: update product when mint the product
+    elif user and action == 'RedeemAndMint':
+        seller_wallet_address = data['sellerAddress']
+        buyer_wallet_address = data['sellerAddress']
 
 
 @ api_view(['DELETE'])
@@ -136,3 +144,11 @@ def delete_the_artwork(request):
         artworkDeleting = Artwork.objects.get(_id=_id)
         artworkDeleting.delete()
     return Response('artworks were deleted')
+
+
+@ api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_the_voucher(request, pk):
+    voucher = Voucher.objects.get(_id=pk)
+    voucher.delete()
+    return Response('signature was deleted')

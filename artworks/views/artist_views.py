@@ -26,4 +26,16 @@ def artist_by_id(request, pk):
         artist=artist).order_by('created_at')
     serializerArtist = ArtistSerializer(artist, many=False)
     serializerArtworks = ArtworkSerializer(artworks, many=True)
-    return Response({'details': serializerArtist.data, 'artworks': serializerArtworks.data})
+    return Response({'artist': serializerArtist.data, 'artworks': serializerArtworks.data})
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_artist_gallery(request, pk):
+    artist = Artist.objects.get(_id=pk)
+    data = request.data
+    artist.gallery_address = data['galleryAddress']
+    artist.wallet_address = data['artistWalletAddress']
+    artist.save()
+    serializer = ArtistSerializer(artist, many=False)
+    return Response(serializer.data)

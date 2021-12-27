@@ -6,6 +6,7 @@ from django.urls import reverse
 from datetime import date
 from django.utils import timezone
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 
 
 from django.contrib.auth.models import (
@@ -17,19 +18,28 @@ from django.contrib.auth.models import (
 
 
 class TheMarketPlace(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
     contract = models.CharField(max_length=250, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    low_boundary = models.IntegerField(default=150, unique=True)  # 100 dollar
+    mid_boundary = models.IntegerField(default=1000, unique=True)  # 500 dollar
+    low_boundary_constant = models.FloatField(
+        default=10, unique=True)  # 10 dollar
+    mid_boundary_percentage = models.FloatField(
+        default=0.02, unique=True)  # 2%
+    high_boundary_percantage = models.FloatField(
+        default=0.05, unique=True)  # 5
 
     class Meta:
         verbose_name = 'Market Place'
 
-    def fetch_transaction_fee(self, price):
-        if(price < 50):
-            transaction_fee = 0.0 * price
-        elif(50 < price < 500):
-            transaction_fee = 0.02 * price
+    def fetch_transaction_fee(self, price):  # price in dollar
+        if(price < self.low_boundary):
+            transaction_fee = self.low_boundary_constant
+        elif(self.low_boundary < price < self.mid_boundary):
+            transaction_fee = self.mid_boundary_percentage * price
         else:
-            transaction_fee = 0.05 * price
+            transaction_fee = self.high_boundary_percantage * price
 
         return transaction_fee
 
@@ -83,7 +93,6 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
-    store_address = models.CharField(max_length=250, blank=True)
     wallet_address = models.CharField(max_length=250, null=True, blank=True)
 
     objects = MyUserManager()
@@ -111,6 +120,7 @@ class Achievement(models.Model):
 
 
 class Tag(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
     name = models.CharField(max_length=255, db_index=True)
 
     def __str__(self):
@@ -118,6 +128,7 @@ class Tag(models.Model):
 
 
 class Category(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
     name = models.CharField(max_length=255, db_index=True)
     slug = models.SlugField(max_length=255, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -134,6 +145,7 @@ class Category(models.Model):
 
 
 class SubCategory(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
     name = models.CharField(max_length=255, db_index=True)
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True)
@@ -160,6 +172,8 @@ class Origin(models.Model):
 
 class Artist(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
+    wallet_address = models.CharField(max_length=255, blank=True)
+    gallery_address = models.CharField(max_length=250, blank=True)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,)
     photo = models.ImageField(null=True, default='/defaultImage.png')
@@ -180,6 +194,7 @@ class Artist(models.Model):
 
 
 class TheToken(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
     tokenID = models.CharField(
         max_length=250, null=True, blank=True, unique=True)
     holder = models.OneToOneField(
@@ -195,9 +210,13 @@ class TheToken(models.Model):
 
 
 class Voucher(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
     title = models.CharField(max_length=350, default="")
     artwork_id = models.IntegerField(default=0, unique=True)
-    price = models.CharField(max_length=350, default="")
+    edition_number = models.CharField(max_length=350, default="")
+    edition = models.CharField(max_length=350, default="")
+    price_wei = models.CharField(max_length=350, default="")
+    price_dollar = models.CharField(max_length=350, default="")
     token_Uri = models.CharField(max_length=350, default="")
     content = models.CharField(max_length=350, default="")
     signature = models.CharField(max_length=350, default="")
@@ -221,14 +240,26 @@ class Artwork(models.Model):
     )
 
     def year_choices():
-        return [(str(r), str(r)) for r in range(1984, date.today().year+1)]
+        return [(str(r), str(r)) for r in range(1884, date.today().year+1)]
 
     def current_year():
         return str((date.today().year))
 
+    def validate(value):
+        if value == 0:
+            raise ValidationError(
+                _('%(value)s is not valid for total edition'),
+                params={'value': value},
+            )
+    # alert
+
+    def clean(self):
+        if self.edition_total < self.edition_number:
+            raise ValidationError(
+                "total edition must be greater than edition number")
+        super(Artwork, self).clean()
+
     _id = models.AutoField(primary_key=True, editable=False)
-    artist = models.ForeignKey(
-        Artist, on_delete=models.SET_NULL, null=True)
     category = models.ForeignKey(
         Category, related_name='artwork_category', on_delete=models.CASCADE)
     sub_category = models.ForeignKey(
@@ -240,10 +271,8 @@ class Artwork(models.Model):
 
     year = models.CharField(
         _('year'), choices=year_choices(), default=current_year, max_length=200)
-
     print = models.CharField(max_length=200, null=True, blank=True)
     condition = models.CharField(max_length=200, null=True, blank=True)
-    edition = models.CharField(max_length=200, null=True, blank=True)
     # uploads to MEDIA_ROOT in setting
     image = models.ImageField(null=True, default='/defaultImage.png')
     width = models.IntegerField(null=True)
@@ -257,25 +286,32 @@ class Artwork(models.Model):
     price = models.DecimalField(max_digits=12, decimal_places=0)
     about_work = models.TextField(blank=True)
     origin = models.ForeignKey(Origin, on_delete=models.SET_NULL, null=True)
-    quantity = models.IntegerField(null=False, default=1)
+    edition_number = models.IntegerField(null=False, default=1)
+    edition_total = models.IntegerField(
+        null=False, default=0, validators=[validate])
     tags = models.ManyToManyField(Tag, blank=True)
     price = models.IntegerField(null=False)
-    price_eth = models.CharField(max_length=200, null=True, blank=True)
+    # price_eth = models.CharField(max_length=200, null=True, blank=True)
     favorites = models.ManyToManyField(
         MyUser, related_name='favorite_artworks', default=None, blank=True)
-
     NFT = models.OneToOneField(
         TheToken, on_delete=models.CASCADE, null=True, blank=True)
     is_minted = models.BooleanField(default=False)
     on_market = models.BooleanField(default=False)
-    signer_address = models.CharField(max_length=255, blank=True)
     voucher = models.ForeignKey(
         Voucher, on_delete=models.SET_NULL, related_name='artwork_signature', null=True, blank=True)
-    in_stock = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     is_carousel = models.BooleanField(default=False)
     created_by = models.ForeignKey(
         MyUser, on_delete=models.SET_NULL, null=True)
+    seller = models.ForeignKey(
+        MyUser, on_delete=models.SET_NULL, related_name='artwork_seller', null=True, blank=True)
+    owner = models.ForeignKey(
+        MyUser, on_delete=models.SET_NULL, related_name='artwork_owner', null=True, blank=True)
+    artist = models.ForeignKey(
+        Artist, on_delete=models.SET_NULL, related_name='artwork_artist', null=True, blank=True)
+    created_by = models.ForeignKey(
+        MyUser, on_delete=models.SET_NULL, related_name='artwork_creator', null=True)  # add artwork from panel
     created_at = models.DateTimeField(auto_now_add=True)
     objects = ArtworkManager()
 
@@ -288,16 +324,14 @@ class Artwork(models.Model):
     def get_absolute_url(self):
         return reverse('artworks: artwork_detail', args=[self.slug])
 
-    def __str__(self):
-        return self.title
-
 
 class Order(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     user = models.ForeignKey(MyUser, on_delete=models.SET_NULL, null=True)
     paymentMethod = models.CharField(max_length=200, null=True, blank=True)
     is_paid = models.BooleanField(default=False)
-    paid_at = models.DateTimeField(auto_now_add=False, null=True, blank=True)
+    paid_at = models.DateTimeField(
+        auto_now_add=False, null=True, blank=True)
     shippingPrice = models.DecimalField(
         max_digits=7, decimal_places=0, null=True, blank=True)
     taxPrice = models.DecimalField(
@@ -317,7 +351,8 @@ class Order(models.Model):
 class OrderItem(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
-    artwork = models.ForeignKey(Artwork, on_delete=models.SET_NULL, null=True)
+    artwork = models.ForeignKey(
+        Artwork, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=200, null=True, blank=True)
     quantity = models.IntegerField(null=False)
     price = models.DecimalField(

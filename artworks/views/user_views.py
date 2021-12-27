@@ -209,15 +209,3 @@ def fetchMyArtworks(request):
         return Response(message, status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def updateUserStore(request):
-    user = request.user
-
-    data = request.data
-    user.store_address = data['storeAddress']
-
-    user.save()
-    serializer = UserSerializerWithToken(user, many=False)
-
-    return Response(serializer.data)

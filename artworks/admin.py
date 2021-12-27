@@ -24,11 +24,11 @@ class UserAdminConfig(UserAdmin):
     list_filter = ('email', 'user_name', 'first_name', 'last_name',
                    'profile_picture', 'is_active', 'is_staff')
     ordering = ('-created_at',)
-    list_display = ('email', 'user_name', 'first_name', 'last_name', 'profile_picture',
+    list_display = ('email', 'user_name', 'first_name', 'last_name',
                     'is_active', 'is_staff')
     fieldsets = (
         (None, {'fields': ('email', 'user_name', 'country', 'city', 'province', 'phone_number', 'postal_code', 'address',
-         'first_name', 'last_name', 'profile_picture', 'wallet_address', 'store_address')}),
+         'first_name', 'last_name', 'profile_picture', 'wallet_address')}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
         ('Personal', {'fields': ('about',)}),
     )
@@ -51,7 +51,7 @@ class ArtworkArtistFilter(AutocompleteFilter):
 class ArtistAdminConfig(admin.ModelAdmin):
     model = Artist
     ordering = ('-_id',)
-    list_display = ['user', '_id']
+    list_display = ['user', '_id', 'gallery_address']
     # this is required for django's autocomplete functionality / when adding user to artist
     # search bar / allow reference autocomplete from ArtworkAdminConfig
     search_fields = ['_id']

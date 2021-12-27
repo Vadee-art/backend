@@ -8,6 +8,8 @@ urlpatterns = [
     path('', views.fetchArtworkList, name='artworks'),
     path('origins/', views.fetch_origin_list, name='origins'),
     path('delete/', views.delete_the_artwork, name='artwork_delete'),
+    path('voucher/<int:pk>/delete/',
+         views.delete_the_voucher, name='voucher_delete'),
     path('update/<int:pk>/<str:action>/',
          views.update_the_artwork, name='artwork_update'),
     path('<int:pk>/', views.fetch_the_artwork, name='the_artWork'),

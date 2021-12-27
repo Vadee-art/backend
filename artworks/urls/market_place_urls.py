@@ -1,4 +1,3 @@
-
 from django.urls import path
 from artworks.views import market_place_views as views
 

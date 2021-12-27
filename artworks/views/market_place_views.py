@@ -33,7 +33,8 @@ def fetch_transaction_fee(request, price):
     return HttpResponse(json.dumps({
         'ether_price': str(ether_price),
         'transaction_fee_ether': str(transaction_fee_ether),
-        'transaction_fee_dollar': str(transaction_fee_dollar)}),
+        'transaction_fee_dollar': str(transaction_fee_dollar),
+        'transaction_fee_front': int(transaction_fee_dollar)}),
         content_type="application/json")
 
 
