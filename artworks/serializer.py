@@ -1,7 +1,7 @@
 from django.db.models import fields
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Article, MyUser, Artwork, Order, OrderItem, Origin, ShippingAddress, Artist, Category, TheMarketPlace, Voucher, SubCategory, Tag
+from .models import Article, MyUser, Artwork, Order, Origin, ShippingAddress, Artist, Category, TheMarketPlace, TheToken, Voucher, SubCategory, Tag
 
 
 class MarketPlaceSerializer(serializers.ModelSerializer):
@@ -126,6 +126,12 @@ class VoucherSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TheTokenSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = TheToken
+        fields = '__all__'
+
+
 class ArtistSerializer(serializers.ModelSerializer):
     _id = serializers.SerializerMethodField(read_only=True)
     firstName = serializers.SerializerMethodField(read_only=True)
@@ -216,26 +222,13 @@ class ShippingAddressSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class OrderItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = '__all__'
-
-
 class OrderSerializer(serializers.ModelSerializer):
-    orderItems = serializers.SerializerMethodField(read_only=True)
     shippingAddress = serializers.SerializerMethodField(read_only=True)
     user = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Order
         fields = '__all__'
-
-    def get_orderItems(self, obj):
-        # reverse query set
-        items = obj.orderitem_set.all()
-        serializer = OrderItemSerializer(items, many=True)
-        return serializer.data
 
     def get_users(self, obj):
         users = obj.user_set.all()

@@ -2,9 +2,9 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from artworks.serializer import ArtworkSerializer, OrderItemSerializer, OrderSerializer
+from artworks.serializer import ArtworkSerializer, OrderSerializer
 from django.contrib.auth.models import User
-from artworks.models import Artwork, Order, ShippingAddress, OrderItem
+from artworks.models import Artwork, Order, ShippingAddress
 from rest_framework import status
 from datetime import datetime
 from django.utils import timezone

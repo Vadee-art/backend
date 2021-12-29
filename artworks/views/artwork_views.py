@@ -2,9 +2,9 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from artworks.serializer import ArtworkSerializer, OriginSerializer, VoucherSerializer
+from artworks.serializer import ArtworkSerializer, OriginSerializer, TheTokenSerializer, VoucherSerializer
 from django.contrib.auth.models import User
-from artworks.models import Artwork, Artist, Category, MyUser, Origin, SubCategory, TheMarketPlace, Voucher
+from artworks.models import Artwork, Artist, Category, MyUser, Order, Origin, SubCategory, TheMarketPlace, TheToken, Voucher
 from rest_framework import status
 from artworks.serializer import CategorySerializer
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -121,18 +121,52 @@ def update_the_artwork(request, pk, action):
         )
         voucher.save()
 
-        artwork.seller = user
         artwork.owner = user
         artwork.voucher = voucher
         artwork.on_market = True
+        artwork.is_minted = False
         artwork.save()
         serializer = VoucherSerializer(voucher, many=False)
         return Response({'voucher': serializer.data})
 
     # 2 - Action Redeem and Mint: update product when mint the product
     elif user and action == 'RedeemAndMint':
-        seller_wallet_address = data['sellerAddress']
-        buyer_wallet_address = data['sellerAddress']
+        token = TheToken.objects.create(
+            market_item_id=None,
+            token_id=data['tokenId'],
+            contract=data['galleryAddress'],
+        )
+        token.holder = user
+        token.save()
+        artwork.NFT = token
+
+        order = Order.objects.create(
+            transaction_hash=data['transactionHash'],
+            price_eth=data['priceEth'],
+            fee_eth=data['feeEth'],
+        )
+        order.seller = artwork.owner
+        order.buyer = user
+        order.is_delivered = False
+        order.save()
+
+        if artwork.edition_number < artwork.edition_total:
+            artwork.edition_number += 1
+
+        if artwork.edition_number == artwork.edition_total:
+            artwork.is_sold_out = True
+
+        # artwork.owner = user
+        artwork.on_market = False
+        artwork.is_minted = True
+        artwork.save()
+
+        # delete the voucher and update artwork
+        voucher = artwork.voucher
+        voucher.delete()
+
+        serializer = TheTokenSerializer(token, many=False)
+        return Response({'token': serializer.data})
 
 
 @ api_view(['DELETE'])
@@ -150,5 +184,14 @@ def delete_the_artwork(request):
 @permission_classes([IsAuthenticated])
 def delete_the_voucher(request, pk):
     voucher = Voucher.objects.get(_id=pk)
+    # voucher artwork id --> artworkId , editionNumber --> 73
+    # e.i 73 ---> x = [ 7, 3]
+    x = [int(a) for a in str(voucher.artwork_id)]
+    artworkId = x[0]
+    artwork = Artwork.objects.get(_id=artworkId)
+    artwork.on_market = False
+    artwork.save()
+
     voucher.delete()
+
     return Response('signature was deleted')

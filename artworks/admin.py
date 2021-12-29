@@ -9,7 +9,6 @@ from .models import (
     Category,
     MyUser,
     Order,
-    OrderItem,
     Artwork,
     ShippingAddress,
     SubCategory,
@@ -76,12 +75,8 @@ class CategoryAdminConfig(admin.ModelAdmin):
 
 class OrderAdminConfig(admin.ModelAdmin):
     model = Order
-    list_display = ['created_at']
-
-
-class OrderItemAdminConfig(admin.ModelAdmin):
-    model = OrderItem
-    list_display = ['created_at']
+    list_display = ['_id', 'created_at',
+                    'transaction_hash', 'price_eth', 'fee_eth']
 
 
 # Register your models here.
@@ -90,7 +85,6 @@ admin.site.register(Artwork, ArtworkAdminConfig)
 admin.site.register(Achievement)
 admin.site.register(Artist, ArtistAdminConfig)
 admin.site.register(Order, OrderAdminConfig)
-admin.site.register(OrderItem, OrderItemAdminConfig)
 admin.site.register(Category, CategoryAdminConfig)
 admin.site.register(SubCategory)
 admin.site.register(Tag)

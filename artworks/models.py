@@ -21,6 +21,7 @@ class TheMarketPlace(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     contract = models.CharField(max_length=250, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    shipping_variable = models.FloatField(default=1, unique=True)
     low_boundary = models.IntegerField(default=150, unique=True)  # 100 dollar
     mid_boundary = models.IntegerField(default=1000, unique=True)  # 500 dollar
     low_boundary_constant = models.FloatField(
@@ -28,7 +29,7 @@ class TheMarketPlace(models.Model):
     mid_boundary_percentage = models.FloatField(
         default=0.02, unique=True)  # 2%
     high_boundary_percantage = models.FloatField(
-        default=0.05, unique=True)  # 5
+        default=0.05, unique=True)  # 5%
 
     class Meta:
         verbose_name = 'Market Place'
@@ -36,12 +37,16 @@ class TheMarketPlace(models.Model):
     def fetch_transaction_fee(self, price):  # price in dollar
         if(price < self.low_boundary):
             transaction_fee = self.low_boundary_constant
+            shipping_price = self.shipping_variable * 50
+
         elif(self.low_boundary < price < self.mid_boundary):
             transaction_fee = self.mid_boundary_percentage * price
+            shipping_price = self.shipping_variable * 100
         else:
             transaction_fee = self.high_boundary_percantage * price
+            shipping_price = self.shipping_variable * 150
 
-        return transaction_fee
+        return {'transaction_fee': transaction_fee, 'shipping_price': shipping_price}
 
     def __str__(self):
         return str(self.created_at)
@@ -195,8 +200,10 @@ class Artist(models.Model):
 
 class TheToken(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
-    tokenID = models.CharField(
+    token_id = models.CharField(
         max_length=250, null=True, blank=True, unique=True)
+    market_item_id = models.CharField(
+        max_length=250, null=True, blank=True)
     holder = models.OneToOneField(
         MyUser, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -206,7 +213,7 @@ class TheToken(models.Model):
         verbose_name = 'NFT'
 
     def __str__(self):
-        return str(self.tokenID)
+        return str(self.token_id)
 
 
 class Voucher(models.Model):
@@ -279,8 +286,6 @@ class Artwork(models.Model):
     height = models.IntegerField(null=True)
     depth = models.IntegerField(null=True)
     unit = models.CharField(max_length=2, choices=UNITS, default="")
-    is_signed = models.BooleanField(null=False, default=False)
-    is_authenticated = models.BooleanField(null=False, default=False)
     frame = models.CharField(max_length=200, null=True, blank=True)
     isPrice = models.BooleanField(null=False, default=False)
     price = models.DecimalField(max_digits=12, decimal_places=0)
@@ -295,17 +300,16 @@ class Artwork(models.Model):
     favorites = models.ManyToManyField(
         MyUser, related_name='favorite_artworks', default=None, blank=True)
     NFT = models.OneToOneField(
-        TheToken, on_delete=models.CASCADE, null=True, blank=True)
+        TheToken, on_delete=models.SET_NULL,  null=True, blank=True)
     is_minted = models.BooleanField(default=False)
     on_market = models.BooleanField(default=False)
     voucher = models.ForeignKey(
         Voucher, on_delete=models.SET_NULL, related_name='artwork_signature', null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    is_sold_out = models.BooleanField(default=False)
     is_carousel = models.BooleanField(default=False)
     created_by = models.ForeignKey(
         MyUser, on_delete=models.SET_NULL, null=True)
-    seller = models.ForeignKey(
-        MyUser, on_delete=models.SET_NULL, related_name='artwork_seller', null=True, blank=True)
     owner = models.ForeignKey(
         MyUser, on_delete=models.SET_NULL, related_name='artwork_owner', null=True, blank=True)
     artist = models.ForeignKey(
@@ -327,41 +331,22 @@ class Artwork(models.Model):
 
 class Order(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
-    user = models.ForeignKey(MyUser, on_delete=models.SET_NULL, null=True)
-    paymentMethod = models.CharField(max_length=200, null=True, blank=True)
-    is_paid = models.BooleanField(default=False)
-    paid_at = models.DateTimeField(
-        auto_now_add=False, null=True, blank=True)
-    shippingPrice = models.DecimalField(
-        max_digits=7, decimal_places=0, null=True, blank=True)
-    taxPrice = models.DecimalField(
-        max_digits=10, decimal_places=0, null=True, blank=True)
-    totalPrice = models.DecimalField(
-        max_digits=16, decimal_places=0, null=True, blank=True)
-    isDelivered = models.BooleanField(default=False)
-    deliveredAt = models.DateTimeField(
+    seller = models.ForeignKey(
+        MyUser, on_delete=models.SET_NULL, related_name='order_seller', null=True)
+    buyer = models.ForeignKey(
+        MyUser, on_delete=models.SET_NULL, related_name='order_buyer', null=True)
+    transaction_hash = models.CharField(max_length=200, null=True, blank=True)
+    price_eth = models.DecimalField(
+        max_digits=7, decimal_places=4, null=True, blank=True)
+    fee_eth = models.DecimalField(
+        max_digits=7, decimal_places=4, null=True, blank=True)
+    is_delivered = models.BooleanField(default=False)
+    delivered_at = models.DateTimeField(
         auto_now_add=False, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.created_at)
-
-
-# cart
-class OrderItem(models.Model):
-    _id = models.AutoField(primary_key=True, editable=False)
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
-    artwork = models.ForeignKey(
-        Artwork, on_delete=models.SET_NULL, null=True)
-    name = models.CharField(max_length=200, null=True, blank=True)
-    quantity = models.IntegerField(null=False)
-    price = models.DecimalField(
-        max_digits=16, decimal_places=0, null=True, blank=True)
-    image = models.CharField(max_length=200, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
 
 
 class ShippingAddress(models.Model):

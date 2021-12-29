@@ -199,8 +199,8 @@ def fetchFavoriteArtistList(request):
 @permission_classes([IsAuthenticated])
 def fetchMyArtworks(request):
     try:
-        artist = Artist.objects.get(user=request.user)
-        artworks = Artwork.objects.filter(artist=artist)
+        user = request.user
+        artworks = Artwork.objects.filter(owner=user)
         serializer = ArtworkSerializer(artworks, many=True)
         return Response({'my_artworks': serializer.data})
 
