@@ -2,9 +2,9 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from artworks.serializer import ArtworkSerializer, OriginSerializer, TheTokenSerializer, VoucherSerializer
+from artworks.serializer import ArtworkSerializer, OrderSerializer, OriginSerializer, TheTokenSerializer, VoucherSerializer
 from django.contrib.auth.models import User
-from artworks.models import Artwork, Artist, Category, MyUser, Order, Origin, SubCategory, TheMarketPlace, TheToken, Voucher
+from artworks.models import Artwork, Artist, Category, MyUser, Order, Origin, ShippingAddress, SubCategory, TheMarketPlace, TheToken, Voucher
 from rest_framework import status
 from artworks.serializer import CategorySerializer
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -131,15 +131,17 @@ def update_the_artwork(request, pk, action):
 
     # 2 - Action Redeem and Mint: update product when mint the product
     elif user and action == 'RedeemAndMint':
+        # a - create NFT
         token = TheToken.objects.create(
             market_item_id=None,
             token_id=data['tokenId'],
             contract=data['galleryAddress'],
         )
+        token.artwork = artwork
         token.holder = user
         token.save()
-        artwork.NFT = token
 
+        # b - create order
         order = Order.objects.create(
             transaction_hash=data['transactionHash'],
             price_eth=data['priceEth'],
@@ -149,6 +151,19 @@ def update_the_artwork(request, pk, action):
         order.buyer = user
         order.is_delivered = False
         order.save()
+
+        # c - relate the shipping address and order
+        shipping_address = ShippingAddress.objects.create(
+            address=data['address'],
+            postal_code=data['postalCode'],
+            city=data['city'],
+            province=data['province'],
+            country=data['country'],
+            phone=data['phoneNumber']
+        )
+        shipping_address.order = order
+        shipping_address.buyer = user
+        shipping_address.save()
 
         if artwork.edition_number < artwork.edition_total:
             artwork.edition_number += 1
@@ -165,8 +180,8 @@ def update_the_artwork(request, pk, action):
         voucher = artwork.voucher
         voucher.delete()
 
-        serializer = TheTokenSerializer(token, many=False)
-        return Response({'token': serializer.data})
+        serializer = OrderSerializer(order, many=False)
+        return Response({'order': serializer.data})
 
 
 @ api_view(['DELETE'])

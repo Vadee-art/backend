@@ -198,24 +198,6 @@ class Artist(models.Model):
         return self.user.email
 
 
-class TheToken(models.Model):
-    _id = models.AutoField(primary_key=True, editable=False)
-    token_id = models.CharField(
-        max_length=250, null=True, blank=True, unique=True)
-    market_item_id = models.CharField(
-        max_length=250, null=True, blank=True)
-    holder = models.OneToOneField(
-        MyUser, on_delete=models.CASCADE, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    contract = models.CharField(max_length=250, null=True, blank=True)
-
-    class Meta:
-        verbose_name = 'NFT'
-
-    def __str__(self):
-        return str(self.token_id)
-
-
 class Voucher(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     title = models.CharField(max_length=350, default="")
@@ -299,8 +281,6 @@ class Artwork(models.Model):
     # price_eth = models.CharField(max_length=200, null=True, blank=True)
     favorites = models.ManyToManyField(
         MyUser, related_name='favorite_artworks', default=None, blank=True)
-    NFT = models.OneToOneField(
-        TheToken, on_delete=models.SET_NULL,  null=True, blank=True)
     is_minted = models.BooleanField(default=False)
     on_market = models.BooleanField(default=False)
     voucher = models.ForeignKey(
@@ -324,9 +304,32 @@ class Artwork(models.Model):
         verbose_name_plural = 'artworks'
         ordering = ('-created_at',)
 
+    def __str__(self):
+        return str(self._id)
+
     # e.g in django template,get URL links for all artworks by calling this
     def get_absolute_url(self):
         return reverse('artworks: artwork_detail', args=[self.slug])
+
+
+class TheToken(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
+    artwork = models.ForeignKey(
+        Artwork, on_delete=models.SET_NULL, related_name='token_artwork', null=True, blank=True)
+    token_id = models.CharField(
+        max_length=250, null=True, blank=True, unique=True)
+    market_item_id = models.CharField(
+        max_length=250, null=True, blank=True)
+    holder = models.ForeignKey(
+        MyUser, on_delete=models.CASCADE, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    contract = models.CharField(max_length=250, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'NFT'
+
+    def __str__(self):
+        return str(self.token_id)
 
 
 class Order(models.Model):
@@ -346,17 +349,20 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.created_at)
+        return str(self._id)
 
 
 class ShippingAddress(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
+    buyer = models.ForeignKey(
+        MyUser, on_delete=models.SET_NULL, related_name='buyer_shipping', null=True)
     order = models.OneToOneField(
         Order, on_delete=models.CASCADE, null=True, blank=True)
     address = models.CharField(max_length=200, null=True, blank=True)
     city = models.CharField(max_length=200, null=True, blank=True)
+    province = models.CharField(max_length=200, null=True, blank=True)
     phone = models.CharField(max_length=200, null=True, blank=True)
-    postalcode = models.CharField(max_length=200, null=True, blank=True)
+    postal_code = models.CharField(max_length=200, null=True, blank=True)
     country = models.CharField(max_length=200, null=True, blank=True)
 
     class Meta:

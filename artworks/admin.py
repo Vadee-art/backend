@@ -79,6 +79,11 @@ class OrderAdminConfig(admin.ModelAdmin):
                     'transaction_hash', 'price_eth', 'fee_eth']
 
 
+class ShippingAddressAdminConfig(admin.ModelAdmin):
+    model = ShippingAddress
+    list_display = ['_id', 'city', 'country', 'phone', 'order']
+
+
 # Register your models here.
 admin.site.register(MyUser, UserAdminConfig)
 admin.site.register(Artwork, ArtworkAdminConfig)
@@ -88,7 +93,7 @@ admin.site.register(Order, OrderAdminConfig)
 admin.site.register(Category, CategoryAdminConfig)
 admin.site.register(SubCategory)
 admin.site.register(Tag)
-admin.site.register(ShippingAddress)
+admin.site.register(ShippingAddress, ShippingAddressAdminConfig)
 admin.site.register(Article)
 admin.site.register(Origin)
 admin.site.register(TheMarketPlace)

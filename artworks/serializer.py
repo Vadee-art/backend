@@ -223,17 +223,23 @@ class ShippingAddressSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    shippingAddress = serializers.SerializerMethodField(read_only=True)
-    user = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = Artwork
+        fields = '__all__'
+
+    def get_transaction_hash(self, obj):
+        transaction_hash = obj.transaction_hash
+        serializer = OrderSerializer(transaction_hash, many=False)
+        return serializer.data
+
+    def get_create_at(self, obj):
+        artist = obj.artist
+        serializer = ArtistSerializer(artist, many=False)
+        return serializer.data
 
     class Meta:
         model = Order
         fields = '__all__'
-
-    def get_users(self, obj):
-        users = obj.user_set.all()
-        serializer = UserSerializer(users, many=True)
-        return serializer.data
 
     def get_shippingAddress(self, obj):
         try:
@@ -243,10 +249,6 @@ class OrderSerializer(serializers.ModelSerializer):
         except:
             shippingAddress = False
         return shippingAddress
-
-    def get_user(self, obj):
-        user = obj.user
-        serializer = UserSerializer(user, many=False)
 
         return serializer.data
 
