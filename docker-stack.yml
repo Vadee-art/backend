@@ -19,7 +19,7 @@ services:
     image: $CONTAINER_IMAGE
     configs:
       - source: backned-config
-        target: .env
+        target: /home/app/web/.env
     environment:
       SECRET_KEY: /run/secrets/django_secret
       SIMPLE_JWT_SECRET_KEY: /run/secrets/django_jwt_secret
