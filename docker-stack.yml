@@ -1,0 +1,135 @@
+version: "3.8"
+
+services:
+  db:
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: stop-first
+      placement:
+        constraints:
+          - node.labels.${ENVIRONMENT} == true
+
+  backend: &backend
+    image: $CONTAINER_IMAGE
+    configs:
+      - source: backned-config
+        target: .env
+    environment:
+      SECRET_KEY: /run/secrets/django_secret
+      SIMPLE_JWT_SECRET_KEY: /run/secrets/django_jwt_secret
+      SQL_PASSWORD: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+      - django_secret
+      - django_jwt_secret
+    networks:
+      - default
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.labels.${ENVIRONMENT} == true
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - traefik.http.routers.${STACK_NAME}-backend-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME}-backend-http.rule=Host(`${DOMAIN?Variable not set}`)
+        - traefik.http.routers.${STACK_NAME}-backend-http.service=${STACK_NAME}-backend
+        - traefik.http.routers.${STACK_NAME}-backend-http.middlewares=https-redirect
+        - traefik.http.routers.${STACK_NAME}-backend.entrypoints=https
+        - traefik.http.routers.${STACK_NAME}-backend.rule=Host(`${DOMAIN?Variable not set}`)
+        - traefik.http.routers.${STACK_NAME}-backend.service=${STACK_NAME}-backend
+        - traefik.http.routers.${STACK_NAME}-backend.tls=true
+        - traefik.http.routers.${STACK_NAME}-backend.tls.certresolver=le
+        - traefik.http.services.${STACK_NAME}-backend.loadbalancer.server.port=1818
+
+  media:
+    networks:
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.labels.${ENVIRONMENT} == true
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - traefik.http.routers.${STACK_NAME}-media-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME}-media-http.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/media`)
+        - traefik.http.routers.${STACK_NAME}-media-http.service=${STACK_NAME}-media
+        - traefik.http.routers.${STACK_NAME}-media-http.middlewares=https-redirect
+        - traefik.http.routers.${STACK_NAME}-media.entrypoints=https
+        - traefik.http.routers.${STACK_NAME}-media.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/media`)
+        - traefik.http.routers.${STACK_NAME}-media.service=${STACK_NAME}-media
+        - traefik.http.middlewares.${STACK_NAME}-media-strip.stripprefix.prefixes=/media
+        - traefik.http.routers.${STACK_NAME}-media.middlewares=${STACK_NAME}-media-strip
+        - traefik.http.routers.${STACK_NAME}-media.tls=true
+        - traefik.http.routers.${STACK_NAME}-media.tls.certresolver=le
+        - traefik.http.services.${STACK_NAME}-media.loadbalancer.server.port=80
+
+  static:
+    networks:
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.labels.${ENVIRONMENT} == true
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - traefik.http.routers.${STACK_NAME}-static-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME}-static-http.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/static`)
+        - traefik.http.routers.${STACK_NAME}-static-http.service=${STACK_NAME}-static
+        - traefik.http.routers.${STACK_NAME}-static-http.middlewares=https-redirect
+        - traefik.http.routers.${STACK_NAME}-static.entrypoints=https
+        - traefik.http.routers.${STACK_NAME}-static.rule=Host(`${DOMAIN?Variable ot set}`) && PathPrefix(`/static`)
+        - traefik.http.middlewares.${STACK_NAME}-static-strip.stripprefix.prefixes=/static
+        - traefik.http.routers.${STACK_NAME}-static.middlewares=${STACK_NAME}-static-strip
+        - traefik.http.routers.${STACK_NAME}-static.service=${STACK_NAME}-static
+        - traefik.http.routers.${STACK_NAME}-static.tls=true
+        - traefik.http.routers.${STACK_NAME}-static.tls.certresolver=le
+        - traefik.http.services.${STACK_NAME}-static.loadbalancer.server.port=80
+
+networks:
+  traefik-public:
+    external: true
+
+configs:
+  backned-config:
+    name: ${STACK_NAME}.env
+    external: true
+
+secrets:
+  postgres_password:
+    name: ${STACK_NAME}-postgres-password
+    external: true
+  django_secret:
+    name: ${STACK_NAME}-django-secret
+    external: true
+  django_jwt_secret:
+    name: ${STACK_NAME}-django-jwt-secret
+    external: true
