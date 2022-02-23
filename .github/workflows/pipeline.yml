@@ -7,7 +7,7 @@ env:
   MAIN_BRANCH: main
   STAGING_DOMAIN: s.api.vadee.art
   PROD_DOMAIN: api.vadee.art
-  TARGET_LAYER: prod
+  TARGET_LAYER: runtime
   STAGING_STACK_NAME: vadee-staging
   PROD_STACK_NAME: vadee
   STAGING_DOCKER_COMPOSE_PATH: docker-compose.prod.yml
