@@ -2,6 +2,8 @@
 
 set -e
 
+export $(cat .env)
+
 if [ "$DATABASE" = "postgres" ]
 then
     echo "Waiting for postgres..."
