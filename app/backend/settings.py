@@ -45,6 +45,7 @@ ALLOWED_HOSTS = [
     'localhost',
     'vadee.art',
     'api.vadee.art',
+    's.api.vadee.art',
     'www.vadee.art',
     'www.vadee.net',
     'www.v1.vadee.net',
