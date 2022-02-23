@@ -13,7 +13,7 @@ RUN apk update \
     && apk add postgresql-dev gcc python3-dev musl-dev
 
 # this is for Pillow
-RUN apk add -u zlib-dev jpeg-dev
+RUN apk add -u libpq jpeg-dev zlib-dev libjpeg
 
 # install dependencies
 RUN pip install --upgrade pip
