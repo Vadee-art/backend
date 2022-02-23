@@ -54,7 +54,7 @@ services:
         - traefik.http.routers.${STACK_NAME}-backend.service=${STACK_NAME}-backend
         - traefik.http.routers.${STACK_NAME}-backend.tls=true
         - traefik.http.routers.${STACK_NAME}-backend.tls.certresolver=le
-        - traefik.http.services.${STACK_NAME}-backend.loadbalancer.server.port=1818
+        - traefik.http.services.${STACK_NAME}-backend.loadbalancer.server.port=8000
 
   media:
     networks:

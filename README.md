@@ -50,6 +50,8 @@ Uses the default Django development server.
 
 Uses gunicorn + nginx.
 
+Follow https://dockerswarm.rocks/ till the end of Portainer section.
+
 1. Rename _.env.prod-sample_ to _.env_. Update the environment variables.
 2. Build the images and run the containers:
 
