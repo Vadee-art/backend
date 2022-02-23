@@ -7,7 +7,6 @@ env:
   MAIN_BRANCH: main
   STAGING_DOMAIN: s.api.vadee.art
   PROD_DOMAIN: api.vadee.art
-  PROD_DOMAIN: api.vadee.art
   TARGET_LAYER: prod
   STAGING_STACK_NAME: vadee-staging
   PROD_STACK_NAME: vadee
