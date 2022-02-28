@@ -195,10 +195,10 @@ USE_TZ = True
 #     BASE_DIR / "static",
 # ]
 
-STATIC_URL = "/static/"
+STATIC_URL = os.environ.get('STATIC_URL', "/static/")
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_URL = "/media/"
+MEDIA_URL = os.environ.get('MEDIA_URL', "/media/")
 MEDIA_ROOT = BASE_DIR / "mediafiles"
 
 
