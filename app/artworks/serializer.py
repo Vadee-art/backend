@@ -71,7 +71,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         # get attr
     def get_artist(self, obj):
-        artist = getattr(obj, artist)
+        artist = getattr(obj, 'artist')
         if artist is None:
             return None
         if artist:  
