@@ -28,7 +28,9 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyUser
         fields = ['id', '_id', 'artist', 'username', 'email',
-                  'firstName', 'lastName', 'country', 'city', 'province', 'phoneNumber', 'postalCode', 'address', 'isAdmin', 'wallet_address']
+                  'firstName', 'lastName', 'country', 'city', 
+                  'province', 'phoneNumber', 'postalCode', 'address',
+                  'isAdmin', 'wallet_address']
 
     # for changing id to _id and keeping the same convention
     def get__id(self, obj):
@@ -67,11 +69,15 @@ class UserSerializer(serializers.ModelSerializer):
     def get_wallet_address(self, obj):
         return obj.wallet_address
 
-        # reverse query set
+        # get attr
     def get_artist(self, obj):
-        artist = obj.artist
-        serializer = ArtistSerializer(artist, many=False)
-        return serializer.data
+        artist = getattr(obj, artist)
+        if artist is None:
+            return None
+        if artist:  
+            serializer = ArtistSerializer(artist, many=False)
+            return serializer.data
+        
 
 
 class UserSerializerWithToken(UserSerializer):
