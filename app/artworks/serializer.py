@@ -69,9 +69,9 @@ class UserSerializer(serializers.ModelSerializer):
     def get_wallet_address(self, obj):
         return obj.wallet_address
 
-        # get attr
+        # get attr - third args is the default
     def get_artist(self, obj):
-        artist = getattr(obj, 'artist')
+        artist = getattr(obj, 'artist', None)
         if artist is None:
             return None
         if artist:  
