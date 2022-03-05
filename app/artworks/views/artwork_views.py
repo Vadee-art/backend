@@ -47,7 +47,7 @@ def fetchArtworkList(request):
     query_category = request.query_params.get('category')
 
     if query_category:
-        category = Category.objects.get(id=query_category)
+        category = Category.objects.get(_id=query_category)
         artworks = Artwork.objects.filter(
             category=category).order_by('created_at')
         serializer = ArtworkSerializer(artworks, many=True)
