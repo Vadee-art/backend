@@ -18,7 +18,7 @@ import requests
 
 @api_view(['GET'])
 def get_subcategory(request):
-    id = request.GET.get('_id', '')
+    id = request.GET.get('id', '')
     result = list(SubCategory.objects.filter(
         category_id=int(id)).values('_id', 'name'))
     return HttpResponse(json.dumps(result), content_type="application/json")
