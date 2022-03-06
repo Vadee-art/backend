@@ -45,6 +45,13 @@ def fetchArtworkList(request):
     query_region = request.query_params.get('regions')
     query_artist = request.query_params.get('artist')
     query_category = request.query_params.get('category')
+    query_on_sale = request.query_params.get('onSale')
+
+    if query_on_sale:
+        artworks = Artwork.objects.filter(
+            on_sale=True).order_by('created_at')
+        serializer = ArtworkSerializer(artworks, many=True)
+        return Response({'artworks': serializer.data})
 
     if query_category:
         category = Category.objects.get(_id=query_category)
