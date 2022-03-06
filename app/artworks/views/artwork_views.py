@@ -18,9 +18,9 @@ import requests
 
 @api_view(['GET'])
 def get_subcategory(request):
-    id = request.GET.get('id', '')
+    id = request.GET.get('_id', '')
     result = list(SubCategory.objects.filter(
-        category_id=int(id)).values('id', 'name'))
+        category_id=int(id)).values('_id', 'name'))
     return HttpResponse(json.dumps(result), content_type="application/json")
 
 
@@ -49,7 +49,7 @@ def fetchArtworkList(request):
 
     if query_on_sale:
         artworks = Artwork.objects.filter(
-            on_sale=True).order_by('created_at')
+            on_market=True).order_by('created_at')
         serializer = ArtworkSerializer(artworks, many=True)
         return Response({'artworks': serializer.data})
 
