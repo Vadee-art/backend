@@ -45,7 +45,7 @@ def fetchArtworkList(request):
     query_region = request.query_params.get('regions')
     query_artist = request.query_params.get('artist')
     query_category = request.query_params.get('category')
-    query_on_sale = request.query_params.get('onSale')
+    query_on_sale = request.query_params.get('onMarket')
 
     if query_on_sale:
         artworks = Artwork.objects.filter(
