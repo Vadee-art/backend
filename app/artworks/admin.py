@@ -60,7 +60,7 @@ class ArtistAdminConfig(admin.ModelAdmin):
 class ArtworkAdminConfig(admin.ModelAdmin):
     model = Artwork
     ordering = ('-created_at',)
-    list_display = ['title', 'artist', 'category', 'origin',
+    list_display = ['title','is_carousel', 'artist', 'category', 'origin',
                     'sub_category', 'price', 'created_at', '_id']
     prepopulated_fields = {'slug': ('title',)}
     list_filter = [ArtworkArtistFilter]
