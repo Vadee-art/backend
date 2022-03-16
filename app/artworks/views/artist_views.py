@@ -7,35 +7,43 @@ from artworks.models import Artist, Artwork
 from rest_framework import status
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def artist_list(request):
-    query_alphabet = request.query_params.get('artist')
+    query_alphabet = request.query_params.get("artist")
     if query_alphabet:
         artists = Artist.objects.filter(text__startswith=query_alphabet).all()
         serializer = ArtistSerializer(artists, many=True)
-        return Response({'artists': serializer.data})
+        return Response({"artists": serializer.data})
     artist = Artist.objects.all()
     serializer = ArtistSerializer(artist, many=True)
     return Response(serializer.data)
 
 
-@ api_view(['GET'])
+@api_view(["GET"])
 def artist_by_id(request, pk):
     artist = Artist.objects.get(_id=pk)
-    artworks = Artwork.objects.filter(
-        artist=artist).order_by('created_at')
+    artworks = Artwork.objects.filter(artist=artist).order_by("created_at")
     serializerArtist = ArtistSerializer(artist, many=False)
     serializerArtworks = ArtworkSerializer(artworks, many=True)
-    return Response({'artist': serializerArtist.data, 'artworks': serializerArtworks.data})
+    return Response(
+        {"artist": serializerArtist.data, "artworks": serializerArtworks.data}
+    )
 
 
-@api_view(['PUT'])
+@api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 def update_artist_gallery(request, pk):
     artist = Artist.objects.get(_id=pk)
     data = request.data
-    artist.gallery_address = data['galleryAddress']
-    artist.wallet_address = data['artistWalletAddress']
+    artist.gallery_address = data["galleryAddress"]
+    artist.wallet_address = data["artistWalletAddress"]
     artist.save()
+    serializer = ArtistSerializer(artist, many=False)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def fetch_is_talent(request):
+    artist = Artist.objects.filter(is_talent=True).first()
     serializer = ArtistSerializer(artist, many=False)
     return Response(serializer.data)
