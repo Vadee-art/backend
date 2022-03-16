@@ -73,7 +73,7 @@ def fetchArtworkList(request):
     if query_last_artwork:
         artwork = Artwork.objects.last()
         serializer = ArtworkSerializer(artwork, many=False)
-        return Response({"artwork": serializer.data})
+        return Response({"artworks": serializer.data})
 
     if query_category:
         category = Category.objects.get(_id=query_category)
