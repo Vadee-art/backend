@@ -111,7 +111,7 @@ class ArtworkAdminConfig(admin.ModelAdmin):
         "origin",
         "sub_category",
         "price",
-        "created_at",
+        "-created_at",
         "_id",
     ]
     prepopulated_fields = {"slug": ("title",)}
