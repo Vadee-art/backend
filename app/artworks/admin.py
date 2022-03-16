@@ -101,7 +101,7 @@ class ArtistAdminConfig(admin.ModelAdmin):
 
 class ArtworkAdminConfig(admin.ModelAdmin):
     model = Artwork
-    ordering = ("created_at",)
+    ordering = ("-created_at",)
     list_display = [
         "title",
         "is_carousel",

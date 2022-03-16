@@ -67,12 +67,12 @@ def fetchArtworkList(request):
 
     if query_on_market:
         artwork = Artwork.objects.filter(on_market=True).order_by("created_at")
-        serializer = ArtworkSerializer(artwork, many=False)
+        serializer = ArtworkSerializer(artwork, many=True)
         return Response({"artworks": serializer.data})
 
     if query_last_artwork:
         artworks = Artwork.objects.latest("created_at")
-        serializer = ArtworkSerializer(artworks, many=True)
+        serializer = ArtworkSerializer(artworks, many=False)
         return Response({"artworks": serializer.data})
 
     if query_category:
