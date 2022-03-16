@@ -96,7 +96,7 @@ def fetchArtworkList(request):
     elif query == None:
         query = ""
         # we could use any value instead of title
-        artworks = Artwork.objects.filter(title__icontains=query).order_by("created_at")
+        artworks = Artwork.objects.filter(title__icontains=query).order_by("-created_at")
         # pagination
         p = Paginator(artworks, 10)
 
