@@ -1,13 +1,27 @@
 from django.db.models import fields
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Article, MyUser, Artwork, Order, Origin, ShippingAddress, Artist, Category, TheMarketPlace, TheToken, Voucher, SubCategory, Tag
+from .models import (
+    Article,
+    MyUser,
+    Artwork,
+    Order,
+    Origin,
+    ShippingAddress,
+    Artist,
+    Category,
+    TheMarketPlace,
+    TheToken,
+    Voucher,
+    SubCategory,
+    Tag,
+)
 
 
 class MarketPlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = TheMarketPlace
-        fields = '__all__'
+        fields = "__all__"
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,10 +41,23 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MyUser
-        fields = ['id', '_id', 'artist', 'username', 'email',
-                  'firstName', 'lastName', 'country', 'city', 
-                  'province', 'phoneNumber', 'postalCode', 'address',
-                  'isAdmin', 'wallet_address']
+        fields = [
+            "id",
+            "_id",
+            "artist",
+            "username",
+            "email",
+            "firstName",
+            "lastName",
+            "country",
+            "city",
+            "province",
+            "phoneNumber",
+            "postalCode",
+            "address",
+            "isAdmin",
+            "wallet_address",
+        ]
 
     # for changing id to _id and keeping the same convention
     def get__id(self, obj):
@@ -70,14 +97,14 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.wallet_address
 
         # get attr - third args is the default
+
     def get_artist(self, obj):
-        artist = getattr(obj, 'artist', None)
+        artist = getattr(obj, "artist", None)
         if artist is None:
             return None
-        if artist:  
+        if artist:
             serializer = ArtistSerializer(artist, many=False)
             return serializer.data
-        
 
 
 class UserSerializerWithToken(UserSerializer):
@@ -85,8 +112,16 @@ class UserSerializerWithToken(UserSerializer):
 
     class Meta:
         model = MyUser
-        fields = ['id', '_id', 'username', 'email',
-                  'firstName', 'lastName', 'isAdmin', 'token']
+        fields = [
+            "id",
+            "_id",
+            "username",
+            "email",
+            "firstName",
+            "lastName",
+            "isAdmin",
+            "token",
+        ]
 
     def get_token(self, obj):
         token = RefreshToken.for_user(obj)
@@ -97,7 +132,7 @@ class UserSerializerWithToken(UserSerializer):
 class SubCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = SubCategory
-        fields = '__all__'
+        fields = "__all__"
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -105,7 +140,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = "__all__"
 
     # reverse query set
     def get_sub_categories(self, obj):
@@ -114,28 +149,28 @@ class CategorySerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-class OriginSerializer (serializers.ModelSerializer):
+class OriginSerializer(serializers.ModelSerializer):
     class Meta:
         model = Origin
-        fields = '__all__'
+        fields = "__all__"
 
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = '__all__'
+        fields = "__all__"
 
 
 class VoucherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Voucher
-        fields = '__all__'
+        fields = "__all__"
 
 
-class TheTokenSerializer (serializers.ModelSerializer):
+class TheTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = TheToken
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ArtistSerializer(serializers.ModelSerializer):
@@ -146,10 +181,11 @@ class ArtistSerializer(serializers.ModelSerializer):
     userId = serializers.SerializerMethodField(read_only=True)
     origin = serializers.SerializerMethodField(read_only=True)
     gallery_address = serializers.SerializerMethodField(read_only=True)
+    artworks = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Artist
-        fields = '__all__'
+        fields = "__all__"
 
     def get__id(self, obj):
         return obj._id
@@ -178,6 +214,10 @@ class ArtistSerializer(serializers.ModelSerializer):
     def get_gallery_address(self, obj):
         return obj.gallery_address
 
+    def get_artworks(self, obj):
+        serializer = UserSerializer(ArtworkSerializer, many=True)
+        return obj.artwork_artist
+
 
 class ArtworkSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField(read_only=True)
@@ -189,7 +229,7 @@ class ArtworkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Artwork
-        fields = '__all__'
+        fields = "__all__"
 
     def get_user(self, obj):
         user = obj.created_by
@@ -225,13 +265,13 @@ class ArtworkSerializer(serializers.ModelSerializer):
 class ShippingAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShippingAddress
-        fields = '__all__'
+        fields = "__all__"
 
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artwork
-        fields = '__all__'
+        fields = "__all__"
 
     def get_transaction_hash(self, obj):
         transaction_hash = obj.transaction_hash
@@ -245,13 +285,14 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = "__all__"
 
     def get_shippingAddress(self, obj):
         try:
             # one to one relation -> obj.shippingAddress
             shippingAddress = ShippingAddressSerializer(
-                obj.shippingaddress, many=False).data
+                obj.shippingaddress, many=False
+            ).data
         except:
             shippingAddress = False
         return shippingAddress
@@ -262,4 +303,4 @@ class OrderSerializer(serializers.ModelSerializer):
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        fields = '__all__'
+        fields = "__all__"
