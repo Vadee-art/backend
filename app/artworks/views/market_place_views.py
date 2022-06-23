@@ -7,13 +7,18 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 import json
 import requests
+from rest_framework import status
 
 
 @api_view(["GET"])
 def fetch_market_place(request):
-    market_place = TheMarketPlace.objects.first()
-    serializer = MarketPlaceSerializer(market_place, many=False)
-    return Response(serializer.data)
+    try:
+        market_place = TheMarketPlace.objects.first()
+        serializer = MarketPlaceSerializer(market_place, many=False)
+        return Response(serializer.data)
+    except:
+        content = {"please move along": "nothing to see here"}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET"])

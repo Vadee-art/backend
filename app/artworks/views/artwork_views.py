@@ -60,34 +60,34 @@ def fetchArtworkList(request):
     query = request.query_params.get("keyword")
     page = request.query_params.get("page")
     query_region = request.query_params.get("regions")
-    query_artist = request.query_params.get("artist")
+    # query_artist = request.query_params.get("artist")
     query_category = request.query_params.get("category")
     query_on_market = request.query_params.get("onMarket")
     query_last_artwork = request.query_params.get("last")
 
-    if query_on_market:
+    if query_on_market is not None:
         artwork = Artwork.objects.filter(on_market=True).order_by("created_at")
         serializer = ArtworkSerializer(artwork, many=True)
         return Response({"artworks": serializer.data})
 
-    if query_last_artwork:
+    if query_last_artwork is not None:
         artwork = Artwork.objects.first()
         serializer = ArtworkSerializer(artwork, many=False)
         return Response({"artworks": serializer.data})
 
-    if query_category:
+    if query_category is not None:
         category = Category.objects.get(_id=query_category)
         artworks = Artwork.objects.filter(category=category).order_by("created_at")
         serializer = ArtworkSerializer(artworks, many=True)
-        return Response({"artworks": serializer.data})
+        return Response({"artworks": serializer.data}, "hi")
 
-    if query_artist:
-        artist = Artist.objects.get(_id=query_artist)
-        artworks = Artwork.objects.filter(artist=artist).order_by("created_at")
-        serializer = ArtworkSerializer(artworks, many=True)
-        return Response({"artworks": serializer.data})
+    # if query_artist:
+    #     artist = Artist.objects.get(_id=query_artist)
+    #     artworks = Artwork.objects.filter(artist=artist).order_by("created_at")
+    #     serializer = ArtworkSerializer(artworks, many=True)
+    #     return Response({"artworks": serializer.data})
 
-    elif query_region:
+    elif query_region is not None:
         origin = Origin.objects.filter(country__icontains=query_region).first()
         artworks = Artwork.objects.filter(origin=origin).order_by("created_at")
         serializer = ArtworkSerializer(artworks, many=True)
@@ -96,16 +96,20 @@ def fetchArtworkList(request):
     elif query == None:
         query = ""
         # we could use any value instead of title
-        artworks = Artwork.objects.filter(title__icontains=query).order_by("-created_at")
+        artworks = Artwork.objects.filter(title__icontains=query).order_by(
+            "-created_at"
+        )
         # pagination
-        p = Paginator(artworks, 10)
+        p = Paginator(artworks, 10)  # number of items you’d like to have on each page
 
         try:
-            artworks = p.page(page)
-        except PageNotAnInteger:  # first render we have no page
             artworks = p.page(1)
-        except EmptyPage:  # page does not exist return the last page
-            artworks = p.page(p.num_pages)
+        except PageNotAnInteger:
+            message = {"details": "Page is not an integer"}
+            return Response(message, status=status.HTTP_404_NOT_FOUND)
+        except EmptyPage:
+            message = {"details": "No more artworks"}
+            return Response(message, status=status.HTTP_404_NOT_FOUND)
 
         if page == None:
             page = 1

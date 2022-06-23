@@ -36,14 +36,13 @@ class UserSerializer(serializers.ModelSerializer):
     wallet_address = serializers.SerializerMethodField(read_only=True)
     username = serializers.SerializerMethodField(read_only=True)
     artist = serializers.SerializerMethodField(read_only=True)
-    _id = serializers.SerializerMethodField(read_only=True)
+    id = serializers.SerializerMethodField(read_only=True)
     isAdmin = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = MyUser
         fields = [
             "id",
-            "_id",
             "artist",
             "username",
             "email",
@@ -60,7 +59,7 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
     # for changing id to _id and keeping the same convention
-    def get__id(self, obj):
+    def get_id(self, obj):
         return obj.id
 
     def get_isAdmin(self, obj):
@@ -173,6 +172,20 @@ class TheTokenSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ArtistArtworksSerializer(serializers.ModelSerializer):
+    _id = serializers.SerializerMethodField(read_only=True)
+    artwork_artist = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Artist
+        fields = "__all__"
+
+    def get_artwork_artist(self, obj):
+        artworks = obj.artwork_artist
+        serializer = ArtworkSerializer(artworks, many=True)
+        return obj.artwork_artist
+
+
 class ArtistSerializer(serializers.ModelSerializer):
     _id = serializers.SerializerMethodField(read_only=True)
     firstName = serializers.SerializerMethodField(read_only=True)
@@ -181,7 +194,6 @@ class ArtistSerializer(serializers.ModelSerializer):
     userId = serializers.SerializerMethodField(read_only=True)
     origin = serializers.SerializerMethodField(read_only=True)
     gallery_address = serializers.SerializerMethodField(read_only=True)
-    artworks = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Artist
@@ -213,10 +225,6 @@ class ArtistSerializer(serializers.ModelSerializer):
 
     def get_gallery_address(self, obj):
         return obj.gallery_address
-
-    def get_artworks(self, obj):
-        serializer = UserSerializer(ArtworkSerializer, many=True)
-        return obj.artwork_artist
 
 
 class ArtworkSerializer(serializers.ModelSerializer):
