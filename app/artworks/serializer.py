@@ -25,8 +25,8 @@ class MarketPlaceSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    firstName = serializers.SerializerMethodField(read_only=True)
-    lastName = serializers.SerializerMethodField(read_only=True)
+    first_name = serializers.SerializerMethodField(read_only=True)
+    last_name = serializers.SerializerMethodField(read_only=True)
     country = serializers.SerializerMethodField(read_only=True)
     city = serializers.SerializerMethodField(read_only=True)
     province = serializers.SerializerMethodField(read_only=True)
@@ -46,8 +46,8 @@ class UserSerializer(serializers.ModelSerializer):
             "artist",
             "username",
             "email",
-            "firstName",
-            "lastName",
+            "first_name",
+            "last_name",
             "country",
             "city",
             "province",
@@ -68,10 +68,10 @@ class UserSerializer(serializers.ModelSerializer):
     def get_username(self, obj):
         return obj.email
 
-    def get_firstName(self, obj):
+    def get_first_name(self, obj):
         return obj.first_name
 
-    def get_lastName(self, obj):
+    def get_last_name(self, obj):
         return obj.last_name
 
     def get_country(self, obj):
@@ -116,8 +116,8 @@ class UserSerializerWithToken(UserSerializer):
             "_id",
             "username",
             "email",
-            "firstName",
-            "lastName",
+            "first_name",
+            "last_name",
             "isAdmin",
             "token",
         ]
@@ -187,9 +187,8 @@ class ArtistArtworksSerializer(serializers.ModelSerializer):
 
 
 class ArtistSerializer(serializers.ModelSerializer):
-    _id = serializers.SerializerMethodField(read_only=True)
-    firstName = serializers.SerializerMethodField(read_only=True)
-    lastName = serializers.SerializerMethodField(read_only=True)
+    first_name = serializers.SerializerMethodField(read_only=True)
+    last_name = serializers.SerializerMethodField(read_only=True)
     photo = serializers.SerializerMethodField(read_only=True)
     userId = serializers.SerializerMethodField(read_only=True)
     origin = serializers.SerializerMethodField(read_only=True)
@@ -199,23 +198,18 @@ class ArtistSerializer(serializers.ModelSerializer):
         model = Artist
         fields = "__all__"
 
-    def get__id(self, obj):
-        return obj._id
-
     def get_userId(self, obj):
         user = obj.user
         userId = user.id
         return userId
 
-    def get_firstName(self, obj):
+    def get_first_name(self, obj):
         user = obj.user
-        firstName = user.first_name
-        return firstName
+        return user.first_name
 
-    def get_lastName(self, obj):
+    def get_last_name(self, obj):
         user = obj.user
-        lastName = user.last_name
-        return lastName
+        return user.last_name
 
     def get_photo(self, obj):
         return obj.photo.url

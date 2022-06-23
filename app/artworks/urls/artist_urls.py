@@ -1,9 +1,11 @@
 from django.urls import path
 from artworks.views import artist_views as views
 
+app_name = "artist"
 
 urlpatterns = [
     path("", views.artist_list, name="artists"),
+    path("search/", views.ArtistSearch.as_view(), name="artists-search"),
     path("talent/", views.fetch_is_talent, name="is_talent"),
     path("<int:pk>/", views.artist_by_id, name="artist_by_id"),
     path(

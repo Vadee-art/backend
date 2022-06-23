@@ -174,10 +174,7 @@ class Artist(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     wallet_address = models.CharField(max_length=255, blank=True)
     gallery_address = models.CharField(max_length=250, blank=True)
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
+    user = models.OneToOneField(MyUser, on_delete=models.CASCADE, related_name="artist")
     photo = models.ImageField(null=True, default="/defaultImage.png")
     birthday = models.DateField(default=date.today)
     origin = models.ForeignKey(Origin, on_delete=models.CASCADE, null=False)
