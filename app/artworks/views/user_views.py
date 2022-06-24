@@ -154,10 +154,10 @@ def deleteUser(request):
 def addFavoriteArtwork(request, pk):
     try:
         artwork = get_object_or_404(Artwork, _id=pk)
-        if artwork.favorites.filter(id=request.user.id).exists():
-            artwork.favorites.remove(request.user)
+        if artwork.favorite_artworks.filter(id=request.user.id).exists():
+            artwork.favorite_artworks.remove(request.user)
         else:
-            artwork.favorites.add(request.user)
+            artwork.favorite_artworks.add(request.user)
             message = {"detail: We could not make any changes!"}
 
         return Response(artwork._id)
@@ -169,7 +169,7 @@ def addFavoriteArtwork(request, pk):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def fetchFavoriteArtworkList(request):
-    artworks = Artwork.objects.filter(favorites=request.user)
+    artworks = Artwork.objects.filter(favorite_artworks=request.user)
     serializer = ArtworkSerializer(artworks, many=True)
     return Response({"favorites": serializer.data})
 

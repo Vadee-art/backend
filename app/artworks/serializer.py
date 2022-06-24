@@ -113,7 +113,6 @@ class UserSerializerWithToken(UserSerializer):
         model = MyUser
         fields = [
             "id",
-            "_id",
             "username",
             "email",
             "first_name",
