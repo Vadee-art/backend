@@ -1,10 +1,11 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from artworks.serializer import ArtworkSerializer, ArtistSerializer
+from artworks.serializer import ArtworkSerializer, ArtistSerializer, TagSerializer
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from artworks.models import Artist, Artwork
+from artworks.models import Artist, Artwork, Tag
 from rest_framework import filters, generics
+from django.db.models import F
 
 
 class ArtistSearch(generics.ListAPIView):
@@ -14,6 +15,30 @@ class ArtistSearch(generics.ListAPIView):
     # '^' Starts-with search.
     # '=' Exact matches.
     search_fields = ["^_id"]
+
+
+class ArtistRelatedArtworks(generics.ListAPIView):
+    serializer_class = ArtworkSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        artistId = self.kwargs.get("artistId", None)
+        artist = Artist.objects.filter(_id=artistId).first()
+        artist_artworks_tags = artist.artwork_artist.all().values("tags___id")
+        artworks_tags = Artwork.objects.all().values("tags___id")
+
+        intersection = artworks_tags.intersection(artist_artworks_tags)
+        # intersection = artworks_tags[0].values() & artist_artworks_tags[0].values()
+        list = []
+        for x in intersection:
+            shit = Artwork.objects.filter(tags___id=x["tags___id"]).exclude(
+                tags___id=None
+            )
+
+            for x in shit:
+                if x not in list:
+                    list.append(x)
+
+        return list
 
 
 @api_view(["GET"])
@@ -29,9 +54,9 @@ def artist_list(request):
 @api_view(["GET"])
 def artist_by_id(request, pk):
     artist = Artist.objects.get(_id=pk)
-    artworks = Artwork.objects.filter(artist=artist).order_by("created_at")
+    artist_artworks = Artwork.objects.filter(artist=artist).order_by("created_at")
     serializerArtist = ArtistSerializer(artist, many=False)
-    serializerArtworks = ArtworkSerializer(artworks, many=True)
+    serializerArtworks = ArtworkSerializer(artist_artworks, many=True)
     return Response(
         {"artist": serializerArtist.data, "artworks": serializerArtworks.data}
     )

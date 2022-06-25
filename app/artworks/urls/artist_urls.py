@@ -8,6 +8,7 @@ urlpatterns = [
     path("search/", views.ArtistSearch.as_view(), name="artists-search"),
     path("talent/", views.fetch_is_talent, name="is_talent"),
     path("<int:pk>/", views.artist_by_id, name="artist_by_id"),
+    path("artist/related/<int:artistId>/", views.ArtistRelatedArtworks.as_view(), name="artist_related"),
     path(
         "<int:pk>/gallery/update/",
         views.update_artist_gallery,
