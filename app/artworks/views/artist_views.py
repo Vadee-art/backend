@@ -17,6 +17,29 @@ class ArtistSearch(generics.ListAPIView):
     search_fields = ["^_id"]
 
 
+#   find artworks with the same category as the artist artworks categories => then find artist of those artworks
+
+
+class ArtistSmililarArtists(generics.ListAPIView):
+    serializer_class = ArtistSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        artistId = self.kwargs.get("artistId", None)
+        artist = Artist.objects.filter(_id=artistId).first()
+        artist_artworks_cats = artist.artwork_artist.all().values("category___id")
+
+        list = []
+        for c in artist_artworks_cats:
+            artworksByArtistCats = Artwork.objects.filter(
+                category___id=c["category___id"]
+            )
+            for a in artworksByArtistCats:
+                if a.artist not in list and a.artist != artist:
+                    list.append(a.artist)
+
+        return list
+
+
 class ArtistRelatedArtworks(generics.ListAPIView):
     serializer_class = ArtworkSerializer
 
@@ -30,13 +53,13 @@ class ArtistRelatedArtworks(generics.ListAPIView):
         # intersection = artworks_tags[0].values() & artist_artworks_tags[0].values()
         list = []
         for x in intersection:
-            shit = Artwork.objects.filter(tags___id=x["tags___id"]).exclude(
+            artworksByTags = Artwork.objects.filter(tags___id=x["tags___id"]).exclude(
                 tags___id=None
             )
 
-            for x in shit:
-                if x not in list:
-                    list.append(x)
+            for a in artworksByTags:
+                if a not in list:
+                    list.append(a)
 
         return list
 

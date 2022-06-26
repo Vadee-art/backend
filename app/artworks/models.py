@@ -289,6 +289,7 @@ class Artwork(models.Model):
     )
     is_active = models.BooleanField(default=True)
     is_sold_out = models.BooleanField(default=False)
+    is_notable = models.BooleanField(default=False)
     is_carousel = models.BooleanField(default=False)
     owner = models.ForeignKey(
         MyUser,
