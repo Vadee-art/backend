@@ -57,7 +57,7 @@ def fetch_origin_list(request):
 
 @api_view(["GET"])
 def fetchArtworkList(request):
-    query = request.query_params.get("keyword")
+    query = request.query_params.get("keyword" or None)
     page = request.query_params.get("page")
     query_region = request.query_params.get("regions")
     # query_artist = request.query_params.get("artist")
@@ -100,7 +100,7 @@ def fetchArtworkList(request):
             "-created_at"
         )
         # pagination
-        p = Paginator(artworks, 10)  # number of items you’d like to have on each page
+        p = Paginator(artworks, 20)  # number of items you’d like to have on each page
 
         try:
             artworks = p.page(1)

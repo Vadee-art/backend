@@ -165,6 +165,9 @@ class Origin(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     country = models.CharField(max_length=255, db_index=True, default="")
     city = models.CharField(max_length=255, db_index=True, default="")
+    description = models.TextField(blank=True)
+    flag = models.ImageField(null=True, default="/defaultImage.png")
+
 
     def __str__(self):
         return self.country
