@@ -24,7 +24,7 @@ class ArtistSimilarArtists(generics.ListAPIView):
     serializer_class = ArtistSerializer
 
     def get_queryset(self, *args, **kwargs):
-        artistId = self.kwargs.get("artistId", None)
+        artistId = self.kwargs.get("artistId")
         artist = Artist.objects.filter(_id=artistId).first()
         if artist.artwork_artist.all().values("category___id"):
             artist_artworks_cats = artist.artwork_artist.all().values("category___id")
