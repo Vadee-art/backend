@@ -76,10 +76,10 @@ def fetchArtworkList(request):
         return Response({"artworks": serializer.data})
 
     if query_category is not None:
-        category = Category.objects.get(_id=query_category)
+        category = Category.objects.get(_id=int(query_category))
         artworks = Artwork.objects.filter(category=category).order_by("created_at")
         serializer = ArtworkSerializer(artworks, many=True)
-        return Response({"artworks": serializer.data}, "hi")
+        return Response({"artworks": serializer.data})
 
     # if query_artist:
     #     artist = Artist.objects.get(_id=query_artist)

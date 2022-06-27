@@ -213,8 +213,13 @@ class ArtistSerializer(serializers.ModelSerializer):
     def get_photo(self, obj):
         return obj.photo.url
 
-    def get_origin(self, obj):
+    def get_origin_country(self, obj):
         return obj.origin.country
+
+    def get_origin(self, obj):
+        origin = obj.origin
+        serializer = OriginSerializer(origin, many=False)
+        return serializer.data
 
     def get_gallery_address(self, obj):
         return obj.gallery_address
@@ -226,6 +231,7 @@ class ArtworkSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField(read_only=True)
     category = serializers.SerializerMethodField(read_only=True)
     sub_category = serializers.SerializerMethodField(read_only=True)
+    origin = serializers.SerializerMethodField(read_only=True)
     voucher = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -255,6 +261,11 @@ class ArtworkSerializer(serializers.ModelSerializer):
     def get_sub_category(self, obj):
         sub_category = obj.sub_category
         serializer = SubCategorySerializer(sub_category, many=False)
+        return serializer.data
+
+    def get_origin(self, obj):
+        origin = obj.origin
+        serializer = OriginSerializer(origin, many=False)
         return serializer.data
 
     def get_voucher(self, obj):
