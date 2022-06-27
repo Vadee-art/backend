@@ -38,6 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
     artist = serializers.SerializerMethodField(read_only=True)
     id = serializers.SerializerMethodField(read_only=True)
     isAdmin = serializers.SerializerMethodField(read_only=True)
+    # favorite_artworks = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = MyUser
@@ -56,6 +57,7 @@ class UserSerializer(serializers.ModelSerializer):
             "address",
             "isAdmin",
             "wallet_address",
+            # "favorite_artworks",
         ]
 
     # for changing id to _id and keeping the same convention
@@ -95,7 +97,10 @@ class UserSerializer(serializers.ModelSerializer):
     def get_wallet_address(self, obj):
         return obj.wallet_address
 
-        # get attr - third args is the default
+    # def get_favorite_artworks(self, obj):
+    #     artworks = obj.user_favorite_artworks
+    #     serializer = ArtworkSerializer(artworks, many=True)
+    #     return serializer.data
 
     def get_artist(self, obj):
         artist = getattr(obj, "artist", None)
