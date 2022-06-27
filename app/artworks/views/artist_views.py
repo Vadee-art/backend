@@ -35,7 +35,7 @@ class ArtistSimilarArtists(generics.ListAPIView):
                     category___id=c["category___id"]
                 )
                 for a in artworksByArtistCats:
-                    if a.artist not in list and a.artist != artist:
+                    if a.artist not in list and a.artist != artist and a.artist != None:
                         list.append(a.artist)
 
             return list
