@@ -164,10 +164,13 @@ class SubCategory(models.Model):
 class Origin(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     country = models.CharField(max_length=255, db_index=True, default="")
-    city = models.CharField(max_length=255, db_index=True, default="")
+    city = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+    )
     description = models.TextField(blank=True)
     flag = models.ImageField(null=True, default="/defaultImage.png")
-
 
     def __str__(self):
         return self.country
@@ -266,7 +269,7 @@ class Artwork(models.Model):
     image = models.ImageField(null=True, default="/defaultImage.png")
     width = models.IntegerField(null=True)
     height = models.IntegerField(null=True)
-    depth = models.IntegerField(null=True)
+    depth = models.IntegerField(null=True, blank=True)
     unit = models.CharField(max_length=2, choices=UNITS, default="")
     frame = models.CharField(max_length=200, null=True, blank=True)
     isPrice = models.BooleanField(null=False, default=False)

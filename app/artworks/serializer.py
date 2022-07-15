@@ -15,6 +15,7 @@ from .models import (
     Voucher,
     SubCategory,
     Tag,
+    Achievement,
 )
 
 
@@ -190,12 +191,19 @@ class ArtistArtworksSerializer(serializers.ModelSerializer):
         return obj.artwork_artist
 
 
+class AchievementsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Achievement
+        fields = "__all__"
+
+
 class ArtistSerializer(serializers.ModelSerializer):
     first_name = serializers.SerializerMethodField(read_only=True)
     last_name = serializers.SerializerMethodField(read_only=True)
     photo = serializers.SerializerMethodField(read_only=True)
     userId = serializers.SerializerMethodField(read_only=True)
     origin = serializers.SerializerMethodField(read_only=True)
+    achievements = serializers.SerializerMethodField(read_only=True)
     gallery_address = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -224,6 +232,11 @@ class ArtistSerializer(serializers.ModelSerializer):
     def get_origin(self, obj):
         origin = obj.origin
         serializer = OriginSerializer(origin, many=False)
+        return serializer.data
+
+    def get_achievements(self, obj):
+        achievements = obj.achievements
+        serializer = AchievementsSerializer(achievements, many=True)
         return serializer.data
 
     def get_gallery_address(self, obj):
