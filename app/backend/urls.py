@@ -15,19 +15,29 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+
 # to use MEDIA_URL in setting
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework.schemas import get_schema_view
+from rest_framework.documentation import include_docs_urls
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/v1/market/', include('artworks.urls.market_place_urls')),
-    path('api/v1/artworks/', include('artworks.urls.artwork_urls')),
-    path('api/v1/users/', include('artworks.urls.user_urls')),
-    path('api/v1/artists/', include('artworks.urls.artist_urls')),
-    path('api/v1/articles/', include('artworks.urls.article_urls')),
-    path('api/v1/orders/', include('artworks.urls.order_urls')),
-
+    path("admin/", admin.site.urls),
+    path("api/v1/market/", include("artworks.urls.market_place_urls")),
+    path("api/v1/artworks/", include("artworks.urls.artwork_urls")),
+    path("api/v1/users/", include("artworks.urls.user_urls")),
+    path("api/v1/artists/", include("artworks.urls.artist_urls")),
+    path("api/v1/articles/", include("artworks.urls.article_urls")),
+    path("api/v1/orders/", include("artworks.urls.order_urls")),
+    path("docs/", include_docs_urls(title="Vadee")),
+    path(
+        "schema",
+        get_schema_view(
+            title="Vadee", description="API for the Vadee listed", version="1.0.0"
+        ),
+        name="openapi-schema",
+    ),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

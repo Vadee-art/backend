@@ -29,7 +29,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework import status
 from django.http import HttpResponse
 import json
-import requests
+from rest_framework import filters, generics
 
 # for admin and change_form.html
 
@@ -96,9 +96,7 @@ def fetchArtworkList(request):
     elif query == None:
         query = ""
         # we could use any value instead of title
-        artworks = Artwork.objects.all().order_by(
-            "-created_at"
-        )
+        artworks = Artwork.objects.all().order_by("-created_at")
         # pagination
         p = Paginator(artworks, 20)  # number of items you’d like to have on each page
 
