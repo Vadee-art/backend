@@ -110,7 +110,7 @@ def fetchArtworkList(request):
         )  # number of items you’d like to have on each page
 
         try:
-            artworks = p.page(page)
+            artworks = p.page(int(page))
         except PageNotAnInteger:
             message = {"details": "Page is not an integer"}
             return Response(message, status=status.HTTP_404_NOT_FOUND)
@@ -121,11 +121,9 @@ def fetchArtworkList(request):
         if page == None:
             page = 1
 
-        page = int(page)
-
         serializer = ArtworkSerializer(artworks, many=True)
         return Response(
-            {"artworks": serializer.data, "page": page, "pages": p.num_pages}
+            {"artworks": serializer.data, "page": int(page), "pages": p.num_pages}
         )
 
 
