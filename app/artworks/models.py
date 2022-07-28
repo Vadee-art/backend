@@ -306,12 +306,11 @@ class Artwork(models.Model):
     )
     artist = models.ForeignKey(
         Artist,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="artwork_artist",
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
     )
-    
     created_by = models.ForeignKey(
         MyUser, on_delete=models.SET_NULL, related_name="artwork_creator", null=True
     )  # add artwork from panel
