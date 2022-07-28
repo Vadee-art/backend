@@ -69,7 +69,6 @@ def fetchArtworkList(request):
         artwork = (
             Artwork.objects.filter(on_market=True)
             .order_by("created_at")
-            .filter(artist=True)
         )
         serializer = ArtworkSerializer(artwork, many=True)
         return Response({"artworks": serializer.data})
@@ -101,7 +100,7 @@ def fetchArtworkList(request):
         query = ""
         # we could use any value instead of title
         artworks_list = (
-            Artwork.objects.all().order_by("-created_at").filter(artist=True)
+            Artwork.objects.all().order_by("-created_at")
         )
 
         # pagination
