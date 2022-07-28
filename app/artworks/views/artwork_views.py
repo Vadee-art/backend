@@ -98,7 +98,7 @@ def fetchArtworkList(request):
         # we could use any value instead of title
         artworks = Artwork.objects.all().order_by("-created_at")
         # pagination
-        p = Paginator(artworks, 20)  # number of items you’d like to have on each page
+        p = Paginator(artworks, 9)  # number of items you’d like to have on each page
 
         try:
             artworks = p.page(1)
