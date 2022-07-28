@@ -1,11 +1,11 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from artworks.serializer import ArtworkSerializer, ArtistSerializer, TagSerializer
+from artworks.serializer import ArtworkSerializer, ArtistSerializer
 from rest_framework.response import Response
-from django.contrib.auth.models import User
-from artworks.models import Artist, Artwork, Tag
+from artworks.models import Artist, Artwork
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from rest_framework import status
 from rest_framework import filters, generics
-from django.db.models import F
 
 
 class ArtistSearch(generics.ListAPIView):
@@ -69,12 +69,38 @@ class ArtistRelatedArtworks(generics.ListAPIView):
 
 @api_view(["GET"])
 def artist_list(request):
+    query = request.query_params.get("keyword" or None)
+    page = request.query_params.get("page")
     query_alphabet = request.query_params.get("alphabet")
     artists = Artist.objects.filter(
         user__last_name__startswith=query_alphabet or ""
     ).all()
     serializer = ArtistSerializer(artists, many=True)
-    return Response({"artists": serializer.data})
+
+    if query == None:
+        query = ""
+        # we could use any value instead of title
+        artists_list = Artist.objects.all().order_by("-user_id")
+
+    # pagination
+    p = Paginator(artists_list, 9)  # number of items you’d like to have on each page
+
+    try:
+        artists = p.page(int(page))
+    except PageNotAnInteger:
+        message = {"details": "Page is not an integer"}
+        return Response(message, status=status.HTTP_404_NOT_FOUND)
+    except EmptyPage:
+        message = {"details": "No more artworks"}
+        return Response(message, status=status.HTTP_404_NOT_FOUND)
+
+    if page == None:
+        page = 1
+
+    serializer = ArtistSerializer(artists, many=True)
+    return Response(
+        {"artists": serializer.data, "page": int(page), "pages": p.num_pages}
+    )
 
 
 @api_view(["GET"])
