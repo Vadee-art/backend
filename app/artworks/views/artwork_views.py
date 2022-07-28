@@ -101,7 +101,7 @@ def fetchArtworkList(request):
         p = Paginator(artworks_list, 6)  # number of items you’d like to have on each page
 
         try:
-            artworks = p.page(1)
+            artworks = p.page(page)
         except PageNotAnInteger:
             message = {"details": "Page is not an integer"}
             return Response(message, status=status.HTTP_404_NOT_FOUND)
