@@ -310,7 +310,6 @@ class Artwork(models.Model):
         related_name="artwork_artist",
         null=False,
         blank=False,
-        default=1
     )
     created_by = models.ForeignKey(
         MyUser, on_delete=models.SET_NULL, related_name="artwork_creator", null=True
