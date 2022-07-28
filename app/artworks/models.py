@@ -306,10 +306,11 @@ class Artwork(models.Model):
     )
     artist = models.ForeignKey(
         Artist,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="artwork_artist",
-        null=True,
-        blank=True,
+        null=False,
+        blank=False,
+        default=1
     )
     created_by = models.ForeignKey(
         MyUser, on_delete=models.SET_NULL, related_name="artwork_creator", null=True

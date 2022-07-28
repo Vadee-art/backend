@@ -66,7 +66,11 @@ def fetchArtworkList(request):
     query_last_artwork = request.query_params.get("last")
 
     if query_on_market is not None:
-        artwork = Artwork.objects.filter(on_market=True).order_by("created_at")
+        artwork = (
+            Artwork.objects.filter(on_market=True)
+            .order_by("created_at")
+            .filter(artist=True)
+        )
         serializer = ArtworkSerializer(artwork, many=True)
         return Response({"artworks": serializer.data})
 
@@ -96,9 +100,14 @@ def fetchArtworkList(request):
     elif query == None:
         query = ""
         # we could use any value instead of title
-        artworks_list = Artwork.objects.all().order_by("-created_at")
+        artworks_list = (
+            Artwork.objects.all().order_by("-created_at").filter(artist=True)
+        )
+
         # pagination
-        p = Paginator(artworks_list, 9)  # number of items you’d like to have on each page
+        p = Paginator(
+            artworks_list, 9
+        )  # number of items you’d like to have on each page
 
         try:
             artworks = p.page(page)
