@@ -37,7 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
     wallet_address = serializers.SerializerMethodField(read_only=True)
     username = serializers.SerializerMethodField(read_only=True)
     artist = serializers.SerializerMethodField(read_only=True)
-    id = serializers.SerializerMethodField(read_only=True)
+    # id = serializers.SerializerMethodField(read_only=True)
     isAdmin = serializers.SerializerMethodField(read_only=True)
     # favorite_artworks = serializers.SerializerMethodField(read_only=True)
 
@@ -62,8 +62,8 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
     # for changing id to _id and keeping the same convention
-    def get_id(self, obj):
-        return obj.id
+    # def get_id(self, obj):
+    #     return obj.id
 
     def get_isAdmin(self, obj):
         return obj.is_staff

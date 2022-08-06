@@ -1,7 +1,11 @@
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.http import JsonResponse
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from artworks.serializer import (
@@ -12,6 +16,7 @@ from artworks.serializer import (
 )
 from artworks.models import Artwork, Artist, MyUser
 from rest_framework import status
+from rest_framework import generics
 
 # Create your views here.
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -95,12 +100,21 @@ def updateUserProfile(request):
 # /api/users/profile user is not the same as the user used for /admin
 
 
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def fetchUserProfile(request):
-    user = request.user
-    serializer = UserSerializer(user, many=False)
-    return Response(serializer.data)
+class UserProfile(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserSerializer
+
+    def get_object(self, queryset=None, **kwargs):
+        user = self.request.user
+        return get_object_or_404(MyUser, id=user.id)
+
+
+# @api_view(["GET"])
+# @permission_classes([IsAuthenticated])
+# def fetchUserProfile(request):
+#
+#     serializer = UserSerializer(user, many=False)
+#     return Response(serializer.data)
 
 
 @api_view(["GET"])
