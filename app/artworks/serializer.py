@@ -245,6 +245,7 @@ class ArtistSerializer(serializers.ModelSerializer):
 
 class ArtworkSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField(read_only=True)
+    collection = serializers.SerializerMethodField(read_only=True)
     artist = serializers.SerializerMethodField(read_only=True)
     tags = serializers.SerializerMethodField(read_only=True)
     category = serializers.SerializerMethodField(read_only=True)
@@ -259,6 +260,11 @@ class ArtworkSerializer(serializers.ModelSerializer):
     def get_user(self, obj):
         user = obj.created_by
         serializer = UserSerializer(user, many=False)
+        return serializer.data
+
+    def get_collection(self, obj):
+        collection = obj.collection
+        serializer = UserSerializer(collection, many=False)
         return serializer.data
 
     def get_artist(self, obj):

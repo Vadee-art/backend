@@ -8,6 +8,7 @@ from django.forms import Textarea
 from .models import (
     Category,
     MyUser,
+    Collection,
     Order,
     Artwork,
     ShippingAddress,
@@ -105,6 +106,7 @@ class ArtworkAdminConfig(admin.ModelAdmin):
     list_display = [
         "_id",
         "title",
+        "collection",
         "is_artist_talented",
         "is_notable",
         "is_carousel",
@@ -147,6 +149,7 @@ admin.site.register(Category, CategoryAdminConfig)
 admin.site.register(SubCategory)
 admin.site.register(Tag)
 admin.site.register(ShippingAddress, ShippingAddressAdminConfig)
+admin.site.register(Collection)
 admin.site.register(Article)
 admin.site.register(Origin)
 admin.site.register(TheMarketPlace)

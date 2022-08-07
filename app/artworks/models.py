@@ -217,6 +217,17 @@ class Voucher(models.Model):
         return self.token_Uri
 
 
+class Collection(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
+    title = models.CharField(max_length=350, default="")
+
+    class Meta:
+        verbose_name = "voucher"
+
+    def __str__(self):
+        return self.token_Uri
+
+
 class ArtworkManager(models.Manager):
     def get_queryset(self):
         return super(ArtworkManager, self).get_queryset().filter(is_active=True)
@@ -256,9 +267,11 @@ class Artwork(models.Model):
         SubCategory, related_name="artwork_sub_category", on_delete=models.CASCADE
     )
     title = models.CharField(max_length=200, null=True, blank=True, default="no title")
+    collection = models.ForeignKey(
+        Collection, on_delete=models.CASCADE, null=True, blank=True
+    )
     subtitle = models.CharField(max_length=200, null=True, blank=True)
     slug = models.SlugField(max_length=255, blank=True)
-
     year = models.CharField(
         _("year"), choices=year_choices(), default=current_year, max_length=200
     )
