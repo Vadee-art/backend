@@ -4,6 +4,7 @@ from artworks.views import artwork_views as views
 
 urlpatterns = [
     path("getSubcategory/", views.get_subcategory, name="sub_category_list"),
+    path("talent/", views.fetch_is_talent, name="talent_artwork"),
     path("categories/", views.categories, name="category_list"),
     path("", views.fetchArtworkList, name="artworks"),
     path("carousels/", views.fetch_is_carousel, name="carousels"),

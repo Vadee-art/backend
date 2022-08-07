@@ -66,10 +66,7 @@ def fetchArtworkList(request):
     query_last_artwork = request.query_params.get("last")
 
     if query_on_market is not None:
-        artwork = (
-            Artwork.objects.filter(on_market=True)
-            .order_by("created_at")
-        )
+        artwork = Artwork.objects.filter(on_market=True).order_by("created_at")
         serializer = ArtworkSerializer(artwork, many=True)
         return Response({"artworks": serializer.data})
 
@@ -99,9 +96,7 @@ def fetchArtworkList(request):
     elif query == None:
         query = ""
         # we could use any value instead of title
-        artworks_list = (
-            Artwork.objects.all().order_by("-created_at")
-        )
+        artworks_list = Artwork.objects.all().order_by("-created_at")
 
         # pagination
         p = Paginator(
@@ -251,3 +246,10 @@ def delete_the_voucher(request, pk):
     voucher.delete()
 
     return Response("signature was deleted")
+
+
+@api_view(["GET"])
+def fetch_is_talent(request):
+    artwork = Artwork.objects.filter(is_artist_talented=True).first()
+    serializer = ArtworkSerializer(artwork, many=False)
+    return Response(serializer.data)

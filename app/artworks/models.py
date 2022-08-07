@@ -186,7 +186,7 @@ class Artist(models.Model):
     biography = models.TextField(blank=True)
     cv = models.TextField(blank=True)
     achievements = models.ManyToManyField(Achievement, blank=True)
-    is_talent = models.BooleanField(default=False)
+
     favorites = models.ManyToManyField(
         MyUser, related_name="favorite_artist", default=None, blank=True
     )
@@ -285,6 +285,7 @@ class Artwork(models.Model):
     )
     is_minted = models.BooleanField(default=False)
     on_market = models.BooleanField(default=False)
+    is_artist_talented = models.BooleanField(default=False)
     voucher = models.ForeignKey(
         Voucher,
         on_delete=models.SET_NULL,

@@ -124,10 +124,3 @@ def update_artist_gallery(request, pk):
     artist.save()
     serializer = ArtistSerializer(artist, many=False)
     return Response(serializer.data)
-
-
-@api_view(["GET"])
-def fetch_is_talent(request):
-    artist = Artist.objects.filter(is_talent=True).first()
-    serializer = ArtistSerializer(artist, many=False)
-    return Response(serializer.data)
