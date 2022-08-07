@@ -222,10 +222,10 @@ class Collection(models.Model):
     title = models.CharField(max_length=350, default="")
 
     class Meta:
-        verbose_name = "voucher"
+        verbose_name = "collection"
 
     def __str__(self):
-        return self.token_Uri
+        return self.title
 
 
 class ArtworkManager(models.Manager):
