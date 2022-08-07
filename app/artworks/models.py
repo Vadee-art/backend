@@ -219,7 +219,7 @@ class Voucher(models.Model):
 
 class Collection(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
-    title = models.CharField(max_length=350, default="")
+    title = models.CharField(max_length=350, blank=True)
 
     class Meta:
         verbose_name = "collection"
