@@ -105,6 +105,7 @@ class ArtworkAdminConfig(admin.ModelAdmin):
     list_display = [
         "_id",
         "title",
+        "is_artist_talented",
         "is_notable",
         "is_carousel",
         "on_market",
