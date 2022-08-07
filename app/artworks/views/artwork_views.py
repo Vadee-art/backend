@@ -51,8 +51,16 @@ def categories(request):
 @api_view(["GET"])
 def fetch_origin_list(request):
     origins = Origin.objects.all()
-    serializer = OriginSerializer(origins, many=True)
-    return Response({"origins": serializer.data})
+    list = []
+    for o in origins:
+        artworks = o.artwork_set.all()
+        originSerializer = OriginSerializer(o, many=False)
+        artworkSerializer = ArtworkSerializer(artworks, many=True)
+        list.append(
+            {"origin": originSerializer.data, "artworks": artworkSerializer.data}
+        )
+
+    return Response(list)
 
 
 @api_view(["GET"])
