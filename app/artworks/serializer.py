@@ -16,6 +16,7 @@ from .models import (
     SubCategory,
     Tag,
     Achievement,
+    Collection,
 )
 
 
@@ -191,6 +192,12 @@ class ArtistArtworksSerializer(serializers.ModelSerializer):
         return obj.artwork_artist
 
 
+class CollectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collection
+        fields = "__all__"
+
+
 class AchievementsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Achievement
@@ -264,7 +271,7 @@ class ArtworkSerializer(serializers.ModelSerializer):
 
     def get_collection(self, obj):
         collection = obj.collection
-        serializer = UserSerializer(collection, many=False)
+        serializer = CollectionSerializer(collection, many=False)
         return serializer.data
 
     def get_artist(self, obj):

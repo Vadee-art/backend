@@ -267,7 +267,7 @@ class Artwork(models.Model):
         SubCategory, related_name="artwork_sub_category", on_delete=models.CASCADE
     )
     title = models.CharField(max_length=200, null=True, blank=True, default="no title")
-    collection = models.ForeignKey(
+    collection = models.OneToOneField(
         Collection, on_delete=models.CASCADE, null=True, blank=True
     )
     subtitle = models.CharField(max_length=200, null=True, blank=True)
