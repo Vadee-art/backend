@@ -284,7 +284,6 @@ class Artwork(models.Model):
     depth = models.IntegerField(null=True, blank=True)
     unit = models.CharField(max_length=2, choices=UNITS, default="")
     frame = models.CharField(max_length=200, null=True, blank=True)
-    isPrice = models.BooleanField(null=False, default=False)
     price = models.DecimalField(max_digits=12, decimal_places=0)
     about_work = models.TextField(blank=True)
     origin = models.ForeignKey(Origin, on_delete=models.SET_NULL, null=True)

@@ -4,6 +4,7 @@ from .models import *
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.forms import Textarea
+from django.utils.safestring import mark_safe
 
 from .models import (
     Category,
@@ -106,6 +107,7 @@ class ArtworkAdminConfig(admin.ModelAdmin):
     list_display = [
         "_id",
         "title",
+        "artwork_image",
         "collection",
         "is_artist_talented",
         "is_notable",
@@ -116,11 +118,21 @@ class ArtworkAdminConfig(admin.ModelAdmin):
         "origin",
         "sub_category",
         "price",
+        "image",
         "created_at",
     ]
+    exclude = ("is_active", "on_market", "is_minted", "is_sold_out")
     prepopulated_fields = {"slug": ("title",)}
     list_filter = [ArtworkArtistFilter]
     autocomplete_fields = ["artist"]
+    readonly_fields = ["artwork_image"]
+
+    def artwork_image(self, obj):
+        return mark_safe(
+            '<img src="/media/{url}" width="50" height=50 border=1/>'.format(
+                url=obj.image,
+            )
+        )
 
 
 class CategoryAdminConfig(admin.ModelAdmin):
