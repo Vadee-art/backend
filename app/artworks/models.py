@@ -192,7 +192,6 @@ class Artist(models.Model):
     biography = models.TextField(blank=True)
     cv = models.TextField(blank=True)
     achievements = models.ManyToManyField(Achievement, blank=True)
-
     favorites = models.ManyToManyField(
         MyUser, related_name="favorite_artist", default=None, blank=True
     )

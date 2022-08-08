@@ -97,7 +97,7 @@ class ArtistAdminConfig(admin.ModelAdmin):
     list_display = ["user", "_id", "gallery_address"]
     # this is required for django's autocomplete functionality / when adding user to artist
     # search bar / allow reference autocomplete from ArtworkAdminConfig
-    search_fields = ["_id"]
+    search_fields = ("user",)
     autocomplete_fields = ["user"]
 
 
@@ -128,13 +128,6 @@ class ArtworkAdminConfig(admin.ModelAdmin):
     # readonly_fields = ["current_image"]
 
     def current_image(self, obj):
-        return mark_safe(
-            '<img src="/media/{url}" width="50" height=50 border=1/>'.format(
-                url=obj.image,
-            )
-        )
-
-    def image(self, obj):
         return mark_safe(
             '<img src="/media/{url}" width="50" height=50 border=1/>'.format(
                 url=obj.image,
