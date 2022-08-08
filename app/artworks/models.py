@@ -126,6 +126,12 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        tags_count = Tag.objects.filter(name__contains=self.name).count()
+        if tags_count > 0:
+            return
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+
 
 class Category(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)

@@ -124,7 +124,7 @@ class ArtworkAdminConfig(admin.ModelAdmin):
     exclude = ("is_active", "on_market", "is_minted", "is_sold_out")
     prepopulated_fields = {"slug": ("title",)}
     list_filter = [ArtworkArtistFilter]
-    autocomplete_fields = ["artist"]
+    autocomplete_fields = ("artist", "tags")
     readonly_fields = ["artwork_image"]
 
     def artwork_image(self, obj):
@@ -151,6 +151,11 @@ class ShippingAddressAdminConfig(admin.ModelAdmin):
     list_display = ["_id", "city", "country", "phone", "order"]
 
 
+class TagAdminConfig(admin.ModelAdmin):
+    model = Tag
+    search_fields = ["name"]
+
+
 # Register your models here.
 admin.site.register(MyUser, UserAdminConfig)
 admin.site.register(Artwork, ArtworkAdminConfig)
@@ -159,7 +164,7 @@ admin.site.register(Artist, ArtistAdminConfig)
 admin.site.register(Order, OrderAdminConfig)
 admin.site.register(Category, CategoryAdminConfig)
 admin.site.register(SubCategory)
-admin.site.register(Tag)
+admin.site.register(Tag, TagAdminConfig)
 admin.site.register(ShippingAddress, ShippingAddressAdminConfig)
 admin.site.register(Collection)
 admin.site.register(Article)
