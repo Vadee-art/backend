@@ -278,7 +278,7 @@ class Artwork(models.Model):
     print = models.CharField(max_length=200, null=True, blank=True)
     condition = models.CharField(max_length=200, null=True, blank=True)
     # uploads to MEDIA_ROOT in setting
-    image = models.ImageField(null=True, default="/defaultImage.png")
+    image = models.ImageField(null=True, blank=True, default="/defaultImage.png")
     width = models.IntegerField(null=True)
     height = models.IntegerField(null=True)
     depth = models.IntegerField(null=True, blank=True)
