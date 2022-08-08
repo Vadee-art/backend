@@ -107,7 +107,7 @@ class ArtworkAdminConfig(admin.ModelAdmin):
     list_display = [
         "_id",
         "title",
-        "artwork_image",
+        "current_image",
         "collection",
         "is_artist_talented",
         "is_notable",
@@ -125,9 +125,16 @@ class ArtworkAdminConfig(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
     list_filter = [ArtworkArtistFilter]
     autocomplete_fields = ("artist", "tags")
-    # readonly_fields = ["artwork_image"]
+    # readonly_fields = ["current_image"]
 
-    def artwork_image(self, obj):
+    def current_image(self, obj):
+        return mark_safe(
+            '<img src="/media/{url}" width="50" height=50 border=1/>'.format(
+                url=obj.image,
+            )
+        )
+
+    def image(self, obj):
         return mark_safe(
             '<img src="/media/{url}" width="50" height=50 border=1/>'.format(
                 url=obj.image,
