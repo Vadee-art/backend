@@ -112,7 +112,7 @@ def fetchArtworkList(request):
 
         # pagination
         p = Paginator(
-            artworks_list, 3
+            artworks_list, 9
         )  # number of items you’d like to have on each page
 
         try:
