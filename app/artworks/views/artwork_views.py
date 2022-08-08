@@ -65,13 +65,18 @@ def fetch_origin_list(request):
 
 @api_view(["GET"])
 def fetchArtworkList(request):
-    query = request.query_params.get("keyword" or None)
+    keyword = request.query_params.get("keyword" or None)
     page = request.query_params.get("page")
     query_region = request.query_params.get("regions")
-    # query_artist = request.query_params.get("artist")
+    query_artist = request.query_params.get("artist")
     query_category = request.query_params.get("category")
     query_on_market = request.query_params.get("onMarket")
     query_last_artwork = request.query_params.get("last")
+
+    if keyword is not None:
+        artwork = Artwork.objects.filter(title=keyword).order_by("created_at")
+        serializer = ArtworkSerializer(artwork, many=True)
+        return Response({"artworks": serializer.data})
 
     if query_on_market is not None:
         artwork = Artwork.objects.filter(on_market=True).order_by("created_at")
@@ -101,14 +106,13 @@ def fetchArtworkList(request):
         serializer = ArtworkSerializer(artworks, many=True)
         return Response({"artworks": serializer.data})
 
-    elif query == None:
-        query = ""
+    elif keyword == None:
         # we could use any value instead of title
         artworks_list = Artwork.objects.all().order_by("-created_at")
 
         # pagination
         p = Paginator(
-            artworks_list, 9
+            artworks_list, 3
         )  # number of items you’d like to have on each page
 
         try:

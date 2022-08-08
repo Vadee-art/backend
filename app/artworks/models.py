@@ -241,8 +241,8 @@ class ArtworkManager(models.Manager):
 
 class Artwork(models.Model):
     UNITS = (
-        ("0", "in"),
-        ("1", "cm"),
+        ("0", "cm"),
+        ("1", "in"),
     )
 
     def year_choices():
