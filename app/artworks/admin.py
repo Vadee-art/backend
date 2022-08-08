@@ -121,7 +121,7 @@ class ArtworkAdminConfig(admin.ModelAdmin):
         "image",
         "created_at",
     ]
-    exclude = ("is_active", "on_market", "is_minted", "is_sold_out")
+    exclude = ("is_active", "on_market", "is_minted", "is_sold_out", "artwork_image")
     prepopulated_fields = {"slug": ("title",)}
     list_filter = [ArtworkArtistFilter]
     autocomplete_fields = ("artist", "tags")
