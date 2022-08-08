@@ -121,11 +121,11 @@ class ArtworkAdminConfig(admin.ModelAdmin):
         "image",
         "created_at",
     ]
-    exclude = ("is_active", "on_market", "is_minted", "is_sold_out", "artwork_image")
+    exclude = ("is_active", "on_market", "is_minted", "is_sold_out")
     prepopulated_fields = {"slug": ("title",)}
     list_filter = [ArtworkArtistFilter]
     autocomplete_fields = ("artist", "tags")
-    readonly_fields = ["artwork_image"]
+    # readonly_fields = ["artwork_image"]
 
     def artwork_image(self, obj):
         return mark_safe(
