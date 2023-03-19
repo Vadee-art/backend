@@ -56,63 +56,63 @@ services:
         - traefik.http.routers.${STACK_NAME}-backend.tls.certresolver=le
         - traefik.http.services.${STACK_NAME}-backend.loadbalancer.server.port=8000
 
-  # media:
-  #   networks:
-  #     - traefik-public
-  #   deploy:
-  #     placement:
-  #       constraints:
-  #         - node.labels.${ENVIRONMENT} == true
-  #     mode: replicated
-  #     replicas: 1
-  #     update_config:
-  #       parallelism: 1
-  #       order: start-first
-  #     labels:
-  #       - traefik.enable=true
-  #       - traefik.docker.network=traefik-public
-  #       - traefik.constraint-label=traefik-public
-  #       - traefik.http.routers.${STACK_NAME}-media-http.entrypoints=http
-  #       - traefik.http.routers.${STACK_NAME}-media-http.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/media`)
-  #       - traefik.http.routers.${STACK_NAME}-media-http.service=${STACK_NAME}-media
-  #       - traefik.http.routers.${STACK_NAME}-media-http.middlewares=https-redirect
-  #       - traefik.http.routers.${STACK_NAME}-media.entrypoints=https
-  #       - traefik.http.routers.${STACK_NAME}-media.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/media`)
-  #       - traefik.http.routers.${STACK_NAME}-media.service=${STACK_NAME}-media
-  #       - traefik.http.middlewares.${STACK_NAME}-media-strip.stripprefix.prefixes=/media
-  #       - traefik.http.routers.${STACK_NAME}-media.middlewares=${STACK_NAME}-media-strip
-  #       - traefik.http.routers.${STACK_NAME}-media.tls=true
-  #       - traefik.http.routers.${STACK_NAME}-media.tls.certresolver=le
-  #       - traefik.http.services.${STACK_NAME}-media.loadbalancer.server.port=80
+  media:
+    networks:
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.labels.${ENVIRONMENT} == true
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - traefik.http.routers.${STACK_NAME}-media-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME}-media-http.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/media`)
+        - traefik.http.routers.${STACK_NAME}-media-http.service=${STACK_NAME}-media
+        - traefik.http.routers.${STACK_NAME}-media-http.middlewares=https-redirect
+        - traefik.http.routers.${STACK_NAME}-media.entrypoints=https
+        - traefik.http.routers.${STACK_NAME}-media.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/media`)
+        - traefik.http.routers.${STACK_NAME}-media.service=${STACK_NAME}-media
+        - traefik.http.middlewares.${STACK_NAME}-media-strip.stripprefix.prefixes=/media
+        - traefik.http.routers.${STACK_NAME}-media.middlewares=${STACK_NAME}-media-strip
+        - traefik.http.routers.${STACK_NAME}-media.tls=true
+        - traefik.http.routers.${STACK_NAME}-media.tls.certresolver=le
+        - traefik.http.services.${STACK_NAME}-media.loadbalancer.server.port=80
 
-  # static:
-  #   networks:
-  #     - traefik-public
-  #   deploy:
-  #     placement:
-  #       constraints:
-  #         - node.labels.${ENVIRONMENT} == true
-  #     mode: replicated
-  #     replicas: 1
-  #     update_config:
-  #       parallelism: 1
-  #       order: start-first
-  #     labels:
-  #       - traefik.enable=true
-  #       - traefik.docker.network=traefik-public
-  #       - traefik.constraint-label=traefik-public
-  #       - traefik.http.routers.${STACK_NAME}-static-http.entrypoints=http
-  #       - traefik.http.routers.${STACK_NAME}-static-http.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/static`)
-  #       - traefik.http.routers.${STACK_NAME}-static-http.service=${STACK_NAME}-static
-  #       - traefik.http.routers.${STACK_NAME}-static-http.middlewares=https-redirect
-  #       - traefik.http.routers.${STACK_NAME}-static.entrypoints=https
-  #       - traefik.http.routers.${STACK_NAME}-static.rule=Host(`${DOMAIN?Variable ot set}`) && PathPrefix(`/static`)
-  #       - traefik.http.middlewares.${STACK_NAME}-static-strip.stripprefix.prefixes=/static
-  #       - traefik.http.routers.${STACK_NAME}-static.middlewares=${STACK_NAME}-static-strip
-  #       - traefik.http.routers.${STACK_NAME}-static.service=${STACK_NAME}-static
-  #       - traefik.http.routers.${STACK_NAME}-static.tls=true
-  #       - traefik.http.routers.${STACK_NAME}-static.tls.certresolver=le
-  #       - traefik.http.services.${STACK_NAME}-static.loadbalancer.server.port=80
+  static:
+    networks:
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.labels.${ENVIRONMENT} == true
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - traefik.http.routers.${STACK_NAME}-static-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME}-static-http.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/static`)
+        - traefik.http.routers.${STACK_NAME}-static-http.service=${STACK_NAME}-static
+        - traefik.http.routers.${STACK_NAME}-static-http.middlewares=https-redirect
+        - traefik.http.routers.${STACK_NAME}-static.entrypoints=https
+        - traefik.http.routers.${STACK_NAME}-static.rule=Host(`${DOMAIN?Variable ot set}`) && PathPrefix(`/static`)
+        - traefik.http.middlewares.${STACK_NAME}-static-strip.stripprefix.prefixes=/static
+        - traefik.http.routers.${STACK_NAME}-static.middlewares=${STACK_NAME}-static-strip
+        - traefik.http.routers.${STACK_NAME}-static.service=${STACK_NAME}-static
+        - traefik.http.routers.${STACK_NAME}-static.tls=true
+        - traefik.http.routers.${STACK_NAME}-static.tls.certresolver=le
+        - traefik.http.services.${STACK_NAME}-static.loadbalancer.server.port=80
 
 networks:
   traefik-public:

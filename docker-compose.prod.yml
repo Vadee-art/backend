@@ -21,17 +21,17 @@ services:
       - POSTGRES_USER=${SQL_USER:-vadee}
       - POSTGRES_DB=${SQL_DATABASE:-vadee}
 
-  # media:
-  #   image: flashspys/nginx-static
-  #   volumes:
-  #     - media_volume:/static
+  media:
+    image: flashspys/nginx-static
+    volumes:
+      - media_volume:/static
 
-  # static:
-  #   image: flashspys/nginx-static
-  #   expose:
-  #     - 80
-  #   volumes:
-  #     - static_volume:/static
+  static:
+    image: flashspys/nginx-static
+    expose:
+      - 80
+    volumes:
+      - static_volume:/static
 
   # nginx:
   #   build: ./nginx
