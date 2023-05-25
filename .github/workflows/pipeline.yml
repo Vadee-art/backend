@@ -204,7 +204,7 @@ jobs:
           > ${{ env.STACK_FILE }}
 
       - name: Move Stack File to Server
-        uses: appleboy/scp-action@v0.1.1
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.STAGING_SERVER_ADDR }}
           username: ${{ secrets.STAGING_SERVER_USER }}
