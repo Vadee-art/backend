@@ -14,13 +14,25 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 
 # to use MEDIA_URL in setting
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework.schemas import get_schema_view
+from rest_framework import permissions
 from rest_framework.documentation import include_docs_urls
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Vadee API",
+        default_version='v1',
+    ),
+    public=True,
+    permission_classes=[permissions.AllowAny],
+)
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -31,13 +43,7 @@ urlpatterns = [
     path("api/v1/articles/", include("artworks.urls.article_urls")),
     path("api/v1/orders/", include("artworks.urls.order_urls")),
     path("docs/", include_docs_urls(title="Vadee")),
-    path(
-        "schema",
-        get_schema_view(
-            title="Vadee", description="API for the Vadee listed", version="1.0.0"
-        ),
-        name="openapi-schema",
-    ),
+    re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -69,17 +69,27 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'drf_yasg',
 ]
 
 REST_FRAMEWORK = {"DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema"}
 
 # User Auth with: django-rest-framework-simplejwt
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
+    'DEFAULT_RENDERER_CLASSES': (
+        'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
+        'djangorestframework_camel_case.render.CamelCaseBrowsableAPIRenderer',
+        # Any other renders
     ),
-    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     "DATETIME_FORMAT": "%b %e, %Y- %H:%M:%S",
+    'DEFAULT_PARSER_CLASSES': (
+        # If you use MultiPartFormParser or FormParser, we also have a camel case version
+        'djangorestframework_camel_case.parser.CamelCaseFormParser',
+        'djangorestframework_camel_case.parser.CamelCaseMultiPartParser',
+        'djangorestframework_camel_case.parser.CamelCaseJSONParser',
+        # Any other parsers
+    ),
 }
 
 
@@ -122,6 +132,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'djangorestframework_camel_case.middleware.CamelCaseMiddleWare',
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -153,9 +164,7 @@ DATABASES = {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
         "NAME": os.environ.get("SQL_DATABASE", "postgres"),
         "USER": os.environ.get("SQL_USER", "postgres"),
-        "PASSWORD": get_secret(
-            "SQL_PASSWORD", os.environ.get("SQL_PASSWORD", "postgres")
-        ),
+        "PASSWORD": get_secret("SQL_PASSWORD", os.environ.get("SQL_PASSWORD", "postgres")),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
@@ -219,7 +228,7 @@ MEDIA_ROOT = BASE_DIR / "mediafiles"
 CORS_ALLOW_ALL_ORIGINS = True
 
 # For our custom user model
-AUTH_USER_MODEL = "artworks.MyUser"
+AUTH_USER_MODEL = "artworks.User"
 
 print("-------------------------------------")
 print("base path: ", BASE_DIR)

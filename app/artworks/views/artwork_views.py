@@ -14,7 +14,7 @@ from artworks.models import (
     Artwork,
     Artist,
     Category,
-    MyUser,
+    User,
     Order,
     Origin,
     ShippingAddress,
@@ -56,9 +56,7 @@ def fetch_origin_list(request):
         artworks = o.artwork_set.all()
         originSerializer = OriginSerializer(o, many=False)
         artworkSerializer = ArtworkSerializer(artworks, many=True)
-        list.append(
-            {"origin": originSerializer.data, "artworks": artworkSerializer.data}
-        )
+        list.append({"origin": originSerializer.data, "artworks": artworkSerializer.data})
 
     return Response(list)
 
@@ -111,9 +109,7 @@ def fetchArtworkList(request):
         artworks_list = Artwork.objects.all().order_by("-created_at")
 
         # pagination
-        p = Paginator(
-            artworks_list, 9
-        )  # number of items you’d like to have on each page
+        p = Paginator(artworks_list, 9)  # number of items you’d like to have on each page
 
         try:
             artworks = p.page(int(page))
@@ -128,9 +124,7 @@ def fetchArtworkList(request):
             page = 1
 
         serializer = ArtworkSerializer(artworks, many=True)
-        return Response(
-            {"artworks": serializer.data, "page": int(page), "pages": p.num_pages}
-        )
+        return Response({"artworks": serializer.data, "page": int(page), "pages": p.num_pages})
 
 
 @api_view(["GET"])

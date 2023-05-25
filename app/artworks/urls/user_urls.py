@@ -4,7 +4,7 @@ from artworks.views import user_views as views
 
 urlpatterns = [
     path("login/", views.MyTokenObtainPairView.as_view(), name="token-obtain-pair"),
-    path("register/", views.registerUser, name="register"),
+    path("register/", views.CreateUserView.as_view(), name="register"),
     path("profile/me", views.UserProfile.as_view(), name="users-profile"),
     path("profile/update/", views.updateUserProfile, name="users-profile-update"),
     path("profile/artworks/mine", views.fetchMyArtworks, name="users-profile-artworks"),
