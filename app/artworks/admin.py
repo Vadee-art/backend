@@ -8,7 +8,7 @@ from django.utils.safestring import mark_safe
 
 from .models import (
     Category,
-    User,
+    MyUser,
     Collection,
     Order,
     Artwork,
@@ -19,7 +19,7 @@ from admin_searchable_dropdown.filters import AutocompleteFilter
 
 
 class UserAdminConfig(UserAdmin):
-    model = User
+    model = MyUser
     search_fields = ("email", "user_name", "first_name", "last_name")
     list_filter = (
         "email",
@@ -63,7 +63,7 @@ class UserAdminConfig(UserAdmin):
         ("Personal", {"fields": ("about",)}),
     )
     formfield_overrides = {
-        User.about: {"widget": Textarea(attrs={"rows": 10, "cols": 40})},
+        MyUser.about: {"widget": Textarea(attrs={"rows": 10, "cols": 40})},
     }
     add_fieldsets = (
         (
@@ -157,7 +157,7 @@ class TagAdminConfig(admin.ModelAdmin):
 
 
 # Register your models here.
-admin.site.register(User, UserAdminConfig)
+admin.site.register(MyUser, UserAdminConfig)
 admin.site.register(Artwork, ArtworkAdminConfig)
 admin.site.register(Achievement)
 admin.site.register(Artist, ArtistAdminConfig)

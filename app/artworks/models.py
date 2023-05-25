@@ -73,7 +73,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class MyUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(verbose_name="email_address", max_length=255, unique=True, blank=False)
     user_name = models.CharField(max_length=150, unique=True)
     first_name = models.CharField(max_length=150, blank=True)
@@ -105,8 +105,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-    class Meta:
-        db_table = 'artworks_myuser'
 
 class Achievement(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
@@ -183,14 +181,14 @@ class Artist(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     wallet_address = models.CharField(max_length=255, blank=True)
     gallery_address = models.CharField(max_length=250, blank=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="artist")
+    user = models.OneToOneField(MyUser, on_delete=models.CASCADE, related_name="artist")
     photo = models.ImageField(null=True, default="/defaultImage.png")
     birthday = models.DateField(default=date.today)
     origin = models.ForeignKey(Origin, on_delete=models.CASCADE, null=False)
     biography = models.TextField(blank=True)
     cv = models.TextField(blank=True)
     achievements = models.ManyToManyField(Achievement, blank=True)
-    favorites = models.ManyToManyField(User, related_name="favorite_artist", default=None, blank=True)
+    favorites = models.ManyToManyField(MyUser, related_name="favorite_artist", default=None, blank=True)
 
     class Meta:
         verbose_name = "artist"
@@ -285,7 +283,7 @@ class Artwork(models.Model):
     tags = models.ManyToManyField(Tag, blank=True)
     price = models.IntegerField(null=False)
     # price_eth = models.CharField(max_length=200, null=True, blank=True)
-    favorite_artworks = models.ManyToManyField(User, related_name="user_favorite_artworks", default=None, blank=True)
+    favorite_artworks = models.ManyToManyField(MyUser, related_name="user_favorite_artworks", default=None, blank=True)
     is_minted = models.BooleanField(default=False)
     on_market = models.BooleanField(default=False)
     is_artist_talented = models.BooleanField(default=False)
@@ -301,7 +299,7 @@ class Artwork(models.Model):
     is_notable = models.BooleanField(default=False)
     is_carousel = models.BooleanField(default=False)
     owner = models.ForeignKey(
-        User,
+        MyUser,
         on_delete=models.SET_NULL,
         related_name="artwork_owner",
         null=True,
@@ -316,7 +314,7 @@ class Artwork(models.Model):
     )
 
     created_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL, related_name="artwork_creator", null=True
+        MyUser, on_delete=models.SET_NULL, related_name="artwork_creator", null=True
     )  # add artwork from panel
     created_at = models.DateTimeField(auto_now_add=True)
     objects = ArtworkManager()
@@ -345,7 +343,7 @@ class TheToken(models.Model):
     )
     token_id = models.CharField(max_length=250, null=True, blank=True, unique=True)
     market_item_id = models.CharField(max_length=250, null=True, blank=True)
-    holder = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    holder = models.ForeignKey(MyUser, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     contract = models.CharField(max_length=250, null=True, blank=True)
 
@@ -358,8 +356,8 @@ class TheToken(models.Model):
 
 class Order(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
-    seller = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="order_seller", null=True)
-    buyer = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="order_buyer", null=True)
+    seller = models.ForeignKey(MyUser, on_delete=models.SET_NULL, related_name="order_seller", null=True)
+    buyer = models.ForeignKey(MyUser, on_delete=models.SET_NULL, related_name="order_buyer", null=True)
     transaction_hash = models.CharField(max_length=200, null=True, blank=True)
     price_eth = models.DecimalField(max_digits=7, decimal_places=4, null=True, blank=True)
     fee_eth = models.DecimalField(max_digits=7, decimal_places=4, null=True, blank=True)
@@ -373,7 +371,7 @@ class Order(models.Model):
 
 class ShippingAddress(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
-    buyer = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="buyer_shipping", null=True)
+    buyer = models.ForeignKey(MyUser, on_delete=models.SET_NULL, related_name="buyer_shipping", null=True)
     order = models.OneToOneField(Order, on_delete=models.CASCADE, null=True, blank=True)
     address = models.CharField(max_length=200, null=True, blank=True)
     city = models.CharField(max_length=200, null=True, blank=True)

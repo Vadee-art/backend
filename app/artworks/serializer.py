@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import (
     Article,
-    User,
+    MyUser,
     Artwork,
     Order,
     Origin,
@@ -44,7 +44,7 @@ class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
-        model = User
+        model = MyUser
         fields = [
             'id',
             'artist',
@@ -117,7 +117,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = MyUser
         fields = ['id', 'user_name', 'email', 'first_name', 'last_name', 'password']
         extra_kwargs = {
             'password': {'required': True, 'write_only': True},
@@ -128,7 +128,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, data):
-        user = User.objects.create(
+        user = MyUser.objects.create(
             first_name=data['first_name'],
             last_name=data['last_name'],
             user_name=data['user_name'],
@@ -143,7 +143,7 @@ class UserSerializerWithToken(UserSerializer):
     token = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        model = User
+        model = MyUser
         fields = [
             'id',
             'username',

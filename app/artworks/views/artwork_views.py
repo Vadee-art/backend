@@ -14,7 +14,7 @@ from artworks.models import (
     Artwork,
     Artist,
     Category,
-    User,
+    MyUser,
     Order,
     Origin,
     ShippingAddress,

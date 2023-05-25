@@ -228,7 +228,7 @@ MEDIA_ROOT = BASE_DIR / "mediafiles"
 CORS_ALLOW_ALL_ORIGINS = True
 
 # For our custom user model
-AUTH_USER_MODEL = "artworks.User"
+AUTH_USER_MODEL = "artworks.MyUser"
 
 print("-------------------------------------")
 print("base path: ", BASE_DIR)

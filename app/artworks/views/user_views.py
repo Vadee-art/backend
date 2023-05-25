@@ -15,7 +15,7 @@ from artworks.serializer import (
     UserSerializer,
     UserSerializerWithToken,
 )
-from artworks.models import Artwork, Artist, User
+from artworks.models import Artwork, Artist, MyUser
 from rest_framework import status
 from rest_framework import generics
 
@@ -98,7 +98,7 @@ class UserProfile(generics.RetrieveAPIView):
 
     def get_object(self, queryset=None, **kwargs):
         user = self.request.user
-        return get_object_or_404(User, id=user.id)
+        return get_object_or_404(MyUser, id=user.id)
 
 
 # @api_view(["GET"])
@@ -112,7 +112,7 @@ class UserProfile(generics.RetrieveAPIView):
 @api_view(["GET"])
 @permission_classes([IsAdminUser])
 def fetchUsers(request):
-    users = User.objects.all()
+    users = MyUser.objects.all()
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
 
@@ -120,7 +120,7 @@ def fetchUsers(request):
 @api_view(["GET"])
 @permission_classes([IsAdminUser])
 def fetchUsersById(request, pk):
-    user = User.objects.get(id=pk)
+    user = MyUser.objects.get(id=pk)
     serializer = UserSerializer(user, many=False)
     return Response(serializer.data)
 
@@ -128,7 +128,7 @@ def fetchUsersById(request, pk):
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 def updateUserById(request, pk):
-    user = User.objects.get(id=pk)
+    user = MyUser.objects.get(id=pk)
 
     data = request.data
     user.first_name = data["firstName"]
@@ -149,7 +149,7 @@ def deleteUser(request):
     data = request.data
     selectedUsers = data["selectedUsers"]
     for id in selectedUsers:
-        userDeleting = User.objects.get(id=id)
+        userDeleting = MyUser.objects.get(id=id)
         userDeleting.delete()
     return Response("users were deleted")
 
