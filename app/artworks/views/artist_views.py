@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from backend.premissions import OwnProfilePermission
 from backend.pagination import Pagination
 from artworks.serializer import ArtworkSerializer, ArtistSerializer, SingleArtistSerializer
 from rest_framework.response import Response
@@ -71,8 +72,8 @@ class ArtistsView(
 ):
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
-
     filter_backends = [filters.OrderingFilter]
+    permission_classes = [OwnProfilePermission]
     ordering_fields = ['-user__user_name']
     ordering = ['-user__user_name']
 

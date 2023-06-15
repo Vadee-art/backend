@@ -229,51 +229,49 @@ class AchievementsSerializer(serializers.ModelSerializer):
         model = Achievement
         fields = '__all__'
 
+    # first_name = serializers.SerializerMethodField(read_only=True)
+    # last_name = serializers.SerializerMethodField(read_only=True)
+    # photo = serializers.SerializerMethodField(read_only=True)
+    # userId = serializers.SerializerMethodField(read_only=True)
+    # origin = serializers.SerializerMethodField(read_only=True)
+    # achievements = serializers.SerializerMethodField(read_only=True)
+    # gallery_address = serializers.SerializerMethodField(read_only=True)
 
-class ArtistSerializer(serializers.ModelSerializer):
-    first_name = serializers.SerializerMethodField(read_only=True)
-    last_name = serializers.SerializerMethodField(read_only=True)
-    photo = serializers.SerializerMethodField(read_only=True)
-    userId = serializers.SerializerMethodField(read_only=True)
-    origin = serializers.SerializerMethodField(read_only=True)
-    achievements = serializers.SerializerMethodField(read_only=True)
-    gallery_address = serializers.SerializerMethodField(read_only=True)
+    # class Meta:
+    #     model = Artist
+    #     fields = '__all__'
 
-    class Meta:
-        model = Artist
-        fields = '__all__'
+    # def get_userId(self, obj):
+    #     user = obj.user
+    #     userId = user.id
+    #     return userId
 
-    def get_userId(self, obj):
-        user = obj.user
-        userId = user.id
-        return userId
+    # def get_first_name(self, obj):
+    #     user = obj.user
+    #     return user.first_name
 
-    def get_first_name(self, obj):
-        user = obj.user
-        return user.first_name
+    # def get_last_name(self, obj):
+    #     user = obj.user
+    #     return user.last_name
 
-    def get_last_name(self, obj):
-        user = obj.user
-        return user.last_name
+    # def get_photo(self, obj):
+    #     return obj.photo.url
 
-    def get_photo(self, obj):
-        return obj.photo.url
+    # def get_origin_country(self, obj):
+    #     return obj.origin.country
 
-    def get_origin_country(self, obj):
-        return obj.origin.country
+    # def get_origin(self, obj):
+    #     origin = obj.origin
+    #     serializer = OriginSerializer(origin, many=False)
+    #     return serializer.data
 
-    def get_origin(self, obj):
-        origin = obj.origin
-        serializer = OriginSerializer(origin, many=False)
-        return serializer.data
+    # def get_achievements(self, obj):
+    #     achievements = obj.achievements
+    #     serializer = AchievementsSerializer(achievements, many=True)
+    #     return serializer.data
 
-    def get_achievements(self, obj):
-        achievements = obj.achievements
-        serializer = AchievementsSerializer(achievements, many=True)
-        return serializer.data
-
-    def get_gallery_address(self, obj):
-        return obj.gallery_address
+    # def get_gallery_address(self, obj):
+    #     return obj.gallery_address
 
 
 class ArtworkSerializer(serializers.ModelSerializer):
@@ -331,15 +329,18 @@ class ArtworkSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-class SingleArtistSerializer(ArtistSerializer):
-    artworks = ArtworkSerializer(many=True)
-
-
-
 class ShippingAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShippingAddress
         fields = '__all__'
+
+
+class ArtistSerializer(serializers.ModelSerializer):
+    origin_id = serializers.IntegerField()
+    class Meta:
+        model = Artist
+        fields = '__all__'
+        read_only_fields = ['user', 'origin', 'achievements', 'favorites']
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -376,3 +377,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = '__all__'
+
+
+class SingleArtistSerializer(ArtistSerializer):
+    artworks = ArtworkSerializer(many=True)
