@@ -90,6 +90,8 @@ REST_FRAMEWORK = {
         'djangorestframework_camel_case.parser.CamelCaseJSONParser',
         # Any other parsers
     ),
+    'DEFAULT_PAGINATION_CLASS': 'backend.pagination.Pagination',
+    'PAGE_SIZE': (50)
 }
 
 

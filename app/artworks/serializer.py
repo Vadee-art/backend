@@ -331,6 +331,11 @@ class ArtworkSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
+class SingleArtistSerializer(ArtistSerializer):
+    artworks = ArtworkSerializer(many=True)
+
+
+
 class ShippingAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShippingAddress
