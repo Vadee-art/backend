@@ -24,26 +24,29 @@ from rest_framework.documentation import include_docs_urls
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+
 schema_view = get_schema_view(
     openapi.Info(
-        title="Vadee API",
+        title='Vadee API',
         default_version='v1',
     ),
+    url=settings.DOMAIN,
     public=True,
     permission_classes=[permissions.AllowAny],
 )
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("api/v1/market/", include("artworks.urls.market_place_urls")),
-    path("api/v1/artworks/", include("artworks.urls.artwork_urls")),
-    path("api/v1/users/", include("artworks.urls.user_urls")),
-    path("api/v1/artists/", include("artworks.urls.artist_urls")),
-    path("api/v1/articles/", include("artworks.urls.article_urls")),
-    path("api/v1/orders/", include("artworks.urls.order_urls")),
-    path("docs/", include_docs_urls(title="Vadee")),
+    path('admin/', admin.site.urls),
+    path('api/v1/market/', include('artworks.urls.market_place_urls')),
+    path('api/v1/artworks/', include('artworks.urls.artwork_urls')),
+    path('api/v1/users/', include('artworks.urls.user_urls')),
+    path('api/v1/artists/', include('artworks.urls.artist_urls')),
+    path('api/v1/articles/', include('artworks.urls.article_urls')),
+    path('api/v1/orders/', include('artworks.urls.order_urls')),
+    path('docs/', include_docs_urls(title='Vadee')),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('__debug__/', include('debug_toolbar.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

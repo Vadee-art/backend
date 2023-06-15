@@ -37,11 +37,11 @@ class UserSerializer(serializers.ModelSerializer):
     address = serializers.SerializerMethodField(read_only=True)
     wallet_address = serializers.SerializerMethodField(read_only=True)
     username = serializers.SerializerMethodField(read_only=True)
-    artist = serializers.SerializerMethodField(read_only=True)
     # id = serializers.SerializerMethodField(read_only=True)
     isAdmin = serializers.SerializerMethodField(read_only=True)
     # favorite_artworks = serializers.SerializerMethodField(read_only=True)
     password = serializers.CharField(write_only=True)
+    artist = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = MyUser
@@ -167,17 +167,9 @@ class SubCategorySerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    sub_categories = serializers.SerializerMethodField(read_only=True)
-
     class Meta:
         model = Category
         fields = '__all__'
-
-    # reverse query set
-    def get_sub_categories(self, obj):
-        subCategories = obj.subcategory_set.all()
-        serializer = SubCategorySerializer(subCategories, many=True)
-        return serializer.data
 
 
 class OriginSerializer(serializers.ModelSerializer):
@@ -202,20 +194,6 @@ class TheTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = TheToken
         fields = '__all__'
-
-
-class ArtistArtworksSerializer(serializers.ModelSerializer):
-    _id = serializers.SerializerMethodField(read_only=True)
-    artwork_artist = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = Artist
-        fields = '__all__'
-
-    def get_artwork_artist(self, obj):
-        artworks = obj.artwork_artist
-        serializer = ArtworkSerializer(artworks, many=True)
-        return obj.artwork_artist
 
 
 class CollectionSerializer(serializers.ModelSerializer):
@@ -275,9 +253,9 @@ class AchievementsSerializer(serializers.ModelSerializer):
 
 
 class ArtworkSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField(read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
     collection = serializers.SerializerMethodField(read_only=True)
-    artist = serializers.SerializerMethodField(read_only=True)
+    artist_id = serializers.IntegerField(read_only=True)
     tags = serializers.SerializerMethodField(read_only=True)
     category = serializers.SerializerMethodField(read_only=True)
     sub_category = serializers.SerializerMethodField(read_only=True)
@@ -288,19 +266,9 @@ class ArtworkSerializer(serializers.ModelSerializer):
         model = Artwork
         fields = '__all__'
 
-    def get_user(self, obj):
-        user = obj.created_by
-        serializer = UserSerializer(user, many=False)
-        return serializer.data
-
     def get_collection(self, obj):
         collection = obj.collection
         serializer = CollectionSerializer(collection, many=False)
-        return serializer.data
-
-    def get_artist(self, obj):
-        artist = obj.artist
-        serializer = ArtistSerializer(artist, many=False)
         return serializer.data
 
     def get_tags(self, obj):
@@ -309,7 +277,7 @@ class ArtworkSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def get_category(self, obj):
-        category = obj.category
+        category = obj.sub_category.category
         serializer = CategorySerializer(category, many=False)
         return serializer.data
 
@@ -336,11 +304,19 @@ class ShippingAddressSerializer(serializers.ModelSerializer):
 
 
 class ArtistSerializer(serializers.ModelSerializer):
-    origin_id = serializers.IntegerField()
+    name = serializers.SerializerMethodField(read_only=True)
+    username = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Artist
         fields = '__all__'
         read_only_fields = ['user', 'origin', 'achievements', 'favorites']
+
+    def get_username(self, obj):
+        return obj.user.email
+
+    def get_name(self, obj):
+        return obj.user.first_name + ' ' + obj.user.last_name
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -380,4 +356,20 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 
 class SingleArtistSerializer(ArtistSerializer):
-    artworks = ArtworkSerializer(many=True)
+    atrworks = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Artist
+        fields = '__all__'
+
+    def get_atrworks(self, obj):
+        artworks = obj.artwork_artist
+        serializer = ArtworkSummary(artworks, many=True)
+        return serializer.data
+
+
+class ArtworkSummary(ArtworkSerializer):
+    origin = None
+    class Meta:
+        model = Artwork
+        exclude = ['origin']

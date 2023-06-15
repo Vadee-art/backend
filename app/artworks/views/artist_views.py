@@ -1,11 +1,8 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from artworks.filtering import ArtistsOrderFilter
 from backend.premissions import OwnProfilePermission
-from backend.pagination import Pagination
 from artworks.serializer import ArtworkSerializer, ArtistSerializer, SingleArtistSerializer
-from rest_framework.response import Response
 from artworks.models import Artist, Artwork
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework import filters, generics, viewsets, mixins
 
 
@@ -64,36 +61,10 @@ class ArtistRelatedArtworks(generics.ListAPIView):
         return list
 
 
-class ArtistsView(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-    viewsets.GenericViewSet
-):
-    queryset = Artist.objects.all()
+class ArtistsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = Artist.objects.select_related('user').prefetch_related('favorites', 'achievements')
     serializer_class = ArtistSerializer
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [ArtistsOrderFilter]
     permission_classes = [OwnProfilePermission]
-    ordering_fields = ['-user__user_name']
-    ordering = ['-user__user_name']
-
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return ArtistSerializer
-        if self.action == 'retrieve':
-            return SingleArtistSerializer
-        if self.action == 'update':
-            return SingleArtistSerializer
-        return ArtistSerializer
-
-
-# @api_view(["PUT"])
-# @permission_classes([IsAuthenticated])
-# def update_artist_gallery(request, pk):
-#     artist = Artist.objects.get(_id=)
-#     data = request.data
-#     artist.gallery_address = data["galleryAddress"]
-#     artist.wallet_address = data["artistWalletAddress"]
-#     artist.save()
-#     serializer = ArtistSerializer(artist, many=False)
-#     return Response(serializer.data)
+    ordering_fields = ['first_name', 'last_name', '_id']
+    ordering = ['last_name']

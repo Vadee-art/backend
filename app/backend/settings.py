@@ -39,6 +39,20 @@ DEBUG = bool(int(os.environ.get("DEBUG", 1)))
 # DEBUG = False
 # DEBUG = os.getenv('DEBUG', 0)
 
+ENV = os.getenv('ENV', 'dev')
+
+IS_PROD = ENV == 'production'
+IS_STAGING = ENV == 'staging'
+IS_DEV = ENV == 'dev'
+
+DEV_DOMAIN = 'http://127.0.0.1:8000'
+STAGING_DOMAIN = 'https://s.api.vadee.art'
+PROD_DOMAIN = 'https://api.vadee.art'
+
+DOMAIN = STAGING_DOMAIN if IS_STAGING \
+    else PROD_DOMAIN if IS_PROD \
+    else DEV_DOMAIN
+
 ALLOWED_HOSTS = [
     "0.0.0.0",
     "127.0.0.1",
@@ -70,6 +84,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'drf_yasg',
+    'debug_toolbar',
 ]
 
 REST_FRAMEWORK = {"DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema"}
@@ -135,6 +150,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'djangorestframework_camel_case.middleware.CamelCaseMiddleWare',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -191,6 +207,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/

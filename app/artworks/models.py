@@ -283,7 +283,7 @@ class Artwork(models.Model):
     tags = models.ManyToManyField(Tag, blank=True)
     price = models.IntegerField(null=False)
     # price_eth = models.CharField(max_length=200, null=True, blank=True)
-    favorite_artworks = models.ManyToManyField(MyUser, related_name="user_favorite_artworks", default=None, blank=True)
+    # favorite_artworks = models.ManyToManyField(MyUser, related_name="user_favorite_artworks", default=None, blank=True)
     is_minted = models.BooleanField(default=False)
     on_market = models.BooleanField(default=False)
     is_artist_talented = models.BooleanField(default=False)

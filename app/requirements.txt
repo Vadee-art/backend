@@ -37,3 +37,4 @@ uritemplate==4.1.1
 urllib3==1.26.7
 drf-yasg[validation]~=1.21.5
 djangorestframework-camel-case
+django-debug-toolbar==3.2.4
