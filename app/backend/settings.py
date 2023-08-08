@@ -61,6 +61,7 @@ ALLOWED_HOSTS = [
     "www.vadee.art",
     "www.vadee.net",
     "www.v1.vadee.net",
+    "staging.vadee.art",
     "192.168.1.36",
 ]
 ALLOWED_HOSTS_ENV = os.environ.get("ALLOWED_HOSTS")
@@ -83,6 +84,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'drf_yasg',
     'debug_toolbar',
+    'imagekit',
 ]
 
 REST_FRAMEWORK = {"DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema"}

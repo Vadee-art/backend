@@ -232,10 +232,14 @@ class ArtworkSerializer(serializers.ModelSerializer):
     sub_category = SubCategorySerializer(many=False, read_only=True)
     origin = OriginSerializer(many=False, read_only=True)
     voucher = VoucherSerializer(many=False, read_only=True)
+    image_medium_quality = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Artwork
         fields = '__all__'
+
+    def get_image_medium_quality(self, obj):
+        return self.context['request'].build_absolute_uri(obj.image_medium_quality.url)
 
 
 class ShippingAddressSerializer(serializers.ModelSerializer):

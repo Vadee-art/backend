@@ -63,7 +63,9 @@ def fetch_origin_list(request):
     return Response(list)
 
 
-class ArtworkViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class ArtworkViewSet(
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
     queryset = (
         Artwork.objects.select_related(
             'artist', 'collection', 'category', 'origin', 'sub_category', 'voucher'
@@ -76,18 +78,18 @@ class ArtworkViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     ordering = ['-created_at']
 
 
-@api_view(["GET"])
-def fetch_the_artwork(request, pk):
-    artwork = Artwork.objects.get(_id=pk)
-    serializer = ArtworkSerializer(artwork, many=False)
-    return Response(serializer.data)
-
-
-@api_view(["GET"])
-def fetch_is_carousel(request):
-    artworks = Artwork.objects.filter(is_carousel=True).order_by("created_at")
-    serializer = ArtworkSerializer(artworks, many=True)
-    return Response(serializer.data)
+class CarouselArtworkViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = (
+        Artwork.objects.filter(is_carousel=True)
+        .select_related(
+            'artist', 'collection', 'category', 'origin', 'sub_category', 'voucher'
+        )
+        .prefetch_related('tags')
+        .all()
+    )
+    serializer_class = ArtworkSerializer
+    ordering_fields = ['-created_at']
+    ordering = ['-created_at']
 
 
 @api_view(["PUT"])

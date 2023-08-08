@@ -1,13 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as __
-from django.conf import settings
 from django.urls import reverse
 from datetime import date
 from django.utils import timezone
-from django.contrib import admin
 from django.core.exceptions import ValidationError
-
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill, ResizeToFit
 
 from django.contrib.auth.models import (
     AbstractBaseUser,
@@ -331,6 +330,13 @@ class Artwork(models.Model):
         MyUser, on_delete=models.SET_NULL, related_name="artwork_creator", null=True
     )  # add artwork from panel
     created_at = models.DateTimeField(auto_now_add=True)
+
+    image_medium_quality = ImageSpecField(
+        source='image',
+        processors=[ResizeToFit(width=720, upscale=False)],
+        format='JPEG',
+        options={'quality': 95},
+    )
 
     objects = ArtworkManager()
 
