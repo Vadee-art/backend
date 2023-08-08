@@ -1,4 +1,3 @@
-from django.db.models import fields
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import (
@@ -207,50 +206,6 @@ class AchievementsSerializer(serializers.ModelSerializer):
         model = Achievement
         fields = '__all__'
 
-    # first_name = serializers.SerializerMethodField(read_only=True)
-    # last_name = serializers.SerializerMethodField(read_only=True)
-    # photo = serializers.SerializerMethodField(read_only=True)
-    # userId = serializers.SerializerMethodField(read_only=True)
-    # origin = serializers.SerializerMethodField(read_only=True)
-    # achievements = serializers.SerializerMethodField(read_only=True)
-    # gallery_address = serializers.SerializerMethodField(read_only=True)
-
-    # class Meta:
-    #     model = Artist
-    #     fields = '__all__'
-
-    # def get_userId(self, obj):
-    #     user = obj.user
-    #     userId = user.id
-    #     return userId
-
-    # def get_first_name(self, obj):
-    #     user = obj.user
-    #     return user.first_name
-
-    # def get_last_name(self, obj):
-    #     user = obj.user
-    #     return user.last_name
-
-    # def get_photo(self, obj):
-    #     return obj.photo.url
-
-    # def get_origin_country(self, obj):
-    #     return obj.origin.country
-
-    # def get_origin(self, obj):
-    #     origin = obj.origin
-    #     serializer = OriginSerializer(origin, many=False)
-    #     return serializer.data
-
-    # def get_achievements(self, obj):
-    #     achievements = obj.achievements
-    #     serializer = AchievementsSerializer(achievements, many=True)
-    #     return serializer.data
-
-    # def get_gallery_address(self, obj):
-    #     return obj.gallery_address
-
 
 class ArtistSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
@@ -270,47 +225,17 @@ class ArtistSerializer(serializers.ModelSerializer):
 
 class ArtworkSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(read_only=True)
-    collection = serializers.SerializerMethodField(read_only=True)
+    collection = CollectionSerializer(many=False, read_only=True)
     artist = ArtistSerializer(many=False, read_only=True)
-    tags = serializers.SerializerMethodField(read_only=True)
-    category = serializers.SerializerMethodField(read_only=True)
-    sub_category = serializers.SerializerMethodField(read_only=True)
-    origin = serializers.SerializerMethodField(read_only=True)
-    voucher = serializers.SerializerMethodField(read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
+    category = CategorySerializer(many=False, read_only=True)
+    sub_category = SubCategorySerializer(many=False, read_only=True)
+    origin = OriginSerializer(many=False, read_only=True)
+    voucher = VoucherSerializer(many=False, read_only=True)
 
     class Meta:
         model = Artwork
         fields = '__all__'
-
-    def get_collection(self, obj):
-        collection = obj.collection
-        serializer = CollectionSerializer(collection, many=False)
-        return serializer.data
-
-    def get_tags(self, obj):
-        tags = obj.tags
-        serializer = TagSerializer(tags, many=True)
-        return serializer.data
-
-    def get_category(self, obj):
-        category = obj.sub_category.category
-        serializer = CategorySerializer(category, many=False)
-        return serializer.data
-
-    def get_sub_category(self, obj):
-        sub_category = obj.sub_category
-        serializer = SubCategorySerializer(sub_category, many=False)
-        return serializer.data
-
-    def get_origin(self, obj):
-        origin = obj.origin
-        serializer = OriginSerializer(origin, many=False)
-        return serializer.data
-
-    def get_voucher(self, obj):
-        voucher = obj.voucher
-        serializer = VoucherSerializer(voucher, many=False)
-        return serializer.data
 
 
 class ShippingAddressSerializer(serializers.ModelSerializer):
@@ -357,22 +282,17 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SingleArtistSerializer(ArtistSerializer):
-    atrworks = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = Artist
-        fields = '__all__'
-
-    def get_atrworks(self, obj):
-        artworks = obj.artwork_artist
-        serializer = ArtworkSummary(artworks, many=True)
-        return serializer.data
-
-
 class ArtworkSummary(ArtworkSerializer):
     origin = None
 
     class Meta:
         model = Artwork
         exclude = ['origin']
+
+
+class SingleArtistSerializer(ArtistSerializer):
+    atrworks = ArtworkSummary(many=True, read_only=True)
+
+    class Meta:
+        model = Artist
+        fields = '__all__'

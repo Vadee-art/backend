@@ -64,7 +64,13 @@ def fetch_origin_list(request):
 
 
 class ArtworkViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Artwork.objects.prefetch_related('artist').all()
+    queryset = (
+        Artwork.objects.select_related(
+            'artist', 'collection', 'category', 'origin', 'sub_category', 'voucher'
+        )
+        .prefetch_related('tags')
+        .all()
+    )
     serializer_class = ArtworkSerializer
     ordering_fields = ['-created_at']
     ordering = ['-created_at']
