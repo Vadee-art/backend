@@ -67,14 +67,18 @@ class UserManager(BaseUserManager):
             # _ if translation needed later
             raise ValueError(__("You must provide an email address"))
         email = self.normalize_email(email)
-        user = self.model(email=email, user_name=user_name, first_name=first_name, **other_fields)
+        user = self.model(
+            email=email, user_name=user_name, first_name=first_name, **other_fields
+        )
         user.set_password(password)
         user.save()
         return user
 
 
 class MyUser(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(verbose_name="email_address", max_length=255, unique=True, blank=False)
+    email = models.EmailField(
+        verbose_name="email_address", max_length=255, unique=True, blank=False
+    )
     user_name = models.CharField(max_length=150, unique=True)
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
@@ -188,7 +192,9 @@ class Artist(models.Model):
     biography = models.TextField(blank=True)
     cv = models.TextField(blank=True)
     achievements = models.ManyToManyField(Achievement, blank=True)
-    favorites = models.ManyToManyField(MyUser, related_name="favorite_artist", default=None, blank=True)
+    favorites = models.ManyToManyField(
+        MyUser, related_name="favorite_artist", default=None, blank=True
+    )
 
     class Meta:
         verbose_name = "artist"
@@ -259,13 +265,21 @@ class Artwork(models.Model):
         super(Artwork, self).clean()
 
     _id = models.AutoField(primary_key=True, editable=False)
-    category = models.ForeignKey(Category, related_name="artwork_category", on_delete=models.CASCADE)
-    sub_category = models.ForeignKey(SubCategory, related_name="artwork_sub_category", on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        Category, related_name="artwork_category", on_delete=models.CASCADE
+    )
+    sub_category = models.ForeignKey(
+        SubCategory, related_name="artwork_sub_category", on_delete=models.CASCADE
+    )
     title = models.CharField(max_length=200, null=True, blank=True, default="no title")
-    collection = models.OneToOneField(Collection, on_delete=models.CASCADE, null=True, blank=True)
+    collection = models.OneToOneField(
+        Collection, on_delete=models.CASCADE, null=True, blank=True
+    )
     subtitle = models.CharField(max_length=200, null=True, blank=True)
     slug = models.SlugField(max_length=255, blank=True)
-    year = models.CharField(_("year"), choices=year_choices(), default=current_year, max_length=200)
+    year = models.CharField(
+        _("year"), choices=year_choices(), default=current_year, max_length=200
+    )
     print = models.CharField(max_length=200, null=True, blank=True)
     condition = models.CharField(max_length=200, null=True, blank=True)
     # uploads to MEDIA_ROOT in setting
@@ -356,10 +370,16 @@ class TheToken(models.Model):
 
 class Order(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
-    seller = models.ForeignKey(MyUser, on_delete=models.SET_NULL, related_name="order_seller", null=True)
-    buyer = models.ForeignKey(MyUser, on_delete=models.SET_NULL, related_name="order_buyer", null=True)
+    seller = models.ForeignKey(
+        MyUser, on_delete=models.SET_NULL, related_name="order_seller", null=True
+    )
+    buyer = models.ForeignKey(
+        MyUser, on_delete=models.SET_NULL, related_name="order_buyer", null=True
+    )
     transaction_hash = models.CharField(max_length=200, null=True, blank=True)
-    price_eth = models.DecimalField(max_digits=7, decimal_places=4, null=True, blank=True)
+    price_eth = models.DecimalField(
+        max_digits=7, decimal_places=4, null=True, blank=True
+    )
     fee_eth = models.DecimalField(max_digits=7, decimal_places=4, null=True, blank=True)
     is_delivered = models.BooleanField(default=False)
     delivered_at = models.DateTimeField(auto_now_add=False, null=True, blank=True)
@@ -371,7 +391,9 @@ class Order(models.Model):
 
 class ShippingAddress(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
-    buyer = models.ForeignKey(MyUser, on_delete=models.SET_NULL, related_name="buyer_shipping", null=True)
+    buyer = models.ForeignKey(
+        MyUser, on_delete=models.SET_NULL, related_name="buyer_shipping", null=True
+    )
     order = models.OneToOneField(Order, on_delete=models.CASCADE, null=True, blank=True)
     address = models.CharField(max_length=200, null=True, blank=True)
     city = models.CharField(max_length=200, null=True, blank=True)

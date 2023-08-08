@@ -44,7 +44,7 @@ def get_subcategory(request):
 @api_view(["GET"])
 def categories(request):
     categories = Category.objects.all()
-    serializer = CategorySerializer(categories, many=True)
+    serializer = CategorySerializer(categories, many=True, context={'request': request})
     return Response(serializer.data)
 
 
@@ -56,13 +56,15 @@ def fetch_origin_list(request):
         artworks = o.artwork_set.all()
         originSerializer = OriginSerializer(o, many=False)
         artworkSerializer = ArtworkSerializer(artworks, many=True)
-        list.append({"origin": originSerializer.data, "artworks": artworkSerializer.data})
+        list.append(
+            {"origin": originSerializer.data, "artworks": artworkSerializer.data}
+        )
 
     return Response(list)
 
 
 class ArtworkViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Artwork.objects.all()
+    queryset = Artwork.objects.prefetch_related('artist').all()
     serializer_class = ArtworkSerializer
     ordering_fields = ['-created_at']
     ordering = ['-created_at']

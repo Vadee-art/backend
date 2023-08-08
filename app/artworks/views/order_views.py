@@ -48,7 +48,7 @@ def addOrderItems(request):
                     name=artwork.title,
                     quantity=1,
                     price=artwork.price,
-                    image=artwork.image
+                    image=artwork.image,
                 )
                 # update stock
                 artwork.quantity -= 1
@@ -69,10 +69,15 @@ def fetchOrderById(request, pk):
             serializer = OrderSerializer(order, many=False)
             return Response(serializer.data)
         else:
-            Response({'Sorry: (, You are not authorized to view this order'},
-                     status=status.HTTP_400_BAD_REQUEST)
+            Response(
+                {'Sorry: (, You are not authorized to view this order'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
     except:
-        return Response({'The order you are requesting does not exit'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {'The order you are requesting does not exit'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 @api_view(['GET'])

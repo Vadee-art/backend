@@ -45,7 +45,11 @@ urlpatterns = [
     path('api/v1/articles/', include('artworks.urls.article_urls')),
     path('api/v1/orders/', include('artworks.urls.order_urls')),
     path('docs/', include_docs_urls(title='Vadee')),
-    re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    re_path(
+        r'^swagger/$',
+        schema_view.with_ui('swagger', cache_timeout=0),
+        name='schema-swagger-ui',
+    ),
     path('__debug__/', include('debug_toolbar.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

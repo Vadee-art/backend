@@ -252,10 +252,26 @@ class AchievementsSerializer(serializers.ModelSerializer):
     #     return obj.gallery_address
 
 
+class ArtistSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField(read_only=True)
+    username = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Artist
+        fields = '__all__'
+        read_only_fields = ['user', 'origin', 'achievements', 'favorites']
+
+    def get_username(self, obj):
+        return obj.user.email
+
+    def get_name(self, obj):
+        return obj.user.first_name + ' ' + obj.user.last_name
+
+
 class ArtworkSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(read_only=True)
     collection = serializers.SerializerMethodField(read_only=True)
-    artist_id = serializers.IntegerField(read_only=True)
+    artist = ArtistSerializer(many=False, read_only=True)
     tags = serializers.SerializerMethodField(read_only=True)
     category = serializers.SerializerMethodField(read_only=True)
     sub_category = serializers.SerializerMethodField(read_only=True)
@@ -303,22 +319,6 @@ class ShippingAddressSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ArtistSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField(read_only=True)
-    username = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = Artist
-        fields = '__all__'
-        read_only_fields = ['user', 'origin', 'achievements', 'favorites']
-
-    def get_username(self, obj):
-        return obj.user.email
-
-    def get_name(self, obj):
-        return obj.user.first_name + ' ' + obj.user.last_name
-
-
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artwork
@@ -341,7 +341,9 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_shippingAddress(self, obj):
         try:
             # one to one relation -> obj.shippingAddress
-            shippingAddress = ShippingAddressSerializer(obj.shippingaddress, many=False).data
+            shippingAddress = ShippingAddressSerializer(
+                obj.shippingaddress, many=False
+            ).data
         except:
             shippingAddress = False
         return shippingAddress
@@ -370,6 +372,7 @@ class SingleArtistSerializer(ArtistSerializer):
 
 class ArtworkSummary(ArtworkSerializer):
     origin = None
+
     class Meta:
         model = Artwork
         exclude = ['origin']

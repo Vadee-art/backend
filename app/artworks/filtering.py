@@ -1,18 +1,17 @@
-
 from rest_framework.filters import OrderingFilter
 
 
 class ArtistsOrderFilter(OrderingFilter):
     allowed_custom_filters = ['last_name', 'first_name']
-    fields_related = {
-        'last_name': 'user__last_name',
-        'first_name': 'user__first_name'
-    }
+    fields_related = {'last_name': 'user__last_name', 'first_name': 'user__first_name'}
+
     def get_ordering(self, request, queryset, view):
         params = request.query_params.get(self.ordering_param)
         if params:
             fields = [param.strip() for param in params.split(',')]
-            ordering = [f for f in fields if f.lstrip('-') in self.allowed_custom_filters]
+            ordering = [
+                f for f in fields if f.lstrip('-') in self.allowed_custom_filters
+            ]
             if ordering:
                 return ordering
 
@@ -24,7 +23,7 @@ class ArtistsOrderFilter(OrderingFilter):
         if ordering:
             for field in ordering:
                 symbol = "-" if "-" in field else ""
-                order_fields.append(symbol+self.fields_related[field.lstrip('-')])
+                order_fields.append(symbol + self.fields_related[field.lstrip('-')])
         if order_fields:
             return queryset.order_by(*order_fields)
 

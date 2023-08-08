@@ -20,11 +20,36 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='MyUser',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
                 ('password', models.CharField(max_length=128, verbose_name='password')),
-                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
-                ('email', models.EmailField(max_length=255, unique=True, verbose_name='email_address')),
+                (
+                    'last_login',
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name='last login'
+                    ),
+                ),
+                (
+                    'is_superuser',
+                    models.BooleanField(
+                        default=False,
+                        help_text='Designates that this user has all permissions without explicitly assigning them.',
+                        verbose_name='superuser status',
+                    ),
+                ),
+                (
+                    'email',
+                    models.EmailField(
+                        max_length=255, unique=True, verbose_name='email_address'
+                    ),
+                ),
                 ('user_name', models.CharField(max_length=150, unique=True)),
                 ('first_name', models.CharField(blank=True, max_length=150)),
                 ('last_name', models.CharField(blank=True, max_length=150)),
@@ -34,15 +59,41 @@ class Migration(migrations.Migration):
                 ('phone_number', models.CharField(blank=True, max_length=150)),
                 ('postal_code', models.CharField(blank=True, max_length=150)),
                 ('address', models.CharField(blank=True, max_length=250)),
-                ('about', models.TextField(blank=True, max_length=500, verbose_name='about')),
+                (
+                    'about',
+                    models.TextField(blank=True, max_length=500, verbose_name='about'),
+                ),
                 ('created_at', models.DateTimeField(default=django.utils.timezone.now)),
                 ('profile_picture', models.ImageField(blank=True, upload_to='')),
                 ('is_active', models.BooleanField(default=True)),
                 ('is_staff', models.BooleanField(default=False)),
                 ('is_admin', models.BooleanField(default=False)),
-                ('wallet_address', models.CharField(blank=True, max_length=250, null=True)),
-                ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups')),
-                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.Permission', verbose_name='user permissions')),
+                (
+                    'wallet_address',
+                    models.CharField(blank=True, max_length=250, null=True),
+                ),
+                (
+                    'groups',
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
+                        related_name='user_set',
+                        related_query_name='user',
+                        to='auth.Group',
+                        verbose_name='groups',
+                    ),
+                ),
+                (
+                    'user_permissions',
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text='Specific permissions for this user.',
+                        related_name='user_set',
+                        related_query_name='user',
+                        to='auth.Permission',
+                        verbose_name='user permissions',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -51,15 +102,26 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Achievement',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
-                ('title', models.CharField(blank=True, default='no title', max_length=200, null=True)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
+                (
+                    'title',
+                    models.CharField(
+                        blank=True, default='no title', max_length=200, null=True
+                    ),
+                ),
                 ('description', models.TextField(blank=True)),
             ],
         ),
         migrations.CreateModel(
             name='Article',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
                 ('title', models.CharField(blank=True, max_length=200, null=True)),
                 ('content', models.TextField(blank=True)),
             ],
@@ -67,15 +129,34 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Artist',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
                 ('wallet_address', models.CharField(blank=True, max_length=255)),
                 ('gallery_address', models.CharField(blank=True, max_length=250)),
-                ('photo', models.ImageField(default='/defaultImage.png', null=True, upload_to='')),
+                (
+                    'photo',
+                    models.ImageField(
+                        default='/defaultImage.png', null=True, upload_to=''
+                    ),
+                ),
                 ('birthday', models.DateField(default=datetime.date.today)),
                 ('biography', models.TextField(blank=True)),
                 ('cv', models.TextField(blank=True)),
-                ('achievements', models.ManyToManyField(blank=True, to='artworks.Achievement')),
-                ('favorites', models.ManyToManyField(blank=True, default=None, related_name='favorite_artist', to=settings.AUTH_USER_MODEL)),
+                (
+                    'achievements',
+                    models.ManyToManyField(blank=True, to='artworks.Achievement'),
+                ),
+                (
+                    'favorites',
+                    models.ManyToManyField(
+                        blank=True,
+                        default=None,
+                        related_name='favorite_artist',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'artist',
@@ -84,22 +165,193 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Artwork',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
-                ('title', models.CharField(blank=True, default='no title', max_length=200, null=True)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
+                (
+                    'title',
+                    models.CharField(
+                        blank=True, default='no title', max_length=200, null=True
+                    ),
+                ),
                 ('subtitle', models.CharField(blank=True, max_length=200, null=True)),
                 ('slug', models.SlugField(blank=True, max_length=255)),
-                ('year', models.CharField(choices=[('1884', '1884'), ('1885', '1885'), ('1886', '1886'), ('1887', '1887'), ('1888', '1888'), ('1889', '1889'), ('1890', '1890'), ('1891', '1891'), ('1892', '1892'), ('1893', '1893'), ('1894', '1894'), ('1895', '1895'), ('1896', '1896'), ('1897', '1897'), ('1898', '1898'), ('1899', '1899'), ('1900', '1900'), ('1901', '1901'), ('1902', '1902'), ('1903', '1903'), ('1904', '1904'), ('1905', '1905'), ('1906', '1906'), ('1907', '1907'), ('1908', '1908'), ('1909', '1909'), ('1910', '1910'), ('1911', '1911'), ('1912', '1912'), ('1913', '1913'), ('1914', '1914'), ('1915', '1915'), ('1916', '1916'), ('1917', '1917'), ('1918', '1918'), ('1919', '1919'), ('1920', '1920'), ('1921', '1921'), ('1922', '1922'), ('1923', '1923'), ('1924', '1924'), ('1925', '1925'), ('1926', '1926'), ('1927', '1927'), ('1928', '1928'), ('1929', '1929'), ('1930', '1930'), ('1931', '1931'), ('1932', '1932'), ('1933', '1933'), ('1934', '1934'), ('1935', '1935'), ('1936', '1936'), ('1937', '1937'), ('1938', '1938'), ('1939', '1939'), ('1940', '1940'), ('1941', '1941'), ('1942', '1942'), ('1943', '1943'), ('1944', '1944'), ('1945', '1945'), ('1946', '1946'), ('1947', '1947'), ('1948', '1948'), ('1949', '1949'), ('1950', '1950'), ('1951', '1951'), ('1952', '1952'), ('1953', '1953'), ('1954', '1954'), ('1955', '1955'), ('1956', '1956'), ('1957', '1957'), ('1958', '1958'), ('1959', '1959'), ('1960', '1960'), ('1961', '1961'), ('1962', '1962'), ('1963', '1963'), ('1964', '1964'), ('1965', '1965'), ('1966', '1966'), ('1967', '1967'), ('1968', '1968'), ('1969', '1969'), ('1970', '1970'), ('1971', '1971'), ('1972', '1972'), ('1973', '1973'), ('1974', '1974'), ('1975', '1975'), ('1976', '1976'), ('1977', '1977'), ('1978', '1978'), ('1979', '1979'), ('1980', '1980'), ('1981', '1981'), ('1982', '1982'), ('1983', '1983'), ('1984', '1984'), ('1985', '1985'), ('1986', '1986'), ('1987', '1987'), ('1988', '1988'), ('1989', '1989'), ('1990', '1990'), ('1991', '1991'), ('1992', '1992'), ('1993', '1993'), ('1994', '1994'), ('1995', '1995'), ('1996', '1996'), ('1997', '1997'), ('1998', '1998'), ('1999', '1999'), ('2000', '2000'), ('2001', '2001'), ('2002', '2002'), ('2003', '2003'), ('2004', '2004'), ('2005', '2005'), ('2006', '2006'), ('2007', '2007'), ('2008', '2008'), ('2009', '2009'), ('2010', '2010'), ('2011', '2011'), ('2012', '2012'), ('2013', '2013'), ('2014', '2014'), ('2015', '2015'), ('2016', '2016'), ('2017', '2017'), ('2018', '2018'), ('2019', '2019'), ('2020', '2020'), ('2021', '2021'), ('2022', '2022')], default=artworks.models.Artwork.current_year, max_length=200, verbose_name='year')),
+                (
+                    'year',
+                    models.CharField(
+                        choices=[
+                            ('1884', '1884'),
+                            ('1885', '1885'),
+                            ('1886', '1886'),
+                            ('1887', '1887'),
+                            ('1888', '1888'),
+                            ('1889', '1889'),
+                            ('1890', '1890'),
+                            ('1891', '1891'),
+                            ('1892', '1892'),
+                            ('1893', '1893'),
+                            ('1894', '1894'),
+                            ('1895', '1895'),
+                            ('1896', '1896'),
+                            ('1897', '1897'),
+                            ('1898', '1898'),
+                            ('1899', '1899'),
+                            ('1900', '1900'),
+                            ('1901', '1901'),
+                            ('1902', '1902'),
+                            ('1903', '1903'),
+                            ('1904', '1904'),
+                            ('1905', '1905'),
+                            ('1906', '1906'),
+                            ('1907', '1907'),
+                            ('1908', '1908'),
+                            ('1909', '1909'),
+                            ('1910', '1910'),
+                            ('1911', '1911'),
+                            ('1912', '1912'),
+                            ('1913', '1913'),
+                            ('1914', '1914'),
+                            ('1915', '1915'),
+                            ('1916', '1916'),
+                            ('1917', '1917'),
+                            ('1918', '1918'),
+                            ('1919', '1919'),
+                            ('1920', '1920'),
+                            ('1921', '1921'),
+                            ('1922', '1922'),
+                            ('1923', '1923'),
+                            ('1924', '1924'),
+                            ('1925', '1925'),
+                            ('1926', '1926'),
+                            ('1927', '1927'),
+                            ('1928', '1928'),
+                            ('1929', '1929'),
+                            ('1930', '1930'),
+                            ('1931', '1931'),
+                            ('1932', '1932'),
+                            ('1933', '1933'),
+                            ('1934', '1934'),
+                            ('1935', '1935'),
+                            ('1936', '1936'),
+                            ('1937', '1937'),
+                            ('1938', '1938'),
+                            ('1939', '1939'),
+                            ('1940', '1940'),
+                            ('1941', '1941'),
+                            ('1942', '1942'),
+                            ('1943', '1943'),
+                            ('1944', '1944'),
+                            ('1945', '1945'),
+                            ('1946', '1946'),
+                            ('1947', '1947'),
+                            ('1948', '1948'),
+                            ('1949', '1949'),
+                            ('1950', '1950'),
+                            ('1951', '1951'),
+                            ('1952', '1952'),
+                            ('1953', '1953'),
+                            ('1954', '1954'),
+                            ('1955', '1955'),
+                            ('1956', '1956'),
+                            ('1957', '1957'),
+                            ('1958', '1958'),
+                            ('1959', '1959'),
+                            ('1960', '1960'),
+                            ('1961', '1961'),
+                            ('1962', '1962'),
+                            ('1963', '1963'),
+                            ('1964', '1964'),
+                            ('1965', '1965'),
+                            ('1966', '1966'),
+                            ('1967', '1967'),
+                            ('1968', '1968'),
+                            ('1969', '1969'),
+                            ('1970', '1970'),
+                            ('1971', '1971'),
+                            ('1972', '1972'),
+                            ('1973', '1973'),
+                            ('1974', '1974'),
+                            ('1975', '1975'),
+                            ('1976', '1976'),
+                            ('1977', '1977'),
+                            ('1978', '1978'),
+                            ('1979', '1979'),
+                            ('1980', '1980'),
+                            ('1981', '1981'),
+                            ('1982', '1982'),
+                            ('1983', '1983'),
+                            ('1984', '1984'),
+                            ('1985', '1985'),
+                            ('1986', '1986'),
+                            ('1987', '1987'),
+                            ('1988', '1988'),
+                            ('1989', '1989'),
+                            ('1990', '1990'),
+                            ('1991', '1991'),
+                            ('1992', '1992'),
+                            ('1993', '1993'),
+                            ('1994', '1994'),
+                            ('1995', '1995'),
+                            ('1996', '1996'),
+                            ('1997', '1997'),
+                            ('1998', '1998'),
+                            ('1999', '1999'),
+                            ('2000', '2000'),
+                            ('2001', '2001'),
+                            ('2002', '2002'),
+                            ('2003', '2003'),
+                            ('2004', '2004'),
+                            ('2005', '2005'),
+                            ('2006', '2006'),
+                            ('2007', '2007'),
+                            ('2008', '2008'),
+                            ('2009', '2009'),
+                            ('2010', '2010'),
+                            ('2011', '2011'),
+                            ('2012', '2012'),
+                            ('2013', '2013'),
+                            ('2014', '2014'),
+                            ('2015', '2015'),
+                            ('2016', '2016'),
+                            ('2017', '2017'),
+                            ('2018', '2018'),
+                            ('2019', '2019'),
+                            ('2020', '2020'),
+                            ('2021', '2021'),
+                            ('2022', '2022'),
+                        ],
+                        default=artworks.models.Artwork.current_year,
+                        max_length=200,
+                        verbose_name='year',
+                    ),
+                ),
                 ('print', models.CharField(blank=True, max_length=200, null=True)),
                 ('condition', models.CharField(blank=True, max_length=200, null=True)),
-                ('image', models.ImageField(blank=True, default='/defaultImage.png', null=True, upload_to='')),
+                (
+                    'image',
+                    models.ImageField(
+                        blank=True, default='/defaultImage.png', null=True, upload_to=''
+                    ),
+                ),
                 ('width', models.IntegerField(null=True)),
                 ('height', models.IntegerField(null=True)),
                 ('depth', models.IntegerField(blank=True, null=True)),
-                ('unit', models.CharField(choices=[('0', 'cm'), ('1', 'in')], default='', max_length=2)),
+                (
+                    'unit',
+                    models.CharField(
+                        choices=[('0', 'cm'), ('1', 'in')], default='', max_length=2
+                    ),
+                ),
                 ('frame', models.CharField(blank=True, max_length=200, null=True)),
                 ('about_work', models.TextField(blank=True)),
                 ('edition_number', models.IntegerField(default=1)),
-                ('edition_total', models.IntegerField(default=0, validators=[artworks.models.Artwork.validate])),
+                (
+                    'edition_total',
+                    models.IntegerField(
+                        default=0, validators=[artworks.models.Artwork.validate]
+                    ),
+                ),
                 ('price', models.IntegerField()),
                 ('is_minted', models.BooleanField(default=False)),
                 ('on_market', models.BooleanField(default=False)),
@@ -109,7 +361,14 @@ class Migration(migrations.Migration):
                 ('is_notable', models.BooleanField(default=False)),
                 ('is_carousel', models.BooleanField(default=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('artist', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='artwork_artist', to='artworks.artist')),
+                (
+                    'artist',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='artwork_artist',
+                        to='artworks.artist',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'artwork',
@@ -120,12 +379,20 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Category',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
                 ('name', models.CharField(db_index=True, max_length=255)),
                 ('slug', models.SlugField(max_length=255, unique=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('is_featured', models.BooleanField(default=False)),
-                ('image', models.ImageField(default='/defaultImage.png', null=True, upload_to='')),
+                (
+                    'image',
+                    models.ImageField(
+                        default='/defaultImage.png', null=True, upload_to=''
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'category',
@@ -136,7 +403,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Collection',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
                 ('title', models.CharField(blank=True, max_length=350)),
             ],
             options={
@@ -146,46 +416,101 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Order',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
-                ('transaction_hash', models.CharField(blank=True, max_length=200, null=True)),
-                ('price_eth', models.DecimalField(blank=True, decimal_places=4, max_digits=7, null=True)),
-                ('fee_eth', models.DecimalField(blank=True, decimal_places=4, max_digits=7, null=True)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
+                (
+                    'transaction_hash',
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
+                (
+                    'price_eth',
+                    models.DecimalField(
+                        blank=True, decimal_places=4, max_digits=7, null=True
+                    ),
+                ),
+                (
+                    'fee_eth',
+                    models.DecimalField(
+                        blank=True, decimal_places=4, max_digits=7, null=True
+                    ),
+                ),
                 ('is_delivered', models.BooleanField(default=False)),
                 ('delivered_at', models.DateTimeField(blank=True, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('buyer', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='order_buyer', to=settings.AUTH_USER_MODEL)),
-                ('seller', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='order_seller', to=settings.AUTH_USER_MODEL)),
+                (
+                    'buyer',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='order_buyer',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'seller',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='order_seller',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name='Origin',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
-                ('country', models.CharField(db_index=True, default='', max_length=255)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
+                (
+                    'country',
+                    models.CharField(db_index=True, default='', max_length=255),
+                ),
                 ('city', models.CharField(blank=True, max_length=255, null=True)),
                 ('description', models.TextField(blank=True)),
-                ('flag', models.ImageField(default='/defaultImage.png', null=True, upload_to='')),
+                (
+                    'flag',
+                    models.ImageField(
+                        default='/defaultImage.png', null=True, upload_to=''
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name='Tag',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
                 ('name', models.CharField(db_index=True, max_length=255)),
             ],
         ),
         migrations.CreateModel(
             name='TheMarketPlace',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
                 ('contract', models.CharField(blank=True, max_length=250, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('shipping_variable', models.FloatField(default=1, unique=True)),
                 ('low_boundary', models.IntegerField(default=150, unique=True)),
                 ('mid_boundary', models.IntegerField(default=1000, unique=True)),
                 ('low_boundary_constant', models.FloatField(default=10, unique=True)),
-                ('mid_boundary_percentage', models.FloatField(default=0.02, unique=True)),
-                ('high_boundary_percantage', models.FloatField(default=0.05, unique=True)),
+                (
+                    'mid_boundary_percentage',
+                    models.FloatField(default=0.02, unique=True),
+                ),
+                (
+                    'high_boundary_percantage',
+                    models.FloatField(default=0.05, unique=True),
+                ),
             ],
             options={
                 'verbose_name': 'Market Place',
@@ -194,7 +519,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Voucher',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
                 ('title', models.CharField(default='', max_length=350)),
                 ('artwork_id', models.IntegerField(default=0, unique=True)),
                 ('edition_number', models.CharField(default='', max_length=350)),
@@ -212,13 +540,41 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TheToken',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
-                ('token_id', models.CharField(blank=True, max_length=250, null=True, unique=True)),
-                ('market_item_id', models.CharField(blank=True, max_length=250, null=True)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
+                (
+                    'token_id',
+                    models.CharField(
+                        blank=True, max_length=250, null=True, unique=True
+                    ),
+                ),
+                (
+                    'market_item_id',
+                    models.CharField(blank=True, max_length=250, null=True),
+                ),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('contract', models.CharField(blank=True, max_length=250, null=True)),
-                ('artwork', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='token_artwork', to='artworks.artwork')),
-                ('holder', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    'artwork',
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='token_artwork',
+                        to='artworks.artwork',
+                    ),
+                ),
+                (
+                    'holder',
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'NFT',
@@ -227,11 +583,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='SubCategory',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
                 ('name', models.CharField(db_index=True, max_length=255)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('category', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='artworks.category')),
+                (
+                    'category',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to='artworks.category',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'sub category',
@@ -242,15 +608,37 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ShippingAddress',
             fields=[
-                ('_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
+                (
+                    '_id',
+                    models.AutoField(editable=False, primary_key=True, serialize=False),
+                ),
                 ('address', models.CharField(blank=True, max_length=200, null=True)),
                 ('city', models.CharField(blank=True, max_length=200, null=True)),
                 ('province', models.CharField(blank=True, max_length=200, null=True)),
                 ('phone', models.CharField(blank=True, max_length=200, null=True)),
-                ('postal_code', models.CharField(blank=True, max_length=200, null=True)),
+                (
+                    'postal_code',
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
                 ('country', models.CharField(blank=True, max_length=200, null=True)),
-                ('buyer', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='buyer_shipping', to=settings.AUTH_USER_MODEL)),
-                ('order', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='artworks.order')),
+                (
+                    'buyer',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='buyer_shipping',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'order',
+                    models.OneToOneField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to='artworks.order',
+                    ),
+                ),
             ],
             options={
                 'verbose_name_plural': 'shipping addresses',
@@ -259,37 +647,70 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='artwork',
             name='category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='artwork_category', to='artworks.category'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='artwork_category',
+                to='artworks.category',
+            ),
         ),
         migrations.AddField(
             model_name='artwork',
             name='collection',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='artworks.collection'),
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to='artworks.collection',
+            ),
         ),
         migrations.AddField(
             model_name='artwork',
             name='created_by',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='artwork_creator', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='artwork_creator',
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
             model_name='artwork',
             name='favorite_artworks',
-            field=models.ManyToManyField(blank=True, default=None, related_name='user_favorite_artworks', to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(
+                blank=True,
+                default=None,
+                related_name='user_favorite_artworks',
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
             model_name='artwork',
             name='origin',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='artworks.origin'),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to='artworks.origin',
+            ),
         ),
         migrations.AddField(
             model_name='artwork',
             name='owner',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='artwork_owner', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='artwork_owner',
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
             model_name='artwork',
             name='sub_category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='artwork_sub_category', to='artworks.subcategory'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='artwork_sub_category',
+                to='artworks.subcategory',
+            ),
         ),
         migrations.AddField(
             model_name='artwork',
@@ -299,16 +720,28 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='artwork',
             name='voucher',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='artwork_signature', to='artworks.voucher'),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='artwork_signature',
+                to='artworks.voucher',
+            ),
         ),
         migrations.AddField(
             model_name='artist',
             name='origin',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='artworks.origin'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to='artworks.origin'
+            ),
         ),
         migrations.AddField(
             model_name='artist',
             name='user',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='artist', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='artist',
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

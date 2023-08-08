@@ -1,7 +1,11 @@
 from rest_framework.decorators import api_view, permission_classes
 from artworks.filtering import ArtistsOrderFilter
 from backend.premissions import OwnProfilePermission
-from artworks.serializer import ArtworkSerializer, ArtistSerializer, SingleArtistSerializer
+from artworks.serializer import (
+    ArtworkSerializer,
+    ArtistSerializer,
+    SingleArtistSerializer,
+)
 from artworks.models import Artist, Artwork
 from rest_framework import filters, generics, viewsets, mixins
 
@@ -29,7 +33,9 @@ class ArtistSimilarArtists(generics.ListAPIView):
 
             list = []
             for c in artist_artworks_cats:
-                artworksByArtistCats = Artwork.objects.filter(category___id=c["category___id"])
+                artworksByArtistCats = Artwork.objects.filter(
+                    category___id=c["category___id"]
+                )
                 for a in artworksByArtistCats:
                     if a.artist not in list and a.artist != artist and a.artist != None:
                         list.append(a.artist)
@@ -52,7 +58,9 @@ class ArtistRelatedArtworks(generics.ListAPIView):
         # intersection = artworks_tags[0].values() & artist_artworks_tags[0].values()
         list = []
         for x in intersection:
-            artworksByTags = Artwork.objects.filter(tags___id=x["tags___id"]).exclude(tags___id=None)
+            artworksByTags = Artwork.objects.filter(tags___id=x["tags___id"]).exclude(
+                tags___id=None
+            )
 
             for a in artworksByTags:
                 if a not in list:
@@ -61,8 +69,15 @@ class ArtistRelatedArtworks(generics.ListAPIView):
         return list
 
 
-class ArtistsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    queryset = Artist.objects.select_related('user').prefetch_related('favorites', 'achievements')
+class ArtistsView(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = Artist.objects.select_related('user').prefetch_related(
+        'favorites', 'achievements'
+    )
     serializer_class = ArtistSerializer
     filter_backends = [ArtistsOrderFilter]
     permission_classes = [OwnProfilePermission]

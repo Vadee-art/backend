@@ -49,9 +49,7 @@ DEV_DOMAIN = 'http://127.0.0.1:8000'
 STAGING_DOMAIN = 'https://s.api.vadee.art'
 PROD_DOMAIN = 'https://api.vadee.art'
 
-DOMAIN = STAGING_DOMAIN if IS_STAGING \
-    else PROD_DOMAIN if IS_PROD \
-    else DEV_DOMAIN
+DOMAIN = STAGING_DOMAIN if IS_STAGING else PROD_DOMAIN if IS_PROD else DEV_DOMAIN
 
 ALLOWED_HOSTS = [
     "0.0.0.0",
@@ -91,7 +89,9 @@ REST_FRAMEWORK = {"DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSc
 
 # User Auth with: django-rest-framework-simplejwt
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
     'DEFAULT_RENDERER_CLASSES': (
         'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
         'djangorestframework_camel_case.render.CamelCaseBrowsableAPIRenderer',
@@ -106,7 +106,7 @@ REST_FRAMEWORK = {
         # Any other parsers
     ),
     'DEFAULT_PAGINATION_CLASS': 'backend.pagination.Pagination',
-    'PAGE_SIZE': (50)
+    'PAGE_SIZE': (50),
 }
 
 
@@ -182,7 +182,9 @@ DATABASES = {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
         "NAME": os.environ.get("SQL_DATABASE", "postgres"),
         "USER": os.environ.get("SQL_USER", "postgres"),
-        "PASSWORD": get_secret("SQL_PASSWORD", os.environ.get("SQL_PASSWORD", "postgres")),
+        "PASSWORD": get_secret(
+            "SQL_PASSWORD", os.environ.get("SQL_PASSWORD", "postgres")
+        ),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
