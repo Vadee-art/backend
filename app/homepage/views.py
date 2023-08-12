@@ -1,12 +1,13 @@
 from rest_framework.views import APIView
 
-from artworks.models import Artist, Artwork, Category, SubCategory
+from artworks.models import Artist, Artwork, Category, Origin, SubCategory
 from rest_framework.response import Response
 from django.db.models import Count
 from artworks.serializer import (
     ArtistSerializer,
     ArtworkSerializer,
     CategorySerializer,
+    OriginSerializer,
     SubCategorySerializer,
 )
 
@@ -14,7 +15,6 @@ from artworks.serializer import (
 class HomepageView(APIView):
     def get(self, request):
         artwork_query = Artwork.objects.select_related(
-            "artist",
             "collection",
             "category",
             "origin",
@@ -34,6 +34,7 @@ class HomepageView(APIView):
         last_artwork = artwork_query.order_by("-created_at").first()
         talented_artwork = artwork_query.filter(is_artist_talented=True).first()
         sub_categories = SubCategory.objects.order_by("-created_at")[:5]
+        origins = Origin.objects.order_by("_id")[:5]
 
         result = dict(
             carousels=ArtworkSerializer(
@@ -53,6 +54,9 @@ class HomepageView(APIView):
             ).data,
             subCategories=SubCategorySerializer(
                 sub_categories, many=True, context={"request": request}
+            ).data,
+            origins=OriginSerializer(
+                origins, many=True, context={"request": request}
             ).data,
         )
         return Response(data=result)
