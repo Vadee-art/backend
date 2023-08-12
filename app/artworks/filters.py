@@ -1,7 +1,6 @@
+from artworks.models import Artwork
 from django_filters import NumberFilter
 from django_filters import rest_framework as filters
-
-from artworks.models import Artwork
 
 
 class ArtworkFilter(filters.FilterSet):
@@ -13,4 +12,5 @@ class ArtworkFilter(filters.FilterSet):
         fields = [
             "category",
             "origin",
+            "sub_category"
         ]
