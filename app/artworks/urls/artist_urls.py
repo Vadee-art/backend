@@ -1,7 +1,7 @@
-from django.urls import path, include
+from django.urls import include, path
+from rest_framework import routers
 
 from artworks.views import artist_views as views
-from rest_framework import routers
 
 app_name = "artist"
 

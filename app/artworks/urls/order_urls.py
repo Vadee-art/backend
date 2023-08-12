@@ -1,6 +1,6 @@
 from django.urls import path
-from artworks.views import order_views as views
 
+from artworks.views import order_views as views
 
 urlpatterns = [
     path('', views.fetchOrders, name='orders'),

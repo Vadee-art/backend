@@ -1,21 +1,12 @@
-from django.contrib import admin
-from .models import *
-
+from admin_searchable_dropdown.filters import AutocompleteFilter
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.forms import Textarea
 from django.utils.safestring import mark_safe
 
-from .models import (
-    Category,
-    MyUser,
-    Collection,
-    Order,
-    Artwork,
-    ShippingAddress,
-    SubCategory,
-)
-from admin_searchable_dropdown.filters import AutocompleteFilter
+from .models import *
+from .models import (Artwork, Category, Collection, MyUser, Order,
+                     ShippingAddress, SubCategory)
 
 
 class UserAdminConfig(UserAdmin):

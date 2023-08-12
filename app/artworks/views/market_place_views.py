@@ -1,13 +1,15 @@
+import json
+
+import requests
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from artworks.serializer import MarketPlaceSerializer
-from artworks.models import Artwork, TheMarketPlace
-from django.http import HttpResponse
 from rest_framework.response import Response
-import json
-import requests
-from rest_framework import status
+
+from artworks.models import Artwork, TheMarketPlace
+from artworks.serializer import MarketPlaceSerializer
 
 
 @api_view(["GET"])

@@ -1,35 +1,30 @@
-from django.shortcuts import render
+import json
+
+from django.http import HttpResponse
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins, viewsets
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-from artworks.serializer import (
-    ArtworkSerializer,
-    OrderSerializer,
-    OriginSerializer,
-    TheTokenSerializer,
-    VoucherSerializer,
-)
-from django.contrib.auth.models import User
+
+from artworks.filters import ArtworkFilter
 from artworks.models import (
     Artwork,
-    Artist,
     Category,
-    MyUser,
     Order,
     Origin,
     ShippingAddress,
     SubCategory,
-    TheMarketPlace,
     TheToken,
     Voucher,
 )
-from rest_framework import status
-from artworks.serializer import CategorySerializer
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from rest_framework import status
-from django.http import HttpResponse
-import json
-from rest_framework import filters, generics, viewsets, mixins
+from artworks.serializer import (
+    ArtworkSerializer,
+    CategorySerializer,
+    OrderSerializer,
+    OriginSerializer,
+    VoucherSerializer,
+)
 
 # for admin and change_form.html
 
@@ -76,6 +71,8 @@ class ArtworkViewSet(
     serializer_class = ArtworkSerializer
     ordering_fields = ['-created_at']
     ordering = ['-created_at']
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ArtworkFilter
 
 
 class CarouselArtworkViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

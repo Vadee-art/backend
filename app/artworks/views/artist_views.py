@@ -1,13 +1,11 @@
+from rest_framework import filters, generics, mixins, viewsets
 from rest_framework.decorators import api_view, permission_classes
+
 from artworks.filtering import ArtistsOrderFilter
-from backend.premissions import OwnProfilePermission
-from artworks.serializer import (
-    ArtworkSerializer,
-    ArtistSerializer,
-    SingleArtistSerializer,
-)
 from artworks.models import Artist, Artwork
-from rest_framework import filters, generics, viewsets, mixins
+from artworks.serializer import (ArtistSerializer, ArtworkSerializer,
+                                 SingleArtistSerializer)
+from backend.premissions import OwnProfilePermission
 
 
 class ArtistSearch(generics.ListAPIView):

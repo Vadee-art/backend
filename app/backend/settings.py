@@ -85,12 +85,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'drf_yasg',
-    'debug_toolbar',
-    'imagekit',
+    "drf_yasg",
+    "debug_toolbar",
+    "imagekit",
+    "django_filters",
 ]
 
-REST_FRAMEWORK = {"DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema"}
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+}
 
 # User Auth with: django-rest-framework-simplejwt
 REST_FRAMEWORK = {
