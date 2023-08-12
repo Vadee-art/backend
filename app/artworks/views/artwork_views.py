@@ -1,12 +1,5 @@
 import json
 
-from django.http import HttpResponse
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, viewsets
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.response import Response
-
 from artworks.filters import ArtworkFilter
 from artworks.models import (
     Artwork,
@@ -23,8 +16,15 @@ from artworks.serializer import (
     CategorySerializer,
     OrderSerializer,
     OriginSerializer,
+    SubCategorySerializer,
     VoucherSerializer,
 )
+from django.http import HttpResponse
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins, views, viewsets
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.response import Response
 
 # for admin and change_form.html
 
@@ -73,6 +73,26 @@ class ArtworkViewSet(
     ordering = ['-created_at']
     filter_backends = [DjangoFilterBackend]
     filterset_class = ArtworkFilter
+
+
+class ArtworkFiltersView(views.APIView):
+    def get(self, request):
+        categories = Category.objects.order_by("-created_at")
+        sub_categories = SubCategory.objects.order_by("-created_at")
+        origins = Origin.objects.order_by("_id")
+
+        result = dict(
+            origins=OriginSerializer(
+                origins, many=True, context={"request": request}
+            ).data,
+            subCategories=SubCategorySerializer(
+                sub_categories, many=True, context={"request": request}
+            ).data,
+            categories=CategorySerializer(
+                categories, many=True, context={"request": request}
+            ).data,
+        )
+        return Response(data=result)
 
 
 class CarouselArtworkViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

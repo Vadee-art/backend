@@ -1,9 +1,23 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import (Achievement, Article, Artist, Artwork, Category,
-                     Collection, MyUser, Order, Origin, ShippingAddress,
-                     SubCategory, Tag, TheMarketPlace, TheToken, Voucher)
+from .models import (
+    Achievement,
+    Article,
+    Artist,
+    Artwork,
+    Category,
+    Collection,
+    MyUser,
+    Order,
+    Origin,
+    ShippingAddress,
+    SubCategory,
+    Tag,
+    TheMarketPlace,
+    TheToken,
+    Voucher,
+)
 
 
 class MarketPlaceSerializer(serializers.ModelSerializer):

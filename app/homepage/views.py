@@ -3,9 +3,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from artworks.models import Artist, Artwork, Category, Origin, SubCategory
-from artworks.serializer import (ArtistSerializer, ArtworkSerializer,
-                                 CategorySerializer, OriginSerializer,
-                                 SubCategorySerializer)
+from artworks.serializer import (
+    ArtistSerializer,
+    ArtworkSerializer,
+    CategorySerializer,
+    OriginSerializer,
+    SubCategorySerializer,
+)
 
 
 class HomepageView(APIView):

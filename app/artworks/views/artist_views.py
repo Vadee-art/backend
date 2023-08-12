@@ -3,8 +3,11 @@ from rest_framework.decorators import api_view, permission_classes
 
 from artworks.filtering import ArtistsOrderFilter
 from artworks.models import Artist, Artwork
-from artworks.serializer import (ArtistSerializer, ArtworkSerializer,
-                                 SingleArtistSerializer)
+from artworks.serializer import (
+    ArtistSerializer,
+    ArtworkSerializer,
+    SingleArtistSerializer,
+)
 from backend.premissions import OwnProfilePermission
 
 

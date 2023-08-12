@@ -5,8 +5,15 @@ from django.forms import Textarea
 from django.utils.safestring import mark_safe
 
 from .models import *
-from .models import (Artwork, Category, Collection, MyUser, Order,
-                     ShippingAddress, SubCategory)
+from .models import (
+    Artwork,
+    Category,
+    Collection,
+    MyUser,
+    Order,
+    ShippingAddress,
+    SubCategory,
+)
 
 
 class UserAdminConfig(UserAdmin):

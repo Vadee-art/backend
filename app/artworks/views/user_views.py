@@ -4,19 +4,27 @@ from django.http import JsonResponse
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from rest_framework import generics, permissions, status
-from rest_framework.decorators import (api_view, authentication_classes,
-                                       permission_classes)
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+
 # Create your views here.
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from artworks.models import Artist, Artwork, MyUser
-from artworks.serializer import (ArtistSerializer, ArtworkSerializer,
-                                 RegisterSerializer, UserSerializer,
-                                 UserSerializerWithToken)
+from artworks.serializer import (
+    ArtistSerializer,
+    ArtworkSerializer,
+    RegisterSerializer,
+    UserSerializer,
+    UserSerializerWithToken,
+)
 
 #  Customizing token claims with JWT / overriding
 
