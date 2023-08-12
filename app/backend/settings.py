@@ -49,7 +49,7 @@ IS_STAGING = ENV == 'staging'
 IS_DEV = ENV == 'dev'
 
 DEV_DOMAIN = 'http://127.0.0.1:8000'
-STAGING_DOMAIN = 'https://s.api.vadee.art'
+STAGING_DOMAIN = 'https://sapi.vadee.art'
 PROD_DOMAIN = 'https://api.vadee.art'
 
 DOMAIN = STAGING_DOMAIN if IS_STAGING else PROD_DOMAIN if IS_PROD else DEV_DOMAIN
@@ -60,7 +60,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "vadee.art",
     "api.vadee.art",
-    "s.api.vadee.art",
+    "sapi.vadee.art",
     "www.vadee.art",
     "www.vadee.net",
     "www.v1.vadee.net",
