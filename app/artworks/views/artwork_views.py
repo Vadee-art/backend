@@ -63,9 +63,16 @@ class ArtworkViewSet(
 ):
     queryset = (
         Artwork.objects.select_related(
-            'artist', 'collection', 'category', 'origin', 'sub_category', 'voucher'
+            'artist',
+            'collection',
+            'category',
+            'origin',
+            'sub_category',
+            'voucher',
+            'artist__user',
+            'owner',
         )
-        .prefetch_related('tags')
+        .prefetch_related('tags', 'artist__achievements', 'artist__favorites')
         .all()
     )
     serializer_class = ArtworkSerializer
@@ -99,9 +106,16 @@ class CarouselArtworkViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = (
         Artwork.objects.filter(is_carousel=True)
         .select_related(
-            'artist', 'collection', 'category', 'origin', 'sub_category', 'voucher'
+            'artist',
+            'collection',
+            'category',
+            'origin',
+            'sub_category',
+            'voucher',
+            'artist__user',
+            'owner',
         )
-        .prefetch_related('tags')
+        .prefetch_related('tags', 'artist__achievements', 'artist__favorites')
         .all()
     )
     serializer_class = ArtworkSerializer
