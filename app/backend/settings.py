@@ -13,6 +13,9 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 
 def get_secret(key, default):
     value = os.getenv(key, default)
@@ -261,3 +264,22 @@ print("base path: ", BASE_DIR)
 print("-------------------------------------")
 USE_TZ = True
 TIME_ZONE = "Asia/Tehran"
+
+
+# Sentry
+sentry_sdk.init(
+    dsn="https://bd04df3b3af4b200f51e3c47dcf04703@o4505692051341312.ingest.sentry.io/4505692052258816",
+    integrations=[DjangoIntegration()],
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True,
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+    # To set a uniform sample rate
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production,
+    profiles_sample_rate=1.0,
+)

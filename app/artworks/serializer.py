@@ -213,8 +213,8 @@ class ArtistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Artist
-        fields = '__all__'
-        read_only_fields = ['user', 'origin', 'achievements', 'favorites']
+        read_only_fields = ["user", "origin", "achievements", "favorites"]
+        exclude = ["wallet_address", "gallery_address"]
 
     def get_username(self, obj):
         return obj.user.email
@@ -245,6 +245,24 @@ class ArtworkSerializer(serializers.ModelSerializer):
         collection = obj.collection
         serializer = CollectionSerializer(collection, many=False)
         return serializer.data
+
+
+class CarouselSerializer(serializers.ModelSerializer):
+    collection = serializers.SerializerMethodField()
+    artist_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Artwork
+        fields = ("title", "artist_name", "collection", "image")
+
+    def get_collection(self, obj):
+        collection = obj.collection
+        serializer = CollectionSerializer(collection, many=False)
+        return serializer.data
+
+    def get_artist_name(self, obj):
+        return obj.artist.user.first_name + obj.artist.user.last_name
+
 
 class ShippingAddressSerializer(serializers.ModelSerializer):
     class Meta:
