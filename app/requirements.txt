@@ -1,4 +1,5 @@
 wheel
+coreapi
 Django~=3.2
 django-admin-searchable-dropdown~=1.0
 django-cors-headers~=3.7
