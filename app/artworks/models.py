@@ -322,7 +322,7 @@ class Artwork(models.Model):
     artist = models.ForeignKey(
         Artist,
         on_delete=models.CASCADE,
-        related_name="artwork_artist",
+        related_name="artworks",
         null=False,
         blank=False,
     )

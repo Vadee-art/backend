@@ -1,14 +1,17 @@
-from rest_framework import filters, generics, mixins, viewsets
-from rest_framework.decorators import api_view, permission_classes
-
-from artworks.filtering import ArtistsOrderFilter
-from artworks.models import Artist, Artwork
+from artworks.filters import ArtistFilter
+from artworks.models import Achievement, Artist, Artwork, Origin
 from artworks.serializer import (
+    AchievementSerializer,
     ArtistSerializer,
     ArtworkSerializer,
+    OriginSerializer,
     SingleArtistSerializer,
 )
 from backend.premissions import OwnProfilePermission
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, generics, mixins, views, viewsets
+from rest_framework.response import Response
 
 
 class ArtistSearch(generics.ListAPIView):
@@ -28,17 +31,19 @@ class ArtistSimilarArtists(generics.ListAPIView):
 
     def get_queryset(self, *args, **kwargs):
         artistId = self.kwargs.get("artistId")
-        artist = Artist.objects.filter(_id=artistId).first()
-        if artist.artwork_artist.all().values("category___id"):
-            artist_artworks_cats = artist.artwork_artist.all().values("category___id")
-
+        artist = get_object_or_404(Artist, pk=artistId)
+        if artist_artworks_cats := artist.artworks.all().values("category___id"):
             list = []
             for c in artist_artworks_cats:
                 artworksByArtistCats = Artwork.objects.filter(
                     category___id=c["category___id"]
                 )
                 for a in artworksByArtistCats:
-                    if a.artist not in list and a.artist != artist and a.artist != None:
+                    if (
+                        a.artist not in list
+                        and a.artist != artist
+                        and a.artist is not None
+                    ):
                         list.append(a.artist)
 
             return list
@@ -51,10 +56,9 @@ class ArtistRelatedArtworks(generics.ListAPIView):
 
     def get_queryset(self, *args, **kwargs):
         artistId = self.kwargs.get("artistId", None)
-        artist = Artist.objects.filter(_id=artistId).first()
-        artist_artworks_tags = artist.artwork_artist.all().values("tags___id")
+        artist = get_object_or_404(Artist, pk=artistId)
+        artist_artworks_tags = artist.artworks.all().values("tags___id")
         artworks_tags = Artwork.objects.all().values("tags___id")
-
         intersection = artworks_tags.intersection(artist_artworks_tags)
         # intersection = artworks_tags[0].values() & artist_artworks_tags[0].values()
         list = []
@@ -76,11 +80,51 @@ class ArtistsView(
     mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
-    queryset = Artist.objects.select_related('user').prefetch_related(
-        'favorites', 'achievements'
-    )
-    serializer_class = ArtistSerializer
-    filter_backends = [ArtistsOrderFilter]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ArtistFilter
     permission_classes = [OwnProfilePermission]
-    ordering_fields = ['first_name', 'last_name', '_id']
-    ordering = ['last_name']
+    ordering = ['first_name', 'last_name']
+    serializer_classes = {
+        'retrieve': SingleArtistSerializer,
+    }
+
+    default_serializer_class = ArtistSerializer
+
+    def get_serializer_class(self):
+        return self.serializer_classes.get(self.action, self.default_serializer_class)
+
+    def get_queryset(self):
+        if self.action == 'retrieve':
+            return Artist.objects.select_related('origin', 'user').prefetch_related(
+                'favorites',
+                'achievements',
+                'artworks',
+                'artworks__collection',
+                'artworks__category',
+                'artworks__origin',
+                'artworks__sub_category',
+                'artworks__voucher',
+                'artworks__artist__user',
+                'artworks__owner',
+                'artworks__tags',
+            )
+        return Artist.objects.select_related('origin', 'user').prefetch_related(
+            'favorites',
+            'achievements',
+        )
+
+
+class ArtistFiltersView(views.APIView):
+    def get(self, request):
+        origins = Origin.objects.order_by("_id")
+        achievements = Achievement.objects.order_by("_id")
+
+        result = dict(
+            origins=OriginSerializer(
+                origins, many=True, context={"request": request}
+            ).data,
+            achievements=AchievementSerializer(
+                achievements, many=True, context={"request": request}
+            ).data,
+        )
+        return Response(data=result)

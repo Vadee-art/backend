@@ -202,7 +202,7 @@ class CollectionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AchievementsSerializer(serializers.ModelSerializer):
+class AchievementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Achievement
         fields = '__all__'
@@ -211,6 +211,8 @@ class AchievementsSerializer(serializers.ModelSerializer):
 class ArtistSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
     username = serializers.SerializerMethodField(read_only=True)
+    origin = OriginSerializer(many=False, read_only=True)
+    achievements = AchievementSerializer(many=True, read_only=True)
 
     class Meta:
         model = Artist
@@ -310,15 +312,13 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 
 class ArtworkSummary(ArtworkSerializer):
-    origin = None
-
     class Meta:
         model = Artwork
-        exclude = ['origin']
+        fields = '__all__'
 
 
 class SingleArtistSerializer(ArtistSerializer):
-    atrworks = ArtworkSummary(many=True, read_only=True)
+    artworks = ArtworkSerializer(many=True, read_only=True)
 
     class Meta:
         model = Artist

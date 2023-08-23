@@ -26,7 +26,7 @@ class HomepageView(APIView):
 
         carousels = artwork_query.filter(is_carousel=True)[:5]
         artists = (
-            Artist.objects.annotate(art_count=Count("artwork_artist"))
+            Artist.objects.annotate(art_count=Count("artworks"))
             .order_by("-art_count")
             .select_related("user")
             .prefetch_related("achievements", "favorites")[:6]

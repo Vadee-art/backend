@@ -1,25 +1,26 @@
+from artworks.views import artist_views as views
 from django.urls import include, path
 from rest_framework import routers
-
-from artworks.views import artist_views as views
 
 app_name = "artist"
 
 router = routers.DefaultRouter()
-router.register(r'', views.ArtistsView)
+router.register(r'', views.ArtistsView, basename='Artist')
 
 urlpatterns = [
     path('', include(router.urls)),
     path("search/", views.ArtistSearch.as_view(), name="artists-search"),
     path(
-        "artist/related/<int:artistId>/",
+        "<int:artistId>/related-artworks/",
         views.ArtistRelatedArtworks.as_view(),
-        name="artist_related_artworks",
     ),
     path(
-        "artist/similar/<int:artistId>/",
+        "<int:artistId>/similar/",
         views.ArtistSimilarArtists.as_view(),
-        name="artist_related_artists",
+    ),
+    path(
+        "filters",
+        views.ArtistFiltersView.as_view(),
     ),
     # path(
     #     "<int:pk>/gallery/update/",

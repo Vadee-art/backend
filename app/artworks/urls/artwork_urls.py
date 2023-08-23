@@ -2,7 +2,7 @@ from artworks.views import artwork_views as views
 from django.urls import include, path
 from rest_framework import routers
 
-app_name = "artist"
+app_name = "artwork"
 
 router = routers.SimpleRouter(trailing_slash=False)
 router.register(r'', views.ArtworkViewSet)
