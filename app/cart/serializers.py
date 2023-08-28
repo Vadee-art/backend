@@ -10,3 +10,9 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = '__all__'
+
+class AddCartItemSerializer(serializers.Serializer):
+    artwork_id = serializers.IntegerField()
+
+    class Meta:
+        fields = '__all__'

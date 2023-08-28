@@ -295,6 +295,8 @@ class Artwork(models.Model):
     edition_total = models.IntegerField(null=False, default=0, validators=[validate])
     tags = models.ManyToManyField(Tag, blank=True)
     price = models.IntegerField(null=False)
+    quantity = models.IntegerField(default=1)
+
     # price_eth = models.CharField(max_length=200, null=True, blank=True)
     # favorite_artworks = models.ManyToManyField(MyUser, related_name="user_favorite_artworks", default=None, blank=True)
     is_minted = models.BooleanField(default=False)
@@ -337,7 +339,6 @@ class Artwork(models.Model):
         format='JPEG',
         options={'quality': 95},
     )
-
     objects = ArtworkManager()
 
     class Meta:
