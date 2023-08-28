@@ -228,7 +228,7 @@ class ArtistSerializer(serializers.ModelSerializer):
 
 class ArtworkSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(read_only=True)
-    collection = serializers.SerializerMethodField(read_only=True)
+    collection = CollectionSerializer(read_only=True, many=False)
     artist = ArtistSerializer(many=False, read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     category = CategorySerializer(many=False, read_only=True)
@@ -243,11 +243,6 @@ class ArtworkSerializer(serializers.ModelSerializer):
 
     def get_image_medium_quality(self, obj):
         return self.context['request'].build_absolute_uri(obj.image_medium_quality.url)
-
-    def get_collection(self, obj):
-        collection = obj.collection
-        serializer = CollectionSerializer(collection, many=False)
-        return serializer.data
 
 
 class CarouselSerializer(serializers.ModelSerializer):

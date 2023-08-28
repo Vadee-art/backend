@@ -11,9 +11,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as __
-from django_filters import FilterSet, NumberFilter
 from imagekit.models import ImageSpecField
-from imagekit.processors import ResizeToFill, ResizeToFit
+from imagekit.processors import ResizeToFit
 
 
 class TheMarketPlace(models.Model):

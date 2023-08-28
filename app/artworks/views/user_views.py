@@ -1,9 +1,18 @@
+from artworks.models import Artist, Artwork, MyUser
+from artworks.serializer import (
+    ArtistSerializer,
+    ArtworkSerializer,
+    RegisterSerializer,
+    UserSerializer,
+    UserSerializerWithToken,
+)
 from django.contrib.auth import get_user_model  # If used custom user model
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from rest_framework import generics, permissions, status
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, permissions, serializers, status
 from rest_framework.decorators import (
     api_view,
     authentication_classes,
@@ -15,15 +24,11 @@ from rest_framework.response import Response
 
 # Create your views here.
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
-
-from artworks.models import Artist, Artwork, MyUser
-from artworks.serializer import (
-    ArtistSerializer,
-    ArtworkSerializer,
-    RegisterSerializer,
-    UserSerializer,
-    UserSerializerWithToken,
+from rest_framework_simplejwt.views import (
+    TokenBlacklistView,
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
 )
 
 #  Customizing token claims with JWT / overriding
@@ -52,6 +57,14 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: MyTokenObtainPairSerializer,
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 
 class CreateUserView(CreateAPIView):

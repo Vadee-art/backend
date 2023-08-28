@@ -14,3 +14,8 @@ class OwnProfilePermission(permissions.BasePermission):
 
         # obj here is a UserProfile instance
         return obj.user == request.user
+
+
+class OwnerPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user

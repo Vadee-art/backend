@@ -54,6 +54,8 @@ PROD_DOMAIN = 'https://api.vadee.art'
 
 DOMAIN = STAGING_DOMAIN if IS_STAGING else PROD_DOMAIN if IS_PROD else DEV_DOMAIN
 
+LOGIN_URL = '/api/v1/token'
+
 ALLOWED_HOSTS = [
     "0.0.0.0",
     "127.0.0.1",
@@ -77,7 +79,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
-    "artworks",
     "admin_searchable_dropdown",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -89,6 +90,8 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "imagekit",
     "django_filters",
+    "artworks",
+    "cart",
 ]
 
 REST_FRAMEWORK = {
@@ -287,3 +290,10 @@ sentry_sdk.init(
     profiles_sample_rate=1.0,
     environment=ENV,
 )
+
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {'type': 'apiKey', 'name': 'AUTHORIZATION', 'in': 'header'}
+    }
+}

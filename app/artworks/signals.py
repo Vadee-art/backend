@@ -1,5 +1,9 @@
+from cart.models import Cart
 from django.contrib.auth.models import User
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
+
+from artworks.models import MyUser
 
 
 # when email is changed user name is changed
@@ -10,3 +14,9 @@ def updateUser(sender, instance, **kwargs):
 
 
 pre_save.connect(updateUser, sender=User)
+
+
+@receiver(post_save, sender=MyUser)
+def user_post_save(sender, instance, created, **kwargs):
+    if created:
+        Cart.objects.create(user=instance)
