@@ -7,6 +7,6 @@ class Cart(TimeStampedModel, SoftDeletableModel):
     artworks = models.ManyToManyField('artworks.Artwork', through='CartItem')
 
 
-class CartItem(TimeStampedModel, SoftDeletableModel):
+class CartItem(TimeStampedModel):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     artwork = models.ForeignKey('artworks.Artwork', on_delete=models.CASCADE)

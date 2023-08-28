@@ -5,7 +5,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import permissions, views
 from rest_framework.response import Response
 
-from cart.models import Cart
+from cart.models import Cart, CartItem
 from cart.serializers import AddCartItemSerializer, CartSerializer
 
 
@@ -41,4 +41,18 @@ class CartView(views.APIView):
             raise ArtworkSoldOut()
 
         cart.artworks.add(artwork)
+        return Response(data=CartSerializer(cart, context={"request": request}).data)
+
+
+    @swagger_auto_schema(
+        request_body=AddCartItemSerializer,
+        responses = {
+            '200' : CartSerializer,
+        },
+    )
+    def delete(self, request):
+        cart = get_object_or_404(Cart, user=request.user)
+        data = AddCartItemSerializer(request.data).data
+        artwork = get_object_or_404(cart.artworks, pk=data['artwork_id'])
+        CartItem.objects.filter(cart=cart, artwork=artwork).delete()
         return Response(data=CartSerializer(cart, context={"request": request}).data)
