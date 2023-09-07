@@ -22,3 +22,4 @@ django-imagekit
 sentry-sdk~=1.29.2
 django-filter~=23.02
 django-model-utils
+django-cte

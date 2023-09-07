@@ -7,6 +7,7 @@ app_name = "artwork"
 router = routers.SimpleRouter(trailing_slash=False)
 router.register(r'', views.ArtworkViewSet)
 router.register(r'carousels/', views.CarouselArtworkViewSet)
+router.register(r'by-origins/', views.OriginsArtworksView, basename='artworks_by_origin')
 
 urlpatterns = [
     path("getSubcategory/", views.get_subcategory, name="sub_category_list"),
@@ -17,7 +18,5 @@ urlpatterns = [
     path("origins/", views.fetch_origin_list, name="origins"),
     path("delete/", views.delete_the_artwork, name="artwork_delete"),
     path("voucher/<int:pk>/delete/", views.delete_the_voucher, name="voucher_delete"),
-    path(
-        "update/<int:pk>/<str:action>/", views.update_the_artwork, name="artwork_update"
-    ),
+    path("update/<int:pk>/<str:action>/", views.update_the_artwork, name="artwork_update"),
 ]

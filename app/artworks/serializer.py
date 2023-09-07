@@ -226,6 +226,17 @@ class ArtistSerializer(serializers.ModelSerializer):
         return obj.user.first_name + ' ' + obj.user.last_name
 
 
+class SimpleArtistSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Artist
+        fields = ('_id', 'name')
+
+    def get_name(self, obj):
+        return obj.user.first_name + ' ' + obj.user.last_name
+
+
 class ArtworkSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(read_only=True)
     collection = CollectionSerializer(read_only=True, many=False)
@@ -240,6 +251,19 @@ class ArtworkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artwork
         fields = '__all__'
+
+    def get_image_medium_quality(self, obj):
+        return self.context['request'].build_absolute_uri(obj.image_medium_quality.url)
+
+
+class SimpleArtworkSerializer(serializers.ModelSerializer):
+    image_medium_quality = serializers.SerializerMethodField(read_only=True)
+    artist = SimpleArtistSerializer(many=False, read_only=True)
+    origin = OriginSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Artwork
+        fields = ('image', 'title', 'artist', 'image_medium_quality', 'origin')
 
     def get_image_medium_quality(self, obj):
         return self.context['request'].build_absolute_uri(obj.image_medium_quality.url)
@@ -290,9 +314,7 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_shippingAddress(self, obj):
         try:
             # one to one relation -> obj.shippingAddress
-            shippingAddress = ShippingAddressSerializer(
-                obj.shippingaddress, many=False
-            ).data
+            shippingAddress = ShippingAddressSerializer(obj.shippingaddress, many=False).data
         except:
             shippingAddress = False
         return shippingAddress

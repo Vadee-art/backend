@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as __
+from django_cte import CTEManager
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFit
 
@@ -66,9 +67,7 @@ class UserManager(BaseUserManager):
             # _ if translation needed later
             raise ValueError(__("You must provide an email address"))
         email = self.normalize_email(email)
-        user = self.model(
-            email=email, user_name=user_name, first_name=first_name, **other_fields
-        )
+        user = self.model(email=email, user_name=user_name, first_name=first_name, **other_fields)
         user.set_password(password)
         user.save()
         return user
@@ -232,7 +231,7 @@ class Collection(models.Model):
         return self.title
 
 
-class ArtworkManager(models.Manager):
+class ArtworkManager(CTEManager):
     def get_queryset(self):
         return super(ArtworkManager, self).get_queryset().filter(is_active=True)
 
@@ -271,14 +270,10 @@ class Artwork(models.Model):
         SubCategory, related_name="artwork_sub_category", on_delete=models.CASCADE
     )
     title = models.CharField(max_length=200, null=True, blank=True, default="no title")
-    collection = models.OneToOneField(
-        Collection, on_delete=models.CASCADE, null=True, blank=True
-    )
+    collection = models.OneToOneField(Collection, on_delete=models.CASCADE, null=True, blank=True)
     subtitle = models.CharField(max_length=200, null=True, blank=True)
     slug = models.SlugField(max_length=255, blank=True)
-    year = models.CharField(
-        _("year"), choices=year_choices(), default=current_year, max_length=200
-    )
+    year = models.CharField(_("year"), choices=year_choices(), default=current_year, max_length=200)
     print = models.CharField(max_length=200, null=True, blank=True)
     condition = models.CharField(max_length=200, null=True, blank=True)
     # uploads to MEDIA_ROOT in setting
@@ -385,9 +380,7 @@ class Order(models.Model):
         MyUser, on_delete=models.SET_NULL, related_name="order_buyer", null=True
     )
     transaction_hash = models.CharField(max_length=200, null=True, blank=True)
-    price_eth = models.DecimalField(
-        max_digits=7, decimal_places=4, null=True, blank=True
-    )
+    price_eth = models.DecimalField(max_digits=7, decimal_places=4, null=True, blank=True)
     fee_eth = models.DecimalField(max_digits=7, decimal_places=4, null=True, blank=True)
     is_delivered = models.BooleanField(default=False)
     delivered_at = models.DateTimeField(auto_now_add=False, null=True, blank=True)

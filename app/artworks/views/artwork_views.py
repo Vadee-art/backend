@@ -16,10 +16,14 @@ from artworks.serializer import (
     CategorySerializer,
     OrderSerializer,
     OriginSerializer,
+    SimpleArtworkSerializer,
     SubCategorySerializer,
     VoucherSerializer,
 )
+from django.db.models import F, Window
+from django.db.models.functions import Rank
 from django.http import HttpResponse
+from django_cte import With
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, views, viewsets
 from rest_framework.decorators import api_view, permission_classes
@@ -51,16 +55,51 @@ def fetch_origin_list(request):
         artworks = o.artwork_set.all()
         originSerializer = OriginSerializer(o, many=False)
         artworkSerializer = ArtworkSerializer(artworks, many=True)
-        list.append(
-            {"origin": originSerializer.data, "artworks": artworkSerializer.data}
-        )
+        list.append({"origin": originSerializer.data, "artworks": artworkSerializer.data})
 
     return Response(list)
 
 
-class ArtworkViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
-):
+class OriginsArtworksView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Origin.objects.values_list("country").order_by("_id")
+    serializer_class = ArtworkSerializer
+
+    def list(self, request):
+        countries = [country[0] for country in self.paginate_queryset(self.queryset)]
+        cte = With(
+            Artwork.objects.annotate(
+                rank=Window(
+                    expression=Rank(),
+                    order_by=F("created_at").desc(),
+                    partition_by=[F("origin_id")],
+                )
+            )
+        )
+        artworks = (
+            cte.queryset()
+            .select_related(
+                "artist__user",
+                "origin",
+            )
+            .with_cte(cte)
+            .filter(origin__country__in=countries)
+            .annotate(rank=cte.col.rank)
+            .filter(rank__lte=3)
+        )
+        artworks_data = SimpleArtworkSerializer(
+            artworks,
+            many=True,
+            context={"request": request},
+        ).data
+
+        response = {}
+        for country in countries:
+            response[country] = [a for a in artworks_data if a['origin']['country'] == country]
+
+        return self.get_paginated_response(response)
+
+
+class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = (
         Artwork.objects.select_related(
             'artist',
@@ -89,15 +128,11 @@ class ArtworkFiltersView(views.APIView):
         origins = Origin.objects.order_by("_id")
 
         result = dict(
-            origins=OriginSerializer(
-                origins, many=True, context={"request": request}
-            ).data,
+            origins=OriginSerializer(origins, many=True, context={"request": request}).data,
             subCategories=SubCategorySerializer(
                 sub_categories, many=True, context={"request": request}
             ).data,
-            categories=CategorySerializer(
-                categories, many=True, context={"request": request}
-            ).data,
+            categories=CategorySerializer(categories, many=True, context={"request": request}).data,
         )
         return Response(data=result)
 
