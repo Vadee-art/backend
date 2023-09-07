@@ -13,7 +13,7 @@ psycopg2-binary
 PyJWT~=2.0
 PyYAML==5.3.1
 pytz
-PyYAML~=5.3
+PyYAML~=5.4
 requests~=2.26
 drf-yasg[validation]~=1.21
 djangorestframework-camel-case
