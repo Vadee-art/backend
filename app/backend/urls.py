@@ -49,6 +49,7 @@ urlpatterns = [
     path("api/v1/artists/", include("artworks.urls.artist_urls")),
     path("api/v1/articles/", include("artworks.urls.article_urls")),
     path("api/v1/orders/", include("artworks.urls.order_urls")),
+    path("api/v1/origins/", include("artworks.urls.origin_urls")),
     path("docs/", include_docs_urls(title="Vadee")),
     re_path(
         r'^swagger/$',

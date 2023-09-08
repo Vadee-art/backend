@@ -1,6 +1,7 @@
-from artworks.models import Artist, Artwork
 from django_filters import CharFilter, NumberFilter
 from django_filters import rest_framework as filters
+
+from artworks.models import Artist, Artwork, Origin
 
 
 class ArtworkFilter(filters.FilterSet):
@@ -23,3 +24,11 @@ class ArtistFilter(filters.FilterSet):
             'achievements',
             'favorites',
         ]
+
+
+class OriginFilter(filters.FilterSet):
+    country = CharFilter(field_name="country", lookup_expr="iexact")
+
+    class Meta:
+        model = Origin
+        fields = ["country"]
