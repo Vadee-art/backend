@@ -16,6 +16,7 @@ from artworks.serializer import (
     CategorySerializer,
     OrderSerializer,
     OriginSerializer,
+    OriginWithArtworksSerializer,
     SimpleArtworkSerializer,
     SubCategorySerializer,
     VoucherSerializer,
@@ -61,11 +62,11 @@ def fetch_origin_list(request):
 
 
 class OriginsArtworksView(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Origin.objects.values_list("country").order_by("_id")
-    serializer_class = ArtworkSerializer
+    queryset = Origin.objects.order_by("_id")
+    serializer_class = OriginWithArtworksSerializer
 
     def list(self, request):
-        countries = [country[0] for country in self.paginate_queryset(self.queryset)]
+        origins = self.paginate_queryset(self.queryset)
         cte = With(
             Artwork.objects.annotate(
                 rank=Window(
@@ -79,24 +80,19 @@ class OriginsArtworksView(mixins.ListModelMixin, viewsets.GenericViewSet):
             cte.queryset()
             .select_related(
                 "artist__user",
-                "origin",
             )
             .with_cte(cte)
-            .filter(origin__country__in=countries)
+            .filter(origin__in=origins)
             .annotate(rank=cte.col.rank)
             .filter(rank__lte=3)
         )
-        artworks_data = SimpleArtworkSerializer(
-            artworks,
-            many=True,
-            context={"request": request},
-        ).data
 
-        response = {}
-        for country in countries:
-            response[country] = [a for a in artworks_data if a['origin']['country'] == country]
+        for origin in origins:
+            origin.artworks = [a for a in artworks if a.origin_id == origin.pk]
 
-        return self.get_paginated_response(response)
+        return Response(
+            data=OriginWithArtworksSerializer(origins, many=True, context={"request": request}).data
+        )
 
 
 class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):

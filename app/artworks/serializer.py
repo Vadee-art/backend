@@ -178,6 +178,17 @@ class OriginSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class OriginWithArtworksSerializer(OriginSerializer):
+    artworks = serializers.SerializerMethodField(read_only=True)
+
+    def get_artworks(self, obj):
+        return SimpleArtworkSerializer(obj.artworks, many=True, context=self.context).data
+
+    class Meta:
+        model = Origin
+        fields = '__all__'
+
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
@@ -259,11 +270,10 @@ class ArtworkSerializer(serializers.ModelSerializer):
 class SimpleArtworkSerializer(serializers.ModelSerializer):
     image_medium_quality = serializers.SerializerMethodField(read_only=True)
     artist = SimpleArtistSerializer(many=False, read_only=True)
-    origin = OriginSerializer(many=False, read_only=True)
 
     class Meta:
         model = Artwork
-        fields = ('_id', 'price', 'image', 'title', 'artist', 'image_medium_quality', 'origin')
+        fields = ('_id', 'price', 'image', 'title', 'artist', 'image_medium_quality')
 
     def get_image_medium_quality(self, obj):
         return self.context['request'].build_absolute_uri(obj.image_medium_quality.url)
