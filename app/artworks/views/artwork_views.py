@@ -90,7 +90,7 @@ class OriginsArtworksView(mixins.ListModelMixin, viewsets.GenericViewSet):
         for origin in origins:
             origin.artworks = [a for a in artworks if a.origin_id == origin.pk]
 
-        return Response(
+        return self.get_paginated_response(
             data=OriginWithArtworksSerializer(origins, many=True, context={"request": request}).data
         )
 
