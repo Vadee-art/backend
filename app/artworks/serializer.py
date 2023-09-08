@@ -263,7 +263,7 @@ class SimpleArtworkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Artwork
-        fields = ('image', 'title', 'artist', 'image_medium_quality', 'origin')
+        fields = ('_id', 'price', 'image', 'title', 'artist', 'image_medium_quality', 'origin')
 
     def get_image_medium_quality(self, obj):
         return self.context['request'].build_absolute_uri(obj.image_medium_quality.url)
