@@ -193,9 +193,7 @@ DATABASES = {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
         "NAME": os.environ.get("SQL_DATABASE", "postgres"),
         "USER": os.environ.get("SQL_USER", "postgres"),
-        "PASSWORD": get_secret(
-            "SQL_PASSWORD", os.environ.get("SQL_PASSWORD", "postgres")
-        ),
+        "PASSWORD": get_secret("SQL_PASSWORD", os.environ.get("SQL_PASSWORD", "postgres")),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
@@ -293,7 +291,5 @@ sentry_sdk.init(
 
 
 SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'api_key': {'type': 'apiKey', 'name': 'AUTHORIZATION', 'in': 'header'}
-    }
+    'SECURITY_DEFINITIONS': {'api_key': {'type': 'apiKey', 'name': 'AUTHORIZATION', 'in': 'header'}}
 }

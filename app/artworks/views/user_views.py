@@ -2,60 +2,25 @@ from artworks.models import Artist, Artwork, MyUser
 from artworks.serializer import (
     ArtistSerializer,
     ArtworkSerializer,
+    MyTokenObtainPairSerializer,
     RegisterSerializer,
+    UserProfileImageSerializer,
     UserSerializer,
-    UserSerializerWithToken,
 )
-from django.contrib.auth import get_user_model  # If used custom user model
-from django.contrib.auth.hashers import make_password
-from django.http import JsonResponse
-from django.http.response import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from backend.premissions import UserProfilePermission
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import generics, permissions, serializers, status
-from rest_framework.decorators import (
-    api_view,
-    authentication_classes,
-    permission_classes,
-)
+from rest_framework import mixins, permissions, status, viewsets
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import CreateAPIView
+from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-
-# Create your views here.
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.views import (
-    TokenBlacklistView,
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
-)
-
-#  Customizing token claims with JWT / overriding
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def get_token(cls, user):
-        token = super().get_token(user)
-        # Add custom claims, meaning when token decrypted more data is available check jwt.io
-        token["username"] = user.user_name
-        token["message"] = "hello world"
-        return token
-
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        # data['username'] = self.user.username
-        # data['email'] = self.user.email
-        #  ...
-        # refactored to the following:
-        serializer = UserSerializerWithToken(self.user).data
-        for k, v in serializer.items():
-            data[k] = v
-
-        return data
-
-
-class MyTokenObtainPairView(TokenObtainPairView):
+class TokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
     @swagger_auto_schema(
@@ -73,52 +38,22 @@ class CreateUserView(CreateAPIView):
     serializer_class = RegisterSerializer
 
 
-@api_view(["PUT"])
-@permission_classes([IsAuthenticated])
-def updateUserProfile(request):
-    user = request.user
-
-    data = request.data
-    user.first_name = data["firstName"]
-    user.last_name = data["lastName"]
-    if "checked" in data:
-        user.country = data["country"]
-        user.city = data["city"]
-        user.province = data["province"]
-        user.phone_number = data["phoneNumber"]
-        user.postal_code = data["postalCode"]
-        user.address = data["address"]
-    if "email" in data:
-        user.email = data["email"]
-        user.username = data["email"]
-    if ("password" in data) and (data["password"] != ""):
-        user.password = make_password(data["password"])
-
-    user.save()
-    serializer = UserSerializerWithToken(user, many=False)
-
-    return Response(serializer.data)
-
-
-# since we have wrapped this view with rest-framework decorator and changed the default authentication
-# /api/users/profile user is not the same as the user used for /admin
-
-
-class UserProfile(generics.RetrieveAPIView):
-    permission_classes = (IsAuthenticated,)
+class UserProfile(
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    parser_classes = (MultiPartParser, JSONParser)
+    queryset = MyUser.objects.filter(is_active=True)
+    permission_classes = (IsAuthenticated, UserProfilePermission)
     serializer_class = UserSerializer
 
-    def get_object(self, queryset=None, **kwargs):
-        user = self.request.user
-        return get_object_or_404(MyUser, id=user.id)
 
-
-# @api_view(["GET"])
-# @permission_classes([IsAuthenticated])
-# def fetchUserProfile(request):
-#
-#     serializer = UserSerializer(user, many=False)
-#     return Response(serializer.data)
+class UserProfileImage(mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = MyUser.objects.filter(is_active=True)
+    parser_classes = (MultiPartParser,)
+    permission_classes = (IsAuthenticated, UserProfilePermission)
+    serializer_class = UserProfileImageSerializer
 
 
 @api_view(["GET"])
@@ -134,24 +69,6 @@ def fetchUsers(request):
 def fetchUsersById(request, pk):
     user = MyUser.objects.get(id=pk)
     serializer = UserSerializer(user, many=False)
-    return Response(serializer.data)
-
-
-@api_view(["PUT"])
-@permission_classes([IsAuthenticated])
-def updateUserById(request, pk):
-    user = MyUser.objects.get(id=pk)
-
-    data = request.data
-    user.first_name = data["firstName"]
-    user.last_name = data["lastName"]
-    if "email" in data:
-        user.email = data["email"]
-        user.username = data["email"]
-    user.is_staff = data["isAdmin"]
-    user.save()
-    serializer = UserSerializer(user, many=False)
-
     return Response(serializer.data)
 
 

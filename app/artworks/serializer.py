@@ -1,5 +1,8 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from artworks.validators import validate_password
 
 from .models import (
     Achievement,
@@ -27,92 +30,36 @@ class MarketPlaceSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    first_name = serializers.SerializerMethodField(read_only=True)
-    last_name = serializers.SerializerMethodField(read_only=True)
-    country = serializers.SerializerMethodField(read_only=True)
-    city = serializers.SerializerMethodField(read_only=True)
-    province = serializers.SerializerMethodField(read_only=True)
-    phoneNumber = serializers.SerializerMethodField(read_only=True)
-    postalCode = serializers.SerializerMethodField(read_only=True)
-    address = serializers.SerializerMethodField(read_only=True)
-    wallet_address = serializers.SerializerMethodField(read_only=True)
-    username = serializers.SerializerMethodField(read_only=True)
-    # id = serializers.SerializerMethodField(read_only=True)
-    isAdmin = serializers.SerializerMethodField(read_only=True)
-    # favorite_artworks = serializers.SerializerMethodField(read_only=True)
-    password = serializers.CharField(write_only=True)
-    artist = serializers.SerializerMethodField(read_only=True)
-
     class Meta:
         model = MyUser
-        fields = [
-            'id',
-            'artist',
-            'username',
-            'email',
-            'first_name',
-            'last_name',
-            'country',
-            'city',
-            'province',
-            'phoneNumber',
-            'postalCode',
-            'address',
-            'isAdmin',
-            'wallet_address',
-            'password'
-            # 'favorite_artworks',
-        ]
+        exclude = (
+            'is_staff',
+            'is_admin',
+            'is_active',
+            'is_superuser',
+            'user_permissions',
+            'groups',
+        )
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'last_login': {'read_only': True},
+            'created_at': {'read_only': True},
+        }
 
-    # for changing id to _id and keeping the same convention
-    # def get_id(self, obj):
-    #     return obj.id
+    def validate(self, data):
+        super().validate(data)
+        if 'password' in data:
+            validate_password(data['password'], data)
+        return data
 
-    def get_isAdmin(self, obj):
-        return obj.is_staff
 
-    def get_username(self, obj):
-        return obj.email
-
-    def get_first_name(self, obj):
-        return obj.first_name
-
-    def get_last_name(self, obj):
-        return obj.last_name
-
-    def get_country(self, obj):
-        return obj.country
-
-    def get_city(self, obj):
-        return obj.city
-
-    def get_province(self, obj):
-        return obj.province
-
-    def get_phoneNumber(self, obj):
-        return obj.phone_number
-
-    def get_postalCode(self, obj):
-        return obj.postal_code
-
-    def get_address(self, obj):
-        return obj.address
-
-    def get_wallet_address(self, obj):
-        return obj.wallet_address
-
-    # def get_favorite_artworks(self, obj):
-    #     artworks = obj.user_favorite_artworks
-    #     serializer = ArtworkSerializer(artworks, many=True)
-    #     return serializer.data
-
-    def get_artist(self, obj):
-        artist = getattr(obj, 'artist', None)
-        if artist is None:
-            return None
-        if artist:
-            serializer = ArtistSerializer(artist, many=False)
-            return serializer.data
+class UserProfileImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyUser
+        fields = ('profile_picture',)
+        extra_kwargs = {
+            'profile_picture': {'read_only': False},
+        }
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -134,6 +81,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             user_name=data['user_name'],
             email=data['email'],
         )
+
+        validate_password(data['password'], user)
         user.set_password(data['password'])
         user.save()
         return user
@@ -350,3 +299,19 @@ class SingleArtistSerializer(ArtistSerializer):
     class Meta:
         model = Artist
         fields = '__all__'
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def get_token(self, user):
+        token = super().get_token(user)
+        token["username"] = user.user_name
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        serializer = UserSerializer(self.user).data
+        data['user'] = dict()
+        for k, v in serializer.items():
+            data['user'][k] = v
+
+        return data
