@@ -90,9 +90,11 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "imagekit",
     "django_filters",
+    'cities_light',
     "artworks",
     "cart",
 ]
+
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
@@ -293,3 +295,5 @@ sentry_sdk.init(
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {'api_key': {'type': 'apiKey', 'name': 'AUTHORIZATION', 'in': 'header'}}
 }
+
+CITIES_LIGHT_INDEX_SEARCH_NAMES = False

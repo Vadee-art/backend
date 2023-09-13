@@ -5,7 +5,8 @@ from artworks.serializer import (
     MyTokenObtainPairSerializer,
     RegisterSerializer,
     UserProfileImageSerializer,
-    UserSerializer,
+    UserSerializerInput,
+    UserSerializerOutput,
 )
 from backend.premissions import UserProfilePermission
 from django.contrib.auth import get_user_model
@@ -44,9 +45,24 @@ class UserProfile(
     viewsets.GenericViewSet,
 ):
     parser_classes = (MultiPartParser, JSONParser)
-    queryset = MyUser.objects.filter(is_active=True)
+    queryset = MyUser.objects.filter(is_active=True).select_related(
+        'city',
+        'city__region',
+        'city__country',
+    )
     permission_classes = (IsAuthenticated, UserProfilePermission)
-    serializer_class = UserSerializer
+    serializer_class = UserSerializerOutput
+
+    @swagger_auto_schema(
+        request_body=UserSerializerInput,
+        responses={
+            status.HTTP_200_OK: UserSerializerOutput,
+        },
+    )
+    def partial_update(self, request, *args, **kwargs):
+        self.serializer_class = UserSerializerInput
+        super().partial_update(request, *args, **kwargs)
+        return Response(UserSerializerOutput(self.get_object(), context={"request": request}).data)
 
 
 class UserProfileImage(mixins.UpdateModelMixin, viewsets.GenericViewSet):
@@ -60,7 +76,7 @@ class UserProfileImage(mixins.UpdateModelMixin, viewsets.GenericViewSet):
 @permission_classes([IsAdminUser])
 def fetchUsers(request):
     users = MyUser.objects.all()
-    serializer = UserSerializer(users, many=True)
+    serializer = UserSerializerOutput(users, many=True)
     return Response(serializer.data)
 
 
@@ -68,7 +84,7 @@ def fetchUsers(request):
 @permission_classes([IsAdminUser])
 def fetchUsersById(request, pk):
     user = MyUser.objects.get(id=pk)
-    serializer = UserSerializer(user, many=False)
+    serializer = UserSerializerOutput(user, many=False)
     return Response(serializer.data)
 
 

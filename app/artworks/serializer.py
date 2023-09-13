@@ -1,3 +1,9 @@
+from cities_light.contrib.restframework3 import (
+    CitySerializer,
+    CountrySerializer,
+    RegionSerializer,
+)
+from cities_light.models import City, Country, Region
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -29,7 +35,9 @@ class MarketPlaceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializerInput(serializers.ModelSerializer):
+    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all(), required=False)
+
     class Meta:
         model = MyUser
         exclude = (
@@ -41,7 +49,9 @@ class UserSerializer(serializers.ModelSerializer):
             'groups',
         )
         extra_kwargs = {
-            'password': {'write_only': True},
+            'password': {'required': False, 'write_only': True},
+            'email': {'required': True},
+            'user_name': {'required': False},
             'last_login': {'read_only': True},
             'created_at': {'read_only': True},
         }
@@ -51,6 +61,21 @@ class UserSerializer(serializers.ModelSerializer):
         if 'password' in data:
             validate_password(data['password'], data)
         return data
+
+
+class UserSerializerOutput(serializers.ModelSerializer):
+    city = CitySerializer(required=False)
+    region = serializers.SerializerMethodField(read_only=True, required=False)
+    country = serializers.SerializerMethodField(read_only=True, required=False)
+
+    class Meta(UserSerializerInput.Meta):
+        pass
+
+    def get_region(self, obj):
+        return RegionSerializer(obj.city.region, context=self.context).data
+
+    def get_country(self, obj):
+        return CountrySerializer(obj.city.country, context=self.context).data
 
 
 class UserProfileImageSerializer(serializers.ModelSerializer):
@@ -88,7 +113,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserSerializerWithToken(UserSerializer):
+class UserSerializerWithToken(UserSerializerOutput):
     token = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -309,7 +334,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
         data = super().validate(attrs)
-        serializer = UserSerializer(self.user).data
+        serializer = UserSerializerOutput(self.user).data
         data['user'] = dict()
         for k, v in serializer.items():
             data['user'][k] = v

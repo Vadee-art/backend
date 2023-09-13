@@ -58,6 +58,7 @@ urlpatterns = [
     ),
     # Cart
     path("api/v1/cart/", CartView.as_view()),
+    path(r'api/v1/geo/', include('cities_light.contrib.restframework3')),
     path('__debug__/', include('debug_toolbar.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

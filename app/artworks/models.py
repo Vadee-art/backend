@@ -80,8 +80,6 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     user_name = models.CharField(max_length=150, unique=True)
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
-    country = models.CharField(max_length=150, null=True)
-    city = models.CharField(max_length=150, null=True)
     province = models.CharField(max_length=150, blank=True)
     phone_number = models.CharField(max_length=150, blank=True)
     postal_code = models.CharField(max_length=150, blank=True)
@@ -93,6 +91,13 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     wallet_address = models.CharField(max_length=250, null=True, blank=True)
+
+    city = models.ForeignKey(
+        'cities_light.City',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
     objects = UserManager()
 
