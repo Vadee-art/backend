@@ -72,12 +72,12 @@ class UserSerializerOutput(serializers.ModelSerializer):
         pass
 
     def get_region(self, obj):
-        if obj.city:
+        if not obj.city:
             return None
         return RegionSerializer(obj.city.region, context=self.context).data
 
     def get_country(self, obj):
-        if obj.city:
+        if not obj.city:
             return None
         return CountrySerializer(obj.city.country, context=self.context).data
 
