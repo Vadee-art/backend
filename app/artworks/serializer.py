@@ -3,7 +3,7 @@ from cities_light.contrib.restframework3 import (
     CountrySerializer,
     RegionSerializer,
 )
-from cities_light.models import City, Country, Region
+from cities_light.models import City
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken

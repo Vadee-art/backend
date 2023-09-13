@@ -6,6 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
+        ('cities_light', '0011_alter_city_country_alter_city_region_and_more'),
         ('artworks', '0009_auto_20230913_0315'),
     ]
 
@@ -17,7 +18,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
-                to='cities_light.city',
+                to='cities_light.City',
             ),
         ),
         migrations.AddField(
@@ -27,7 +28,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
-                to='cities_light.country',
+                to='cities_light.Country',
             ),
         ),
     ]
