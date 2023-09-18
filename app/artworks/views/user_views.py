@@ -64,6 +64,17 @@ class UserProfile(
         super().partial_update(request, *args, **kwargs)
         return Response(UserSerializerOutput(self.get_object(), context={"request": request}).data)
 
+    @swagger_auto_schema(
+        request_body=UserSerializerInput,
+        responses={
+            status.HTTP_200_OK: UserSerializerOutput,
+        },
+    )
+    def update(self, request, *args, **kwargs):
+        self.serializer_class = UserSerializerInput
+        super().update(request, *args, **kwargs)
+        return Response(UserSerializerOutput(self.get_object(), context={"request": request}).data)
+
 
 class UserProfileImage(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     queryset = MyUser.objects.filter(is_active=True)

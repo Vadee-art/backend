@@ -65,8 +65,8 @@ class UserSerializerInput(serializers.ModelSerializer):
 
 class UserSerializerOutput(serializers.ModelSerializer):
     city = CitySerializer(required=False)
-    region = serializers.SerializerMethodField(read_only=True, required=False)
-    country = serializers.SerializerMethodField(read_only=True, required=False)
+    region = RegionSerializer(read_only=True, required=False, source='city.region')
+    country = CountrySerializer(read_only=True, required=False, source='city.country')
 
     class Meta(UserSerializerInput.Meta):
         pass
