@@ -18,7 +18,7 @@ RUN apk add -u libpq jpeg-dev zlib-dev libjpeg
 # install dependencies
 RUN pip install --upgrade pip
 COPY ./requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install -U -r requirements.txt
 
 # copy entrypoint.sh
 COPY ./entrypoint.sh .
