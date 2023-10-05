@@ -2,6 +2,12 @@
 
 ### Development
 
+Get the `dapp` submodule:
+
+```sh
+git submodule init
+```
+
 Uses the default Django development server.
 
 1. Rename `.env.dev-sample` to `.env`.
