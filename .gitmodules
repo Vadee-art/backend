@@ -1,0 +1,3 @@
+[submodule "app/dapp"]
+	path = app/dapp
+	url = git@github.com:Vadee-art/dapp.git
