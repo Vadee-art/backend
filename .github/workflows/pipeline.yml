@@ -30,6 +30,14 @@ jobs:
       - name: Git Checkout
         uses: actions/checkout@v2
 
+      - name: Initial Git Submodule
+        run: |
+          git submodule init
+
+      - name: Update Git Submodule
+        run: |
+          git submodule update
+
       - id: image_id
         name: Generate Image ID
         run: |
