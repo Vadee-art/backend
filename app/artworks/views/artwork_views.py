@@ -158,6 +158,8 @@ class VoucherViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = Voucher.objects.all()
@@ -166,11 +168,21 @@ class VoucherViewSet(
     ordering = ['-created_at']
 
     def perform_create(self, serializer):
+        self.validate()
+        return super().perform_create(serializer)
+
+    def perform_destroy(self, serializer):
+        self.validate()
+        return super().perform_destroy(serializer)
+
+    def perform_update(self, serializer):
+        self.validate()
+        return super().perform_update(serializer)
+
+    def validate(self):
         artwork = Artwork.objects.filter(pk=self.request.data['artwork_id']).first()
         if not artwork or self.request.user != artwork.artist.user:
             raise ValidationError('Artwork not found')
-
-        return super().perform_create(serializer)
 
 
 @api_view(["PUT"])

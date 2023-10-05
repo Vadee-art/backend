@@ -16,6 +16,7 @@ from django.utils.translation import gettext_lazy as __
 from django_cte import CTEManager
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFit
+from rest_framework.exceptions import ValidationError as HTTPValidationError
 
 
 class TheMarketPlace(models.Model):
@@ -216,23 +217,34 @@ class Artist(models.Model):
 
 class Voucher(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
-    title = models.CharField(max_length=350, default="")
-    artwork_id = models.IntegerField()
-    edition = models.IntegerField(max_length=350, default="")
-    price_wei = models.CharField(max_length=350, default="")
-    price_dollar = models.CharField(max_length=350, default="")
+    title = models.CharField(max_length=350)
+    artwork_id = models.ForeignKey('Artwork', on_delete=models.CASCADE)
+    edition = models.IntegerField()
+    price_wei = models.IntegerField()
+    price_dollar = models.IntegerField()
     content = models.CharField(max_length=350, default="")
-    signature = models.CharField(max_length=350, default="")
+    signature = models.CharField(max_length=350)
+    is_sold = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "voucher"
 
     def __str__(self):
-        return self.token_Uri
+        return self.token_uri
 
     @property
     def token_uri(self):
         return urljoin(settings.DOMAIN, f'/tokens/{self._id}')
+
+    def delete(self, *args, **kwargs):
+        if self.is_sold:
+            raise HTTPValidationError('Cannot delete sold vouchers')
+        return super().delete(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        if self.is_sold:
+            raise HTTPValidationError('Cannot update sold vouchers')
+        return super().save(*args, **kwargs)
 
 
 class Collection(models.Model):
@@ -312,13 +324,6 @@ class Artwork(models.Model):
     is_minted = models.BooleanField(default=False)
     on_market = models.BooleanField(default=False)
     is_artist_talented = models.BooleanField(default=False)
-    voucher = models.ForeignKey(
-        Voucher,
-        on_delete=models.SET_NULL,
-        related_name="artwork_signature",
-        null=True,
-        blank=True,
-    )
     is_active = models.BooleanField(default=True)
     is_sold_out = models.BooleanField(default=False)
     is_notable = models.BooleanField(default=False)
