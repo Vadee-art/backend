@@ -76,8 +76,7 @@ class ArtistsView(
 ):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ArtistFilter
-    # permission_classes = [OwnProfilePermission]
-    authentication_classes = []
+    permission_classes = [OwnProfilePermission]
     ordering = ['first_name', 'last_name']
     serializer_classes = {
         'retrieve': SingleArtistSerializer,

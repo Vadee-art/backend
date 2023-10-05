@@ -8,6 +8,7 @@ router = routers.SimpleRouter(trailing_slash=False)
 router.register(r'', views.ArtworkViewSet)
 router.register(r'carousels/', views.CarouselArtworkViewSet)
 router.register(r'by-origins/', views.OriginsArtworksView, basename='artworks_by_origin')
+router.register(r'vouchers/', views.VoucherViewSet, basename='voucher')
 
 urlpatterns = [
     path("getSubcategory/", views.get_subcategory, name="sub_category_list"),

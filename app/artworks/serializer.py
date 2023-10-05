@@ -174,9 +174,14 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class VoucherSerializer(serializers.ModelSerializer):
+    token_uri = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Voucher
         fields = '__all__'
+
+    def get_token_uri(self, obj):
+        return obj.token_uri
 
 
 class TheTokenSerializer(serializers.ModelSerializer):

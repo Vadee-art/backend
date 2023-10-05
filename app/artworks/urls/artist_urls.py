@@ -7,6 +7,7 @@ app_name = "artist"
 router = routers.DefaultRouter()
 router.register(r'', views.ArtistsView, basename='Artist')
 
+
 urlpatterns = [
     path('', include(router.urls)),
     path("search/", views.ArtistSearch.as_view(), name="artists-search"),

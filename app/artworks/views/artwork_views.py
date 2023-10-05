@@ -17,7 +17,6 @@ from artworks.serializer import (
     OrderSerializer,
     OriginSerializer,
     OriginWithArtworksSerializer,
-    SimpleArtworkSerializer,
     SubCategorySerializer,
     VoucherSerializer,
 )
@@ -28,6 +27,7 @@ from django_cte import With
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, views, viewsets
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
@@ -152,6 +152,25 @@ class CarouselArtworkViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = ArtworkSerializer
     ordering_fields = ['-created_at']
     ordering = ['-created_at']
+
+
+class VoucherViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = Voucher.objects.all()
+    serializer_class = VoucherSerializer
+    ordering_fields = ['-created_at']
+    ordering = ['-created_at']
+
+    def perform_create(self, serializer):
+        artwork = Artwork.objects.filter(pk=self.request.data['artwork_id']).first()
+        if not artwork or self.request.user != artwork.artist.user:
+            raise ValidationError('Artwork not found')
+
+        return super().perform_create(serializer)
 
 
 @api_view(["PUT"])

@@ -1,5 +1,7 @@
 from datetime import date
+from urllib.parse import urljoin
 
+from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -215,12 +217,10 @@ class Artist(models.Model):
 class Voucher(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     title = models.CharField(max_length=350, default="")
-    artwork_id = models.IntegerField(default=0, unique=True)
-    edition_number = models.CharField(max_length=350, default="")
-    edition = models.CharField(max_length=350, default="")
+    artwork_id = models.IntegerField()
+    edition = models.IntegerField(max_length=350, default="")
     price_wei = models.CharField(max_length=350, default="")
     price_dollar = models.CharField(max_length=350, default="")
-    token_Uri = models.CharField(max_length=350, default="")
     content = models.CharField(max_length=350, default="")
     signature = models.CharField(max_length=350, default="")
 
@@ -229,6 +229,10 @@ class Voucher(models.Model):
 
     def __str__(self):
         return self.token_Uri
+
+    @property
+    def token_uri(self):
+        return urljoin(settings.DOMAIN, f'/tokens/{self._id}')
 
 
 class Collection(models.Model):
