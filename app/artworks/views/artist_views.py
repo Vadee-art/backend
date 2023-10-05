@@ -35,15 +35,9 @@ class ArtistSimilarArtists(generics.ListAPIView):
         if artist_artworks_cats := artist.artworks.all().values("category___id"):
             list = []
             for c in artist_artworks_cats:
-                artworksByArtistCats = Artwork.objects.filter(
-                    category___id=c["category___id"]
-                )
+                artworksByArtistCats = Artwork.objects.filter(category___id=c["category___id"])
                 for a in artworksByArtistCats:
-                    if (
-                        a.artist not in list
-                        and a.artist != artist
-                        and a.artist is not None
-                    ):
+                    if a.artist not in list and a.artist != artist and a.artist is not None:
                         list.append(a.artist)
 
             return list
@@ -82,7 +76,8 @@ class ArtistsView(
 ):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ArtistFilter
-    permission_classes = [OwnProfilePermission]
+    # permission_classes = [OwnProfilePermission]
+    authentication_classes = []
     ordering = ['first_name', 'last_name']
     serializer_classes = {
         'retrieve': SingleArtistSerializer,
@@ -120,9 +115,7 @@ class ArtistFiltersView(views.APIView):
         achievements = Achievement.objects.order_by("_id")
 
         result = dict(
-            origins=OriginSerializer(
-                origins, many=True, context={"request": request}
-            ).data,
+            origins=OriginSerializer(origins, many=True, context={"request": request}).data,
             achievements=AchievementSerializer(
                 achievements, many=True, context={"request": request}
             ).data,

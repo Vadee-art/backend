@@ -35,7 +35,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = os.environ.get('SECRET_KEY', 'SHTYCVutydc')
 SECRET_KEY = get_secret("SECRET_KEY", os.getenv("SECRET_KEY"))
-
+PRIVATE_KEY = get_secret("PRIVATE_KEY", os.getenv("PRIVATE_KEY"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.environ.get("DEBUG", 1)))
@@ -86,6 +86,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django_safe_settings',
     "drf_yasg",
     "debug_toolbar",
     "imagekit",
@@ -297,3 +298,21 @@ SWAGGER_SETTINGS = {
 }
 
 CITIES_LIGHT_INDEX_SEARCH_NAMES = False
+
+if IS_PROD:
+    WEB3_PROVIDER = None
+    VADEE_ADDRESS = None
+elif IS_PROD:
+    WEB3_PROVIDER = 'enc:c226b0434be72dc9049fcb4b9e6349ed1c45654e12d3d8284983f3a52688a65b343cc205cd973fdc72a5c4d08275bcfc01270df18e15ba1ae6ad756f823917bd65f1b7d05df59acc49f5df40d96d55e2'
+    VADEE_ADDRESS = '0x77305d566841b9ED0614dc5bF23Fe8858c3D4ab6'
+else:
+    WEB3_PROVIDER = 'enc:fb9b1dd48f0f82257ad145f99d713322d3815c0ee49a32f0d1f803593826b667435836128773209ce42433309008c7be4ec1fa63e43dfe8e4d1948dd10fbe481c29403e4c3d597ff19e6bddd2c1256af'
+    VADEE_ADDRESS = '0x77305d566841b9ED0614dc5bF23Fe8858c3D4ab6'
+
+
+## ##################################################################
+## this must be at the bottom of settings.py
+## ##################################################################
+from django_safe_settings.patch import patch_all
+
+patch_all()

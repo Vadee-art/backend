@@ -109,6 +109,9 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         "Returns the short name for the user."
         return self.first_name
 
+    def get_full_name(self):
+        return self.first_name + ' ' + self.last_name
+
     def __str__(self):
         return self.email
 
@@ -198,6 +201,9 @@ class Artist(models.Model):
     favorites = models.ManyToManyField(
         MyUser, related_name="favorite_artist", default=None, blank=True
     )
+    contract = models.CharField(max_length=64, blank=True)
+    vadee_fee = models.IntegerField(default=10)
+    royalty_fee = models.IntegerField(default=10)
 
     class Meta:
         verbose_name = "artist"

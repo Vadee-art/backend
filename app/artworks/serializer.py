@@ -205,8 +205,8 @@ class ArtistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Artist
-        read_only_fields = ["user", "origin", "achievements", "favorites"]
-        exclude = ["wallet_address", "gallery_address"]
+        read_only_fields = ["user", "origin", "achievements", "favorites", "contract", "vadee_fee"]
+        exclude = ["gallery_address"]
 
     def get_username(self, obj):
         return obj.user.email
