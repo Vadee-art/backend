@@ -97,7 +97,6 @@ class ArtistsView(
                 'artworks__category',
                 'artworks__origin',
                 'artworks__sub_category',
-                'artworks__voucher',
                 'artworks__artist__user',
                 'artworks__owner',
                 'artworks__tags',

@@ -19,7 +19,6 @@ class HomepageView(APIView):
             'category',
             'origin',
             'sub_category',
-            'voucher',
             'artist__user',
             'owner',
         ).prefetch_related('tags', 'artist__achievements', 'artist__favorites')
@@ -38,26 +37,16 @@ class HomepageView(APIView):
         origins = Origin.objects.order_by("_id")[:5]
 
         result = dict(
-            carousels=ArtworkSerializer(
-                carousels, many=True, context={"request": request}
-            ).data,
-            artists=ArtistSerializer(
-                artists, many=True, context={"request": request}
-            ).data,
+            carousels=ArtworkSerializer(carousels, many=True, context={"request": request}).data,
+            artists=ArtistSerializer(artists, many=True, context={"request": request}).data,
             featuredCategories=CategorySerializer(
                 featured_categories, many=True, context={"request": request}
             ).data,
-            lastArtwork=ArtworkSerializer(
-                last_artwork, context={"request": request}
-            ).data,
-            talentedArtwork=ArtworkSerializer(
-                talented_artwork, context={"request": request}
-            ).data,
+            lastArtwork=ArtworkSerializer(last_artwork, context={"request": request}).data,
+            talentedArtwork=ArtworkSerializer(talented_artwork, context={"request": request}).data,
             subCategories=SubCategorySerializer(
                 sub_categories, many=True, context={"request": request}
             ).data,
-            origins=OriginSerializer(
-                origins, many=True, context={"request": request}
-            ).data,
+            origins=OriginSerializer(origins, many=True, context={"request": request}).data,
         )
         return Response(data=result)

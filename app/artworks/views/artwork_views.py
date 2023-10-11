@@ -103,7 +103,6 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
             'category',
             'origin',
             'sub_category',
-            'voucher',
             'artist__user',
             'owner',
         )
@@ -142,7 +141,6 @@ class CarouselArtworkViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             'category',
             'origin',
             'sub_category',
-            'voucher',
             'artist__user',
             'owner',
         )

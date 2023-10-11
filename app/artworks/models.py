@@ -218,7 +218,7 @@ class Artist(models.Model):
 class Voucher(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     title = models.CharField(max_length=350)
-    artwork_id = models.ForeignKey('Artwork', on_delete=models.CASCADE)
+    artwork_id = models.ForeignKey('Artwork', on_delete=models.CASCADE, related_name='vouchers')
     edition = models.IntegerField()
     price_wei = models.IntegerField()
     price_dollar = models.IntegerField()
