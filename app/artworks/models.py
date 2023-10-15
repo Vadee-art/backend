@@ -149,6 +149,7 @@ class Category(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_featured = models.BooleanField(default=False)
     image = models.ImageField(null=True, default="/defaultImage.png")
+    show_in_homepage = models.BooleanField(default=False)
 
     class Meta:
         ordering = ("-created_at",)
@@ -165,6 +166,7 @@ class SubCategory(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_featured = models.BooleanField(default=False)
 
     class Meta:
         ordering = ("-created_at",)
@@ -185,6 +187,7 @@ class Origin(models.Model):
     )
     description = models.TextField(blank=True)
     flag = models.ImageField(null=True, default="/defaultImage.png")
+    is_featured = models.BooleanField(default=False)
 
     def __str__(self):
         return self.country
@@ -207,6 +210,7 @@ class Artist(models.Model):
     contract = models.CharField(max_length=64, blank=True)
     vadee_fee = models.IntegerField(default=10)
     royalty_fee = models.IntegerField(default=10)
+    is_featured = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "artist"
