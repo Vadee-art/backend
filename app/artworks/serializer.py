@@ -239,7 +239,6 @@ class ArtworkSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     category = CategorySerializer(many=False, read_only=True)
     sub_category = SubCategorySerializer(many=False, read_only=True)
-    origin = OriginSerializer(many=False, read_only=True)
     voucher = VoucherSerializer(many=False, read_only=True)
     image_medium_quality = serializers.SerializerMethodField(read_only=True)
 
@@ -249,6 +248,14 @@ class ArtworkSerializer(serializers.ModelSerializer):
 
     def get_image_medium_quality(self, obj):
         return self.context['request'].build_absolute_uri(obj.image_medium_quality.url)
+
+
+class ArtworkWithoutArtistSerializer(ArtworkSerializer):
+    artist = None
+
+    class Meta:
+        model = Artwork
+        exclude = ('artist',)
 
 
 class SimpleArtworkSerializer(serializers.ModelSerializer):
@@ -322,14 +329,8 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ArtworkSummary(ArtworkSerializer):
-    class Meta:
-        model = Artwork
-        fields = '__all__'
-
-
 class SingleArtistSerializer(ArtistSerializer):
-    artworks = ArtworkSerializer(many=True, read_only=True)
+    artworks = ArtworkWithoutArtistSerializer(many=True, read_only=True)
 
     class Meta:
         model = Artist

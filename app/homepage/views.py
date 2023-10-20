@@ -50,7 +50,7 @@ class HomepageView(APIView):
                 sub_categories, many=True, context={"request": request}
             ).data,
             origins=OriginSerializer(origins, many=True, context={"request": request}).data,
-            selected_artworks={
+            selectedArtworks={
                 category.name: SimpleArtworkSerializer(
                     Artwork.objects.filter(category=category).order_by('-created_at')[:6],
                     many=True,
