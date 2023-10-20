@@ -22,7 +22,6 @@ from artworks.serializer import (
 )
 from django.db.models import F, Window
 from django.db.models.functions import Rank
-from django.http import HttpResponse
 from django_cte import With
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, views, viewsets
@@ -30,15 +29,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-
-# for admin and change_form.html
-
-
-@api_view(["GET"])
-def get_subcategory(request):
-    id = request.GET.get("id", "")
-    result = list(SubCategory.objects.filter(category_id=int(id)).values("_id", "name"))
-    return HttpResponse(json.dumps(result), content_type="application/json")
 
 
 @api_view(["GET"])
@@ -48,19 +38,6 @@ def categories(request):
     return Response(serializer.data)
 
 
-@api_view(["GET"])
-def fetch_origin_list(request):
-    origins = Origin.objects.all()
-    list = []
-    for o in origins:
-        artworks = o.artwork_set.all()
-        originSerializer = OriginSerializer(o, many=False)
-        artworkSerializer = ArtworkSerializer(artworks, many=True)
-        list.append({"origin": originSerializer.data, "artworks": artworkSerializer.data})
-
-    return Response(list)
-
-
 class OriginsArtworksView(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Origin.objects.order_by("_id")
     serializer_class = OriginWithArtworksSerializer
@@ -68,11 +45,11 @@ class OriginsArtworksView(mixins.ListModelMixin, viewsets.GenericViewSet):
     def list(self, request):
         origins = self.paginate_queryset(self.queryset)
         cte = With(
-            Artwork.objects.annotate(
+            Artwork.simple_object.annotate(
                 rank=Window(
                     expression=Rank(),
                     order_by=F("created_at").desc(),
-                    partition_by=[F("origin_id")],
+                    partition_by=[F("artist__origin_id")],
                 )
             )
         )
@@ -80,15 +57,18 @@ class OriginsArtworksView(mixins.ListModelMixin, viewsets.GenericViewSet):
             cte.queryset()
             .select_related(
                 "artist__user",
+                "artist__origin",
             )
             .with_cte(cte)
-            .filter(origin__in=origins)
+            .filter(artist__origin__in=origins)
             .annotate(rank=cte.col.rank)
             .filter(rank__lte=3)
         )
+        q = str(artworks.query)
+        print(q)
 
         for origin in origins:
-            origin.artworks = [a for a in artworks if a.origin_id == origin.pk]
+            origin.artworks = [a for a in artworks if a.artist.origin_id == origin.pk]
 
         return self.get_paginated_response(
             data=OriginWithArtworksSerializer(origins, many=True, context={"request": request}).data
@@ -96,19 +76,7 @@ class OriginsArtworksView(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    queryset = (
-        Artwork.objects.select_related(
-            'artist',
-            'collection',
-            'category',
-            'origin',
-            'sub_category',
-            'artist__user',
-            'owner',
-        )
-        .prefetch_related('tags', 'artist__achievements', 'artist__favorites')
-        .all()
-    )
+    queryset = Artwork.objects.all()
     serializer_class = ArtworkSerializer
     ordering_fields = ['-created_at']
     ordering = ['-created_at']
@@ -133,20 +101,7 @@ class ArtworkFiltersView(views.APIView):
 
 
 class CarouselArtworkViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = (
-        Artwork.objects.filter(is_carousel=True)
-        .select_related(
-            'artist',
-            'collection',
-            'category',
-            'origin',
-            'sub_category',
-            'artist__user',
-            'owner',
-        )
-        .prefetch_related('tags', 'artist__achievements', 'artist__favorites')
-        .all()
-    )
+    queryset = Artwork.objects.filter(is_carousel=True).all()
     serializer_class = ArtworkSerializer
     ordering_fields = ['-created_at']
     ordering = ['-created_at']

@@ -11,7 +11,7 @@ class NumberInFilter(BaseInFilter, NumberFilter):
 class ArtworkFilter(filters.FilterSet):
     price__gt = NumberFilter(field_name="price", lookup_expr="gt")
     price__lt = NumberFilter(field_name="price", lookup_expr="lt")
-    origin = NumberInFilter(field_name='origin_id', lookup_expr='in')
+    origin = NumberInFilter(field_name='artist__origin_id', lookup_expr='in')
     category = NumberInFilter(field_name='category_id', lookup_expr='in')
     sub_category = NumberInFilter(field_name='sub_category_id', lookup_expr='in')
 

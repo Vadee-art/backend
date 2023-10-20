@@ -1,8 +1,7 @@
 from artworks.models import Artist, Artwork, Category, Origin, SubCategory
 from artworks.serializer import (
     ArtistSerializer,
-    ArtworkSerializer,
-    CategorySerializer,
+        CategorySerializer,
     OriginSerializer,
     SimpleArtworkSerializer,
     SubCategorySerializer,
@@ -14,15 +13,9 @@ from rest_framework.views import APIView
 
 class HomepageView(APIView):
     def get(self, request):
-        artwork_query = Artwork.objects.select_related(
-            'artist',
-            'collection',
-            'category',
-            'origin',
-            'sub_category',
-            'artist__user',
-            'owner',
-        ).prefetch_related('tags', 'artist__achievements', 'artist__favorites')
+        artwork_query = Artwork.simple_object.select_related(
+            'artist', 'artist__origin', 'artist__user'
+        ).all()
 
         carousels = artwork_query.filter(is_carousel=True)[:5]
         artists = (
@@ -39,20 +32,24 @@ class HomepageView(APIView):
         origins = Origin.objects.filter(is_featured=True).order_by("_id")[:5]
         selected_categories = Category.objects.filter(show_in_homepage=True)[:2]
         result = dict(
-            carousels=ArtworkSerializer(carousels, many=True, context={"request": request}).data,
+            carousels=SimpleArtworkSerializer(
+                carousels, many=True, context={"request": request}
+            ).data,
             artists=ArtistSerializer(artists, many=True, context={"request": request}).data,
             featuredCategories=CategorySerializer(
                 featured_categories, many=True, context={"request": request}
             ).data,
-            lastArtwork=ArtworkSerializer(last_artwork, context={"request": request}).data,
-            talentedArtwork=ArtworkSerializer(talented_artwork, context={"request": request}).data,
+            lastArtwork=SimpleArtworkSerializer(last_artwork, context={"request": request}).data,
+            talentedArtwork=SimpleArtworkSerializer(
+                talented_artwork, context={"request": request}
+            ).data,
             subCategories=SubCategorySerializer(
                 sub_categories, many=True, context={"request": request}
             ).data,
             origins=OriginSerializer(origins, many=True, context={"request": request}).data,
             selectedArtworks={
                 category.name: SimpleArtworkSerializer(
-                    Artwork.objects.filter(category=category).order_by('-created_at')[:6],
+                    artwork_query.filter(category=category).order_by('-created_at')[:6],
                     many=True,
                     context={"request": request},
                 ).data

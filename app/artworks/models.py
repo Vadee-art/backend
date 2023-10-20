@@ -264,7 +264,26 @@ class Collection(models.Model):
 
 class ArtworkManager(CTEManager):
     def get_queryset(self):
-        return super(ArtworkManager, self).get_queryset().filter(is_active=True)
+        return (
+            super()
+            .get_queryset()
+            .filter(is_active=True)
+            .select_related(
+                'artist',
+                'collection',
+                'category',
+                'sub_category',
+                'artist__user',
+                'owner',
+                'artist__origin',
+            )
+            .prefetch_related('tags', 'artist__achievements', 'artist__favorites')
+        )
+
+
+class SimpleArtworkManager(CTEManager):
+    def get_queryset(self):
+        return super().get_queryset()
 
 
 class Artwork(models.Model):
@@ -316,7 +335,7 @@ class Artwork(models.Model):
     frame = models.CharField(max_length=200, null=True, blank=True)
     price = models.DecimalField(max_digits=12, decimal_places=0)
     about_work = models.TextField(blank=True)
-    origin = models.ForeignKey(Origin, on_delete=models.SET_NULL, null=True)
+    # origin = models.ForeignKey(Origin, on_delete=models.SET_NULL, null=True)
     edition_number = models.IntegerField(null=False, default=1)
     edition_total = models.IntegerField(null=False, default=0, validators=[validate])
     tags = models.ManyToManyField(Tag, blank=True)
@@ -359,6 +378,7 @@ class Artwork(models.Model):
         options={'quality': 95},
     )
     objects = ArtworkManager()
+    simple_object = SimpleArtworkManager()
 
     class Meta:
         verbose_name = "artwork"

@@ -113,7 +113,6 @@ class ArtworkAdminConfig(admin.ModelAdmin):
         "on_market",
         "artist",
         "category",
-        "origin",
         "sub_category",
         "price",
         "image",
