@@ -95,7 +95,6 @@ class ArtistsView(
                 'artworks',
                 'artworks__collection',
                 'artworks__category',
-                'artworks__origin',
                 'artworks__sub_category',
                 'artworks__artist__user',
                 'artworks__owner',
