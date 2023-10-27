@@ -7,12 +7,11 @@ from django.utils.safestring import mark_safe
 from .models import *
 from .models import (
     Artwork,
-    Category,
     Collection,
+    Genre,
     MyUser,
     Order,
     ShippingAddress,
-    SubCategory,
 )
 
 
@@ -112,8 +111,8 @@ class ArtworkAdminConfig(admin.ModelAdmin):
         "is_carousel",
         "on_market",
         "artist",
-        "category",
-        "sub_category",
+        "genre",
+        # "sub_category",
         "price",
         "image",
         "created_at",
@@ -132,8 +131,8 @@ class ArtworkAdminConfig(admin.ModelAdmin):
         )
 
 
-class CategoryAdminConfig(admin.ModelAdmin):
-    model = Category
+class GenreAdminConfig(admin.ModelAdmin):
+    model = Genre
     list_display = ["name", "slug"]
     prepopulated_fields = {"slug": ("name",)}
 
@@ -159,8 +158,7 @@ admin.site.register(Artwork, ArtworkAdminConfig)
 admin.site.register(Achievement)
 admin.site.register(Artist, ArtistAdminConfig)
 admin.site.register(Order, OrderAdminConfig)
-admin.site.register(Category, CategoryAdminConfig)
-admin.site.register(SubCategory)
+admin.site.register(Genre, GenreAdminConfig)
 admin.site.register(Tag, TagAdminConfig)
 admin.site.register(ShippingAddress, ShippingAddressAdminConfig)
 admin.site.register(Collection)

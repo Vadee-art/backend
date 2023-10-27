@@ -142,7 +142,7 @@ class Tag(models.Model):
         super().save(*args, **kwargs)  # Call the "real" save() method.
 
 
-class Category(models.Model):
+class Genre(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     name = models.CharField(max_length=255, db_index=True)
     slug = models.SlugField(max_length=255, unique=True)
@@ -153,28 +153,27 @@ class Category(models.Model):
 
     class Meta:
         ordering = ("-created_at",)
-        verbose_name = "category"
+        verbose_name = "genre"
         verbose_name_plural = "categories"
 
     def __str__(self):
         return self.name
 
 
-class SubCategory(models.Model):
-    _id = models.AutoField(primary_key=True, editable=False)
-    name = models.CharField(max_length=255, db_index=True)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_featured = models.BooleanField(default=False)
+# class SubCategory(models.Model):
+#     _id = models.AutoField(primary_key=True, editable=False)
+#     name = models.CharField(max_length=255, db_index=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     is_featured = models.BooleanField(default=False)
 
-    class Meta:
-        ordering = ("-created_at",)
-        verbose_name = "sub category"
-        verbose_name_plural = "sub categories"
+#     class Meta:
+#         ordering = ("-created_at",)
+#         verbose_name = "sub category"
+#         verbose_name_plural = "sub categories"
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
 
 class Origin(models.Model):
@@ -271,8 +270,7 @@ class ArtworkManager(CTEManager):
             .select_related(
                 'artist',
                 'collection',
-                'category',
-                'sub_category',
+                'genre',
                 'artist__user',
                 'owner',
                 'artist__origin',
@@ -313,12 +311,10 @@ class Artwork(models.Model):
         super(Artwork, self).clean()
 
     _id = models.AutoField(primary_key=True, editable=False)
-    category = models.ForeignKey(
-        Category, related_name="artwork_category", on_delete=models.CASCADE
-    )
-    sub_category = models.ForeignKey(
-        SubCategory, related_name="artwork_sub_category", on_delete=models.CASCADE
-    )
+    genre = models.ForeignKey(Genre, related_name="genre", on_delete=models.CASCADE, null=True)
+    # sub_category = models.ForeignKey(
+    #     SubCategory, related_name="artwork_sub_category", on_delete=models.CASCADE
+    # )
     title = models.CharField(max_length=200, null=True, blank=True, default="no title")
     collection = models.OneToOneField(Collection, on_delete=models.CASCADE, null=True, blank=True)
     subtitle = models.CharField(max_length=200, null=True, blank=True)

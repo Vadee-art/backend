@@ -15,13 +15,12 @@ from .models import (
     Article,
     Artist,
     Artwork,
-    Category,
     Collection,
+    Genre,
     MyUser,
     Order,
     Origin,
     ShippingAddress,
-    SubCategory,
     Tag,
     TheMarketPlace,
     TheToken,
@@ -138,15 +137,10 @@ class UserSerializerWithToken(UserSerializerOutput):
         return str(token.access_token)
 
 
-class SubCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SubCategory
-        fields = '__all__'
-
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Category
+        model = Genre
         fields = '__all__'
 
 
@@ -237,8 +231,7 @@ class ArtworkSerializer(serializers.ModelSerializer):
     collection = CollectionSerializer(read_only=True, many=False)
     artist = ArtistSerializer(many=False, read_only=True)
     tags = TagSerializer(many=True, read_only=True)
-    category = CategorySerializer(many=False, read_only=True)
-    sub_category = SubCategorySerializer(many=False, read_only=True)
+    genre = CategorySerializer(many=False, read_only=True)
     voucher = VoucherSerializer(many=False, read_only=True)
     image_medium_quality = serializers.SerializerMethodField(read_only=True)
 

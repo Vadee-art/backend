@@ -23,7 +23,7 @@ class ArtistSearch(generics.ListAPIView):
     search_fields = ["^_id"]
 
 
-#   find artworks with the same category as the artist artworks categories => then find artist of those artworks
+#   find artworks with the same genre as the artist artworks categories => then find artist of those artworks
 
 
 class ArtistSimilarArtists(generics.ListAPIView):
@@ -94,8 +94,7 @@ class ArtistsView(
                 'achievements',
                 'artworks',
                 'artworks__collection',
-                'artworks__category',
-                'artworks__sub_category',
+                'artworks__genre',
                 'artworks__artist__user',
                 'artworks__owner',
                 'artworks__tags',
