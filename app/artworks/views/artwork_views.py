@@ -1,5 +1,3 @@
-import json
-
 from artworks.filters import ArtworkFilter
 from artworks.models import (
     Artwork,
@@ -7,15 +5,19 @@ from artworks.models import (
     Order,
     Origin,
     ShippingAddress,
+    Technique,
+    Theme,
     TheToken,
     Voucher,
 )
 from artworks.serializer import (
     ArtworkSerializer,
-    CategorySerializer,
+    GenreSerializer,
     OrderSerializer,
     OriginSerializer,
     OriginWithArtworksSerializer,
+    TechniqueSerializer,
+    ThemeSerializer,
     VoucherSerializer,
 )
 from django.db.models import F, Window
@@ -32,7 +34,7 @@ from rest_framework.response import Response
 @api_view(["GET"])
 def categories(request):
     categories = Genre.objects.all()
-    serializer = CategorySerializer(categories, many=True, context={'request': request})
+    serializer = GenreSerializer(categories, many=True, context={'request': request})
     return Response(serializer.data)
 
 
@@ -85,15 +87,17 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
 class ArtworkFiltersView(views.APIView):
     def get(self, request):
         categories = Genre.objects.order_by("-created_at")
-        # sub_categories = SubCategory.objects.order_by("-created_at")
+        themes = Theme.objects.order_by("-created_at")
+        techniques = Technique.objects.order_by("-created_at")
         origins = Origin.objects.order_by("_id")
 
         result = dict(
             origins=OriginSerializer(origins, many=True, context={"request": request}).data,
-            # subCategories=SubCategorySerializer(
-            #     sub_categories, many=True, context={"request": request}
-            # ).data,
-            categories=CategorySerializer(categories, many=True, context={"request": request}).data,
+            themes=ThemeSerializer(themes, many=True, context={"request": request}).data,
+            techniques=TechniqueSerializer(
+                techniques, many=True, context={"request": request}
+            ).data,
+            categories=GenreSerializer(categories, many=True, context={"request": request}).data,
         )
         return Response(data=result)
 

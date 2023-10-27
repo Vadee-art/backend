@@ -4,14 +4,23 @@ from django.contrib.auth.admin import UserAdmin
 from django.forms import Textarea
 from django.utils.safestring import mark_safe
 
-from .models import *
 from .models import (
+    Achievement,
+    Article,
+    Artist,
     Artwork,
     Collection,
     Genre,
     MyUser,
     Order,
+    Origin,
     ShippingAddress,
+    Tag,
+    Technique,
+    TheMarketPlace,
+    Theme,
+    TheToken,
+    Voucher,
 )
 
 
@@ -43,9 +52,6 @@ class UserAdminConfig(UserAdmin):
                 "fields": (
                     "email",
                     "user_name",
-                    "country",
-                    "city",
-                    "province",
                     "phone_number",
                     "postal_code",
                     "address",
@@ -112,7 +118,8 @@ class ArtworkAdminConfig(admin.ModelAdmin):
         "on_market",
         "artist",
         "genre",
-        # "sub_category",
+        "theme",
+        "technique",
         "price",
         "image",
         "created_at",
@@ -162,6 +169,8 @@ admin.site.register(Genre, GenreAdminConfig)
 admin.site.register(Tag, TagAdminConfig)
 admin.site.register(ShippingAddress, ShippingAddressAdminConfig)
 admin.site.register(Collection)
+admin.site.register(Theme)
+admin.site.register(Technique)
 admin.site.register(Article)
 admin.site.register(Origin)
 admin.site.register(TheMarketPlace)

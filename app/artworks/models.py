@@ -160,20 +160,32 @@ class Genre(models.Model):
         return self.name
 
 
-# class SubCategory(models.Model):
-#     _id = models.AutoField(primary_key=True, editable=False)
-#     name = models.CharField(max_length=255, db_index=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     is_featured = models.BooleanField(default=False)
+class Theme(models.Model):
+    name = models.CharField(max_length=255, db_index=True)
+    slug = models.SlugField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_featured = models.BooleanField(default=False)
 
-#     class Meta:
-#         ordering = ("-created_at",)
-#         verbose_name = "sub category"
-#         verbose_name_plural = "sub categories"
+    class Meta:
+        ordering = ("-created_at",)
 
-#     def __str__(self):
-#         return self.name
+    def __str__(self):
+        return self.name
+
+
+class Technique(models.Model):
+    name = models.CharField(max_length=255, db_index=True)
+    slug = models.SlugField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_featured = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return self.name
 
 
 class Origin(models.Model):
@@ -274,6 +286,8 @@ class ArtworkManager(CTEManager):
                 'artist__user',
                 'owner',
                 'artist__origin',
+                'theme',
+                'technique',
             )
             .prefetch_related('tags', 'artist__achievements', 'artist__favorites')
         )
@@ -303,18 +317,21 @@ class Artwork(models.Model):
                 params={"value": value},
             )
 
-    # alert
-
     def clean(self):
         if self.edition_total < self.edition_number:
             raise ValidationError("total edition must be greater than edition number")
         super(Artwork, self).clean()
 
     _id = models.AutoField(primary_key=True, editable=False)
-    genre = models.ForeignKey(Genre, related_name="genre", on_delete=models.CASCADE, null=True)
-    # sub_category = models.ForeignKey(
-    #     SubCategory, related_name="artwork_sub_category", on_delete=models.CASCADE
-    # )
+    genre = models.ForeignKey(
+        Genre, related_name="genre_artworks", on_delete=models.CASCADE, null=True
+    )
+    theme = models.ForeignKey(
+        Theme, related_name="them_artworks", on_delete=models.CASCADE, null=True
+    )
+    technique = models.ForeignKey(
+        Technique, related_name="technique_artworks", on_delete=models.CASCADE, null=True
+    )
     title = models.CharField(max_length=200, null=True, blank=True, default="no title")
     collection = models.OneToOneField(Collection, on_delete=models.CASCADE, null=True, blank=True)
     subtitle = models.CharField(max_length=200, null=True, blank=True)

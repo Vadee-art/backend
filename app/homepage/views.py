@@ -1,9 +1,11 @@
-from artworks.models import Artist, Artwork, Genre, Origin
+from artworks.models import Artist, Artwork, Genre, Origin, Technique, Theme
 from artworks.serializer import (
     ArtistSerializer,
-    CategorySerializer,
+    GenreSerializer,
     OriginSerializer,
     SimpleArtworkSerializer,
+    TechniqueSerializer,
+    ThemeSerializer,
 )
 from django.db.models import Count
 from rest_framework.response import Response
@@ -24,27 +26,29 @@ class HomepageView(APIView):
             .select_related("user")
             .prefetch_related("achievements", "favorites")[:6]
         )
-        featured_categories = Genre.objects.filter(is_featured=True)[:5]
+        featured_genres = Genre.objects.filter(is_featured=True)[:5]
         last_artwork = artwork_query.order_by("-created_at").first()
         talented_artwork = artwork_query.filter(is_artist_talented=True).first()
-        # sub_categories = SubCategory.objects.filter(is_featured=True).order_by("-created_at")[:5]
+        themes = Theme.objects.filter(is_featured=True).order_by("-created_at")[:5]
+        techniques = Technique.objects.filter(is_featured=True).order_by("-created_at")[:5]
         origins = Origin.objects.filter(is_featured=True).order_by("_id")[:5]
-        selected_categories = Genre.objects.filter(show_in_homepage=True)[:2]
+        selected_genres = Genre.objects.filter(show_in_homepage=True)[:2]
         result = dict(
             carousels=SimpleArtworkSerializer(
                 carousels, many=True, context={"request": request}
             ).data,
             artists=ArtistSerializer(artists, many=True, context={"request": request}).data,
-            featuredCategories=CategorySerializer(
-                featured_categories, many=True, context={"request": request}
+            featuredGenres=GenreSerializer(
+                featured_genres, many=True, context={"request": request}
             ).data,
             lastArtwork=SimpleArtworkSerializer(last_artwork, context={"request": request}).data,
             talentedArtwork=SimpleArtworkSerializer(
                 talented_artwork, context={"request": request}
             ).data,
-            # subCategories=SubCategorySerializer(
-            #     sub_categories, many=True, context={"request": request}
-            # ).data,
+            themes=ThemeSerializer(themes, many=True, context={"request": request}).data,
+            techniques=TechniqueSerializer(
+                techniques, many=True, context={"request": request}
+            ).data,
             origins=OriginSerializer(origins, many=True, context={"request": request}).data,
             selectedArtworks={
                 genre.name: SimpleArtworkSerializer(
@@ -52,7 +56,7 @@ class HomepageView(APIView):
                     many=True,
                     context={"request": request},
                 ).data
-                for genre in selected_categories
+                for genre in selected_genres
             },
         )
         return Response(data=result)

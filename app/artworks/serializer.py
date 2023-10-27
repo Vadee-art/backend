@@ -22,7 +22,9 @@ from .models import (
     Origin,
     ShippingAddress,
     Tag,
+    Technique,
     TheMarketPlace,
+    Theme,
     TheToken,
     Voucher,
 )
@@ -137,10 +139,21 @@ class UserSerializerWithToken(UserSerializerOutput):
         return str(token.access_token)
 
 
-
-class CategorySerializer(serializers.ModelSerializer):
+class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
+        fields = '__all__'
+
+
+class ThemeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Theme
+        fields = '__all__'
+
+
+class TechniqueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Technique
         fields = '__all__'
 
 
@@ -231,9 +244,11 @@ class ArtworkSerializer(serializers.ModelSerializer):
     collection = CollectionSerializer(read_only=True, many=False)
     artist = ArtistSerializer(many=False, read_only=True)
     tags = TagSerializer(many=True, read_only=True)
-    genre = CategorySerializer(many=False, read_only=True)
+    genre = GenreSerializer(many=False, read_only=True)
     voucher = VoucherSerializer(many=False, read_only=True)
     image_medium_quality = serializers.SerializerMethodField(read_only=True)
+    theme = ThemeSerializer(many=False, read_only=True)
+    technique = TechniqueSerializer(many=False, read_only=True)
 
     class Meta:
         model = Artwork
