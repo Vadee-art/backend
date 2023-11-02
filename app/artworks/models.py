@@ -224,6 +224,7 @@ class Artist(models.Model):
     vadee_fee = models.IntegerField(default=10)
     royalty_fee = models.IntegerField(default=10)
     is_featured = models.BooleanField(default=False)
+    similar_artists = models.ManyToManyField('Artist')
 
     class Meta:
         verbose_name = "artist"
