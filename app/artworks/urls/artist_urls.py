@@ -16,7 +16,7 @@ urlpatterns = [
         views.ArtistRelatedArtworks.as_view(),
     ),
     path(
-        "<int:artistId>/similar/",
+        "<int:id>/similar/",
         views.ArtistSimilarArtists.as_view(),
     ),
     path(

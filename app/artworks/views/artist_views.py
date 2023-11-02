@@ -5,6 +5,7 @@ from artworks.serializer import (
     ArtistSerializer,
     ArtworkSerializer,
     OriginSerializer,
+    SimpleArtistSerializer,
     SingleArtistSerializer,
 )
 from backend.premissions import OwnProfilePermission
@@ -28,23 +29,13 @@ class ArtistSearch(generics.ListAPIView):
 #   find artworks with the same genre as the artist artworks categories => then find artist of those artworks
 
 
-class ArtistSimilarArtists(generics.ListAPIView):
-    serializer_class = ArtistSerializer
-
-    def get_queryset(self, *args, **kwargs):
-        artistId = self.kwargs.get("artistId")
-        artist = get_object_or_404(Artist, pk=artistId)
-        if artist_artworks_cats := artist.artworks.all().values("category___id"):
-            list = []
-            for c in artist_artworks_cats:
-                artworksByArtistCats = Artwork.objects.filter(category___id=c["category___id"])
-                for a in artworksByArtistCats:
-                    if a.artist not in list and a.artist != artist and a.artist is not None:
-                        list.append(a.artist)
-
-            return list
-        else:
-            return []
+class ArtistSimilarArtists(views.APIView):
+    def get(self, request, id):
+        artist = get_object_or_404(Artist, pk=id)
+        result = SimpleArtistSerializer(
+            artist.similar_artists, many=True, context={"request": request}
+        ).data
+        return Response(data=result)
 
 
 class ArtistRelatedArtworks(generics.ListAPIView):
