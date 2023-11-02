@@ -18,4 +18,5 @@ urlpatterns = [
     path("delete/", views.delete_the_artwork, name="artwork_delete"),
     path("voucher/<int:pk>/delete/", views.delete_the_voucher, name="voucher_delete"),
     path("update/<int:pk>/<str:action>/", views.update_the_artwork, name="artwork_update"),
+    path("<int:id>/similar/", views.SimilarArtworks.as_view()),
 ]

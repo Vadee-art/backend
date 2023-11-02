@@ -11,26 +11,11 @@ router.register(r'', views.ArtistsView, basename='Artist')
 urlpatterns = [
     path('', include(router.urls)),
     path("search/", views.ArtistSearch.as_view(), name="artists-search"),
-    path(
-        "<int:artistId>/related-artworks/",
-        views.ArtistRelatedArtworks.as_view(),
-    ),
-    path(
-        "<int:id>/similar/",
-        views.ArtistSimilarArtists.as_view(),
-    ),
-    path(
-        "<int:id>/follow",
-        views.FollowArtistView.as_view(),
-    ),
-    path(
-        "<int:id>/unfollow",
-        views.UnFollowArtistView.as_view(),
-    ),
-    path(
-        "filters",
-        views.ArtistFiltersView.as_view(),
-    ),
+    path("<int:artistId>/related-artworks/", views.ArtistRelatedArtworks.as_view()),
+    path("<int:id>/similar/", views.ArtistSimilarArtists.as_view()),
+    path("<int:id>/follow", views.FollowArtistView.as_view()),
+    path("<int:id>/unfollow", views.UnFollowArtistView.as_view()),
+    path("filters", views.ArtistFiltersView.as_view()),
     # path(
     #     "<int:pk>/gallery/update/",
     #     views.update_artist_gallery,

@@ -16,12 +16,14 @@ from artworks.serializer import (
     OrderSerializer,
     OriginSerializer,
     OriginWithArtworksSerializer,
+    SimpleArtworkSerializer,
     TechniqueSerializer,
     ThemeSerializer,
     VoucherSerializer,
 )
 from django.db.models import F, Window
 from django.db.models.functions import Rank
+from django.shortcuts import get_object_or_404
 from django_cte import With
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, views, viewsets
@@ -36,6 +38,15 @@ def categories(request):
     categories = Genre.objects.all()
     serializer = GenreSerializer(categories, many=True, context={'request': request})
     return Response(serializer.data)
+
+
+class SimilarArtworks(views.APIView):
+    def get(self, request, id):
+        artwork = get_object_or_404(Artwork, pk=id)
+        result = SimpleArtworkSerializer(
+            artwork.similar_artworks, many=True, context={"request": request}
+        ).data
+        return Response(data=result)
 
 
 class OriginsArtworksView(mixins.ListModelMixin, viewsets.GenericViewSet):

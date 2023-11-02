@@ -393,6 +393,9 @@ class Artwork(models.Model):
         format='JPEG',
         options={'quality': 95},
     )
+
+    similar_artworks = models.ManyToManyField('Artwork')
+
     objects = ArtworkManager()
     simple_object = SimpleArtworkManager()
 
