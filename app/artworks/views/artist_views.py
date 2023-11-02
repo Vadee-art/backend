@@ -11,7 +11,9 @@ from backend.premissions import OwnProfilePermission
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, mixins, views, viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class ArtistSearch(generics.ListAPIView):
@@ -76,6 +78,7 @@ class ArtistsView(
 ):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ArtistFilter
+    authentication_classes = [JWTAuthentication]
     permission_classes = [OwnProfilePermission]
     ordering = ['first_name', 'last_name']
     serializer_classes = {
@@ -99,10 +102,12 @@ class ArtistsView(
                 'artworks__owner',
                 'artworks__tags',
             )
-        return Artist.objects.select_related('origin', 'user').prefetch_related(
+        queryset = Artist.objects.select_related('origin', 'user').prefetch_related(
             'favorites',
             'achievements',
         )
+
+        return queryset
 
 
 class ArtistFiltersView(views.APIView):
@@ -117,3 +122,23 @@ class ArtistFiltersView(views.APIView):
             ).data,
         )
         return Response(data=result)
+
+
+class FollowArtistView(views.APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, id):
+        artist = get_object_or_404(Artist, pk=id)
+        request.user.followed_artists.add(artist)
+        request.user.save()
+        return Response()
+
+
+class UnFollowArtistView(views.APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, id):
+        artist = get_object_or_404(Artist, pk=id)
+        request.user.followed_artists.remove(artist)
+        request.user.save()
+        return Response()

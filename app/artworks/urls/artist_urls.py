@@ -20,6 +20,14 @@ urlpatterns = [
         views.ArtistSimilarArtists.as_view(),
     ),
     path(
+        "<int:id>/follow",
+        views.FollowArtistView.as_view(),
+    ),
+    path(
+        "<int:id>/unfollow",
+        views.UnFollowArtistView.as_view(),
+    ),
+    path(
         "filters",
         views.ArtistFiltersView.as_view(),
     ),

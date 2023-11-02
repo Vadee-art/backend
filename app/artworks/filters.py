@@ -1,4 +1,4 @@
-from django_filters import BaseInFilter, CharFilter, NumberFilter
+from django_filters import BaseInFilter, BooleanFilter, CharFilter, NumberFilter
 from django_filters import rest_framework as filters
 
 from artworks.models import Artist, Artwork, Origin
@@ -22,8 +22,13 @@ class ArtworkFilter(filters.FilterSet):
 
 
 class ArtistFilter(filters.FilterSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = kwargs.pop('request', None)
+
     name_starts = CharFilter(field_name="user__first_name", lookup_expr="istartswith")
     origin = NumberInFilter(field_name='origin_id', lookup_expr='in')
+    is_following = BooleanFilter(method='is_following_filter')
 
     class Meta:
         model = Artist
@@ -33,6 +38,16 @@ class ArtistFilter(filters.FilterSet):
             'achievements',
             'favorites',
         ]
+
+    def is_following_filter(self, queryset, name, value):
+        user = self.request.user
+        if user.is_authenticated:
+            if value:
+                queryset = queryset.filter(followers=user.id)
+            else:
+                queryset = queryset.exclude(followers=user.id)
+
+        return queryset
 
 
 class OriginFilter(filters.FilterSet):
