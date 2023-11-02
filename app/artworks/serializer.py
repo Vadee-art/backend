@@ -233,7 +233,7 @@ class SimpleArtistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Artist
-        fields = ('_id', 'name', 'origin')
+        fields = ('_id', 'name', 'origin', 'photo')
 
     def get_name(self, obj):
         return obj.user.first_name + ' ' + obj.user.last_name
