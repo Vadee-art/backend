@@ -214,10 +214,18 @@ class ArtistSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField(read_only=True)
     origin = OriginSerializer(many=False, read_only=True)
     achievements = AchievementSerializer(many=True, read_only=True)
+    is_following = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Artist
-        read_only_fields = ["user", "origin", "achievements", "favorites", "contract", "vadee_fee"]
+        read_only_fields = [
+            "user",
+            "origin",
+            "achievements",
+            "favorites",
+            "contract",
+            "vadee_fee",
+        ]
         exclude = ["gallery_address"]
 
     def get_username(self, obj):
@@ -226,17 +234,24 @@ class ArtistSerializer(serializers.ModelSerializer):
     def get_name(self, obj):
         return obj.user.first_name + ' ' + obj.user.last_name
 
+    def get_is_following(self, obj):
+        return obj.followers.filter(id=self.context['request'].user.id).exists()
+
 
 class SimpleArtistSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
     origin = OriginSerializer(many=False, read_only=True)
+    is_following = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Artist
-        fields = ('_id', 'name', 'origin', 'photo')
+        fields = ('_id', 'name', 'origin', 'photo', 'is_following')
 
     def get_name(self, obj):
         return obj.user.first_name + ' ' + obj.user.last_name
+
+    def get_is_following(self, obj):
+        return obj.followers.filter(id=self.context['request'].user.id).exists()
 
 
 class ArtworkSerializer(serializers.ModelSerializer):
