@@ -4,9 +4,13 @@ from cities_light.contrib.restframework3 import (
     RegionSerializer,
 )
 from cities_light.models import City
+from django.contrib.auth import authenticate
+from eth_account.messages import encode_defunct
 from rest_framework import serializers
+from rest_framework.exceptions import APIException
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from web3 import Web3
 
 from artworks.validators import validate_password
 
@@ -373,4 +377,38 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         for k, v in serializer.items():
             data['user'][k] = v
 
+        return data
+
+
+class Web3TokenObtainPairSerializer(serializers.Serializer):
+    token_class = RefreshToken
+
+    msg = serializers.CharField(max_length=128, required=True)
+    sig = serializers.CharField(max_length=256, required=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def get_token(cls, user):
+        return cls.token_class.for_user(user)
+
+    def validate(self, attrs):
+        msg = attrs['msg']
+        sig = attrs['sig']
+        signable_msg = encode_defunct(text=msg)
+
+        web3 = Web3()
+
+        try:
+            address = web3.eth.account.recover_message(signable_msg, signature=sig)
+        except:
+            raise serializers.ValidationError(detail='Invalid signature')
+
+        self.user = authenticate(address)
+        refresh = self.get_token(self.user)
+        data = {}
+        data["refresh"] = str(refresh)
+        data["access"] = str(refresh.access_token)
+        data['user'] = UserSerializerOutput(self.user).data
         return data

@@ -9,6 +9,7 @@ router.register('profile-picture/', views.UserProfileImage, basename='ProfilePic
 urlpatterns = [
     path('', include(router.urls)),
     path("login/", views.TokenObtainPairView.as_view(), name="token-obtain-pair"),
+    path("login-web3/", views.Web3TokenObtainPairView.as_view(), name="token-obtain-pair"),
     path("register/", views.CreateUserView.as_view(), name="register"),
     path("profile/artworks/mine", views.fetchMyArtworks, name="users-profile-artworks"),
     path(

@@ -7,6 +7,7 @@ from artworks.serializer import (
     UserProfileImageSerializer,
     UserSerializerInput,
     UserSerializerOutput,
+    Web3TokenObtainPairSerializer,
 )
 from backend.premissions import UserProfilePermission
 from django.contrib.auth import get_user_model
@@ -18,6 +19,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 
@@ -26,7 +28,19 @@ class TokenObtainPairView(TokenObtainPairView):
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_200_OK: MyTokenObtainPairSerializer,
+            status.HTTP_200_OK: TokenRefreshSerializer,
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class Web3TokenObtainPairView(TokenObtainPairView):
+    serializer_class = Web3TokenObtainPairSerializer
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: TokenRefreshSerializer,
         }
     )
     def post(self, request, *args, **kwargs):
