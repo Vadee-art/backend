@@ -224,7 +224,7 @@ class Artist(models.Model):
     vadee_fee = models.IntegerField(default=10)
     royalty_fee = models.IntegerField(default=10)
     is_featured = models.BooleanField(default=False)
-    similar_artists = models.ManyToManyField('Artist')
+    similar_artists = models.ManyToManyField('Artist', symmetrical=True)
 
     class Meta:
         verbose_name = "artist"
@@ -394,7 +394,7 @@ class Artwork(models.Model):
         options={'quality': 95},
     )
 
-    similar_artworks = models.ManyToManyField('Artwork')
+    similar_artworks = models.ManyToManyField('Artwork', symmetrical=True)
 
     objects = ArtworkManager()
     simple_object = SimpleArtworkManager()
