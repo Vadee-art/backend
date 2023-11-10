@@ -12,7 +12,7 @@ router.register(r'vouchers/', views.VoucherViewSet, basename='voucher')
 
 urlpatterns = [
     path("talent/", views.fetch_is_talent, name="talent_artwork"),
-    path("categories/", views.categories, name="category_list"),
+    path("genres/", views.categories, name="category_list"),
     path('', include(router.urls)),
     path('filters/', views.ArtworkFiltersView.as_view()),
     path("delete/", views.delete_the_artwork, name="artwork_delete"),

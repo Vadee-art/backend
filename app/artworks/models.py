@@ -156,7 +156,7 @@ class Genre(models.Model):
     class Meta:
         ordering = ("-created_at",)
         verbose_name = "genre"
-        verbose_name_plural = "categories"
+        verbose_name_plural = "genre"
 
     def __str__(self):
         return self.name

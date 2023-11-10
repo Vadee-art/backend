@@ -97,7 +97,7 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
 
 class ArtworkFiltersView(views.APIView):
     def get(self, request):
-        categories = Genre.objects.order_by("-created_at")
+        genres = Genre.objects.order_by("-created_at")
         themes = Theme.objects.order_by("-created_at")
         techniques = Technique.objects.order_by("-created_at")
         origins = Origin.objects.order_by("_id")
@@ -108,7 +108,7 @@ class ArtworkFiltersView(views.APIView):
             techniques=TechniqueSerializer(
                 techniques, many=True, context={"request": request}
             ).data,
-            categories=GenreSerializer(categories, many=True, context={"request": request}).data,
+            genres=GenreSerializer(genres, many=True, context={"request": request}).data,
         )
         return Response(data=result)
 
