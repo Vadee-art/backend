@@ -31,7 +31,7 @@ class ArtistSearch(generics.ListAPIView):
 
 class ArtistSimilarArtists(views.APIView):
     def get(self, request, id):
-        artist = get_object_or_404(Artist, pk=id)
+        artist = get_object_or_404(Artist.objects.get_for_user(request.user), pk=id)
         result = SimpleArtistSerializer(
             artist.similar_artists, many=True, context={"request": request}
         ).data
@@ -83,19 +83,27 @@ class ArtistsView(
 
     def get_queryset(self):
         if self.action == 'retrieve':
-            return Artist.objects.select_related('origin', 'user').prefetch_related(
+            return (
+                Artist.objects.get_for_user(self.request.user)
+                .select_related('origin', 'user')
+                .prefetch_related(
+                    'favorites',
+                    'achievements',
+                    'artworks',
+                    'artworks__collection',
+                    'artworks__genre',
+                    'artworks__artist__user',
+                    'artworks__owner',
+                    'artworks__tags',
+                )
+            )
+        queryset = (
+            Artist.objects.get_for_user(self.request.user)
+            .select_related('origin', 'user')
+            .prefetch_related(
                 'favorites',
                 'achievements',
-                'artworks',
-                'artworks__collection',
-                'artworks__genre',
-                'artworks__artist__user',
-                'artworks__owner',
-                'artworks__tags',
             )
-        queryset = Artist.objects.select_related('origin', 'user').prefetch_related(
-            'favorites',
-            'achievements',
         )
 
         return queryset

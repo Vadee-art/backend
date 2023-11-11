@@ -171,7 +171,7 @@ def addFavoriteArtist(request, pk):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def fetchFavoriteArtistList(request):
-    artists = Artist.objects.filter(favorites=request.user)
+    artists = Artist.objects.get_for_user(request.user).filter(favorites=request.user)
     serializer = ArtistSerializer(artists, many=True)
     return Response({"favorites": serializer.data})
 

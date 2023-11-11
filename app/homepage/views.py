@@ -20,7 +20,8 @@ class HomepageView(APIView):
 
         carousels = artwork_query.filter(is_carousel=True)[:5]
         artists = (
-            Artist.objects.filter(is_featured=True)
+            Artist.objects.get_for_user(self.request.user)
+            .filter(is_featured=True)
             .annotate(art_count=Count("artworks"))
             .order_by("-art_count")
             .select_related("user")

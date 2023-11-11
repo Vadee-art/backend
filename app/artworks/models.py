@@ -9,6 +9,8 @@ from django.contrib.auth.models import (
 )
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Exists, Value
+from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -206,6 +208,18 @@ class Origin(models.Model):
         return self.country
 
 
+class ArtistManager(models.Manager):
+    def get_queryset(self) -> QuerySet:
+        return super().get_queryset()
+
+    def get_for_user(self, user):
+        if not user or not user.is_authenticated:
+            return self.get_queryset().annotate(is_following=Value('false'))
+
+        is_following = super().filter(followers__in=[user.id])
+        return self.get_queryset().annotate(is_following=Exists(is_following))
+
+
 class Artist(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     wallet_address = models.CharField(max_length=255, blank=True)
@@ -225,6 +239,8 @@ class Artist(models.Model):
     royalty_fee = models.IntegerField(default=10)
     is_featured = models.BooleanField(default=False)
     similar_artists = models.ManyToManyField('Artist', symmetrical=True)
+
+    objects = ArtistManager()
 
     class Meta:
         verbose_name = "artist"
