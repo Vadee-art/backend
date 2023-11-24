@@ -15,10 +15,21 @@ class ArtworkFilter(filters.FilterSet):
     genre = NumberInFilter(field_name='genre_id', lookup_expr='in')
     theme = NumberInFilter(field_name='theme_id', lookup_expr='in')
     technique = NumberInFilter(field_name='technique_id', lookup_expr='in')
+    is_saved = BooleanFilter(method='is_saved_filter')
 
     class Meta:
         model = Artwork
         fields = ["genre", "origin", 'theme', 'technique']
+
+    def is_saved_filter(self, queryset, name, value):
+        user = self.request.user
+        if user.is_authenticated:
+            if value:
+                queryset = queryset.filter(users_saved=user.id)
+            else:
+                queryset = queryset.exclude(users_saved=user.id)
+
+        return queryset
 
 
 class ArtistFilter(filters.FilterSet):
