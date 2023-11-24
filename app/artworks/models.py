@@ -98,6 +98,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     wallet_address = models.CharField(max_length=250, null=True, blank=True)
 
     followed_artists = models.ManyToManyField('Artist', related_name='followers')
+    saved_artworks = models.ManyToManyField('Artwork', related_name='users_saved')
 
     city = models.ForeignKey(
         'cities_light.City',

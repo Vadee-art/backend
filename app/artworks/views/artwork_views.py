@@ -49,6 +49,24 @@ class SimilarArtworks(views.APIView):
         return Response(data=result)
 
 
+class SaveArtwork(views.APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, id):
+        artwork = get_object_or_404(Artwork.simple_object, pk=id)
+        request.user.saved_artworks.add(artwork)
+        return Response()
+
+
+class UnSaveArtwork(views.APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, id):
+        artwork = get_object_or_404(Artwork.simple_object, pk=id)
+        request.user.saved_artworks.remove(artwork)
+        return Response()
+
+
 class OriginsArtworksView(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Origin.objects.order_by("_id")
     serializer_class = OriginWithArtworksSerializer
