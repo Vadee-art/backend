@@ -239,7 +239,7 @@ class Artist(models.Model):
     vadee_fee = models.IntegerField(default=10)
     royalty_fee = models.IntegerField(default=10)
     is_featured = models.BooleanField(default=False)
-    similar_artists = models.ManyToManyField('Artist', symmetrical=True)
+    similar_artists = models.ManyToManyField('Artist', symmetrical=True, null=True, blank=True)
 
     objects = ArtistManager()
 
@@ -411,7 +411,7 @@ class Artwork(models.Model):
         options={'quality': 95},
     )
 
-    similar_artworks = models.ManyToManyField('Artwork', symmetrical=True)
+    similar_artworks = models.ManyToManyField('Artwork', symmetrical=True, null=True, blank=True)
 
     objects = ArtworkManager()
     simple_object = SimpleArtworkManager()
