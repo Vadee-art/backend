@@ -53,7 +53,7 @@ class SaveArtwork(views.APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, id):
-        artwork = get_object_or_404(Artwork.simple_object, pk=id)
+        artwork = get_object_or_404(Artwork.objects, pk=id)
         request.user.saved_artworks.add(artwork)
         return Response()
 
@@ -62,7 +62,7 @@ class UnSaveArtwork(views.APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, id):
-        artwork = get_object_or_404(Artwork.simple_object, pk=id)
+        artwork = get_object_or_404(Artwork.objects, pk=id)
         request.user.saved_artworks.remove(artwork)
         return Response()
 
@@ -74,7 +74,7 @@ class OriginsArtworksView(mixins.ListModelMixin, viewsets.GenericViewSet):
     def list(self, request):
         origins = self.paginate_queryset(self.queryset)
         cte = With(
-            Artwork.simple_object.annotate(
+            Artwork.objects.annotate(
                 rank=Window(
                     expression=Rank(),
                     order_by=F("created_at").desc(),
@@ -112,10 +112,24 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
     filter_backends = [DjangoFilterBackend]
     filterset_class = ArtworkFilter
 
-    # def get_queryset(self):
-    #     if self.action == 'list':
-    #         return Artwork.simple_object.all()
-    #     return Artwork.objects.all()
+    def get_queryset(self):
+        if self.action == 'list':
+            return (
+                Artwork.objects.select_related(
+                    'collection',
+                    'artist',
+                    'artist__user',
+                    'genre',
+                    'theme',
+                    'technique',
+                )
+                .prefetch_related(
+                    'tags',
+                    'similar_artworks',
+                )
+                .all()
+            )
+        return Artwork.objects.all()
 
 
 class ArtworkFiltersView(views.APIView):

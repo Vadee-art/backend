@@ -421,7 +421,7 @@ class Artwork(models.Model):
     similar_artworks = models.ManyToManyField('Artwork', symmetrical=True, null=True, blank=True)
 
     # objects = ArtworkManager()
-    # simple_object = SimpleArtworkManager()
+    # objects = SimpleArtworkManager()
 
     class Meta:
         verbose_name = "artwork"

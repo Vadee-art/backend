@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 
 class HomepageView(APIView):
     def get(self, request):
-        artwork_query = Artwork.simple_object.select_related(
+        artwork_query = Artwork.objects.select_related(
             'artist', 'artist__origin', 'artist__user'
         ).all()
 
