@@ -294,30 +294,7 @@ class Collection(models.Model):
 
 
 class ArtworkManager(CTEManager):
-    def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .filter(is_active=True)
-            .select_related(
-                'artist',
-                'collection',
-                'genre',
-                'artist__user',
-                'owner',
-                'artist__origin',
-                'theme',
-                'technique',
-            )
-            .prefetch_related(
-                'tags',
-                'artist__achievements',
-                'artist__favorites',
-                'artist__similar_artists',
-                'artist__followers',
-                'similar_artworks',
-            )
-        )
+    pass
 
 
 class SimpleArtworkManager(CTEManager):
@@ -420,7 +397,7 @@ class Artwork(models.Model):
 
     similar_artworks = models.ManyToManyField('Artwork', symmetrical=True, null=True, blank=True)
 
-    # objects = ArtworkManager()
+    objects = ArtworkManager()
     # objects = SimpleArtworkManager()
 
     class Meta:
