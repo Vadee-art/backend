@@ -254,7 +254,7 @@ class SimpleArtistSerializer(IsFollowingMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Artist
-        fields = ('_id', 'name', 'origin', 'photo', 'is_following')
+        fields = ('_id', 'name', 'origin', 'photo', 'is_following', 'birthday')
 
     def get_name(self, obj):
         return obj.user.first_name + ' ' + obj.user.last_name

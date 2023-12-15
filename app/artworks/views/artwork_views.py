@@ -111,7 +111,13 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
     ordering = ['-created_at']
     filter_backends = [DjangoFilterBackend]
     filterset_class = ArtworkFilter
-    
+    serializer_classes = {
+        'retrieve': SimpleArtworkSerializer,
+        'list': ArtworkSerializer,
+    }
+
+    default_serializer_class = ArtworkSerializer
+
     def get_queryset(self):
         if self.action == 'list':
             return (
@@ -119,6 +125,7 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
                     'collection',
                     'artist',
                     'artist__user',
+                    'artist__origin',
                     'genre',
                     'theme',
                     'technique',
