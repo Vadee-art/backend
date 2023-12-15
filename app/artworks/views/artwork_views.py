@@ -112,7 +112,6 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
     filter_backends = [DjangoFilterBackend]
     filterset_class = ArtworkFilter
     serializer_classes = {
-        'retrieve': ArtworkSerializer,
         'list': SimpleArtworkSerializer,
     }
 
@@ -123,22 +122,26 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
 
     def get_queryset(self):
         if self.action == 'list':
-            return (
-                Artwork.objects.select_related(
-                    'collection',
-                    'artist',
-                    'artist__user',
-                    'artist__origin',
-                    'genre',
-                    'theme',
-                    'technique',
-                )
-                .prefetch_related(
-                    'tags',
-                )
-                .all()
+            return Artwork.objects.select_related(
+                'artist',
+                'artist__user',
+                'artist__origin',
+            ).all()
+        return (
+            Artwork.objects.select_related(
+                'collection',
+                'artist',
+                'artist__user',
+                'artist__origin',
+                'genre',
+                'theme',
+                'technique',
             )
-        return Artwork.objects.all()
+            .prefetch_related(
+                'tags',
+            )
+            .all()
+        )
 
 
 class ArtworkFiltersView(views.APIView):
