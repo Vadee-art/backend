@@ -112,8 +112,8 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
     filter_backends = [DjangoFilterBackend]
     filterset_class = ArtworkFilter
     serializer_classes = {
-        'retrieve': SimpleArtworkSerializer,
-        'list': ArtworkSerializer,
+        'retrieve': ArtworkSerializer,
+        'list': SimpleArtworkSerializer,
     }
 
     default_serializer_class = ArtworkSerializer
