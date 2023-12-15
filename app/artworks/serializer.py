@@ -213,12 +213,21 @@ class AchievementSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ArtistSerializer(serializers.ModelSerializer):
+class IsFollowingMixin(serializers.Serializer):
+    is_following = serializers.SerializerMethodField(read_only=True)
+
+    def get_is_following(self, obj):
+        try:
+            return getattr(obj, 'is_following')
+        except:
+            return self.context['request'].user in obj.followers.all()
+
+
+class ArtistSerializer(serializers.ModelSerializer, IsFollowingMixin):
     name = serializers.SerializerMethodField(read_only=True)
     username = serializers.SerializerMethodField(read_only=True)
     origin = OriginSerializer(many=False, read_only=True)
     achievements = AchievementSerializer(many=True, read_only=True)
-    is_following = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Artist
@@ -238,14 +247,10 @@ class ArtistSerializer(serializers.ModelSerializer):
     def get_name(self, obj):
         return obj.user.first_name + ' ' + obj.user.last_name
 
-    def get_is_following(self, obj):
-        return obj.followers.filter(id=self.context['request'].user.id).exists()
 
-
-class SimpleArtistSerializer(serializers.ModelSerializer):
+class SimpleArtistSerializer(IsFollowingMixin, serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
     origin = OriginSerializer(many=False, read_only=True)
-    is_following = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Artist
@@ -253,36 +258,6 @@ class SimpleArtistSerializer(serializers.ModelSerializer):
 
     def get_name(self, obj):
         return obj.user.first_name + ' ' + obj.user.last_name
-
-    def get_is_following(self, obj):
-        return obj.followers.filter(id=self.context['request'].user.id).exists()
-
-
-class ArtworkSerializer(serializers.ModelSerializer):
-    user_id = serializers.IntegerField(read_only=True)
-    collection = CollectionSerializer(read_only=True, many=False)
-    artist = ArtistSerializer(many=False, read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
-    genre = GenreSerializer(many=False, read_only=True)
-    voucher = VoucherSerializer(many=False, read_only=True)
-    image_medium_quality = serializers.SerializerMethodField(read_only=True)
-    theme = ThemeSerializer(many=False, read_only=True)
-    technique = TechniqueSerializer(many=False, read_only=True)
-
-    class Meta:
-        model = Artwork
-        fields = '__all__'
-
-    def get_image_medium_quality(self, obj):
-        return self.context['request'].build_absolute_uri(obj.image_medium_quality.url)
-
-
-class ArtworkWithoutArtistSerializer(ArtworkSerializer):
-    artist = None
-
-    class Meta:
-        model = Artwork
-        exclude = ('artist',)
 
 
 class SimpleArtworkSerializer(serializers.ModelSerializer):
@@ -295,6 +270,34 @@ class SimpleArtworkSerializer(serializers.ModelSerializer):
 
     def get_image_medium_quality(self, obj):
         return self.context['request'].build_absolute_uri(obj.image_medium_quality.url)
+
+
+class ArtworkSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(read_only=True)
+    collection = CollectionSerializer(read_only=True, many=False)
+    artist = ArtistSerializer(many=False, read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
+    genre = GenreSerializer(many=False, read_only=True)
+    voucher = VoucherSerializer(many=False, read_only=True)
+    image_medium_quality = serializers.SerializerMethodField(read_only=True)
+    theme = ThemeSerializer(many=False, read_only=True)
+    technique = TechniqueSerializer(many=False, read_only=True)
+    similar_artworks = SimpleArtworkSerializer(many=True)
+
+    class Meta:
+        model = Artwork
+        fields = '__all__'
+
+    def get_image_medium_quality(self, obj):
+        return self.context['request'].build_absolute_uri(obj.image_medium_quality.url)
+
+
+class ArtworkWithoutArtistSerializer(SimpleArtworkSerializer):
+    artist = None
+
+    class Meta(SimpleArtworkSerializer.Meta):
+        model = Artwork
+        fields = tuple(x for x in SimpleArtworkSerializer.Meta.fields if x != 'artist')
 
 
 class CarouselSerializer(serializers.ModelSerializer):

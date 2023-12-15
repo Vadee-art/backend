@@ -97,7 +97,11 @@ class ArtworkArtistFilter(AutocompleteFilter):
 class ArtistAdminConfig(admin.ModelAdmin):
     model = Artist
     ordering = ("-_id",)
-    list_display = ["user", "_id", "gallery_address"]
+    list_display = [
+        "user",
+        "_id",
+        "gallery_address",
+    ]
     # this is required for django's autocomplete functionality / when adding user to artist
     # search bar / allow reference autocomplete from ArtworkAdminConfig
     search_fields = ("user",)

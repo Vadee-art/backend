@@ -121,7 +121,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         return self.first_name + ' ' + self.last_name
 
     def __str__(self):
-        return self.email
+        return self.user_name
 
 
 class Achievement(models.Model):
@@ -247,7 +247,7 @@ class Artist(models.Model):
         verbose_name = "artist"
 
     def __str__(self):
-        return self.user.email
+        return str(self.user)
 
 
 class Voucher(models.Model):
@@ -309,7 +309,14 @@ class ArtworkManager(CTEManager):
                 'theme',
                 'technique',
             )
-            .prefetch_related('tags', 'artist__achievements', 'artist__favorites')
+            .prefetch_related(
+                'tags',
+                'artist__achievements',
+                'artist__favorites',
+                'artist__similar_artists',
+                'artist__followers',
+                'similar_artworks',
+            )
         )
 
 
@@ -413,8 +420,8 @@ class Artwork(models.Model):
 
     similar_artworks = models.ManyToManyField('Artwork', symmetrical=True, null=True, blank=True)
 
-    objects = ArtworkManager()
-    simple_object = SimpleArtworkManager()
+    # objects = ArtworkManager()
+    # simple_object = SimpleArtworkManager()
 
     class Meta:
         verbose_name = "artwork"

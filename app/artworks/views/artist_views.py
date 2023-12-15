@@ -31,9 +31,21 @@ class ArtistSearch(generics.ListAPIView):
 
 class ArtistSimilarArtists(views.APIView):
     def get(self, request, id):
-        artist = get_object_or_404(Artist.objects.get_for_user(request.user), pk=id)
+        artist = get_object_or_404(
+            Artist.objects.get_for_user(request.user),
+            pk=id,
+        )
+        similar_artist = (
+            Artist.objects.get_for_user(request.user)
+            .select_related('origin', 'user')
+            .prefetch_related(
+                'favorites',
+                'achievements',
+                'similar_artists',
+            )
+        )
         result = SimpleArtistSerializer(
-            artist.similar_artists, many=True, context={"request": request}
+            similar_artist, many=True, context={"request": request}
         ).data
         return Response(data=result)
 
@@ -74,6 +86,7 @@ class ArtistsView(
     ordering = ['first_name', 'last_name']
     serializer_classes = {
         'retrieve': SingleArtistSerializer,
+        'list': SimpleArtistSerializer,
     }
 
     default_serializer_class = ArtistSerializer
@@ -90,19 +103,20 @@ class ArtistsView(
                     'favorites',
                     'achievements',
                     'artworks',
-                    'artworks__collection',
-                    'artworks__genre',
-                    'artworks__artist__user',
-                    'artworks__owner',
-                    'artworks__tags',
+                    'similar_artists',
                 )
             )
+
+        if self.action == 'list':
+            return Artist.objects.get_for_user(self.request.user).select_related('origin', 'user')
+
         queryset = (
             Artist.objects.get_for_user(self.request.user)
             .select_related('origin', 'user')
             .prefetch_related(
                 'favorites',
                 'achievements',
+                'similar_artists',
             )
         )
 

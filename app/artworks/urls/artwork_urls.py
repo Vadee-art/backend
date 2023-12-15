@@ -5,7 +5,7 @@ from rest_framework import routers
 app_name = "artwork"
 
 router = routers.SimpleRouter(trailing_slash=False)
-router.register(r'', views.ArtworkViewSet)
+router.register(r'', views.ArtworkViewSet, basename='artworks')
 router.register(r'carousels/', views.CarouselArtworkViewSet)
 router.register(r'by-origins/', views.OriginsArtworksView, basename='artworks_by_origin')
 router.register(r'vouchers/', views.VoucherViewSet, basename='voucher')

@@ -112,6 +112,11 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
     filter_backends = [DjangoFilterBackend]
     filterset_class = ArtworkFilter
 
+    # def get_queryset(self):
+    #     if self.action == 'list':
+    #         return Artwork.simple_object.all()
+    #     return Artwork.objects.all()
+
 
 class ArtworkFiltersView(views.APIView):
     def get(self, request):
