@@ -111,7 +111,7 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
     ordering = ['-created_at']
     filter_backends = [DjangoFilterBackend]
     filterset_class = ArtworkFilter
-
+    
     def get_queryset(self):
         if self.action == 'list':
             return (
@@ -125,7 +125,6 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
                 )
                 .prefetch_related(
                     'tags',
-                    'similar_artworks',
                 )
                 .all()
             )

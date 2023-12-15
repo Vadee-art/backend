@@ -275,7 +275,7 @@ class SimpleArtworkSerializer(serializers.ModelSerializer):
 class ArtworkSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(read_only=True)
     collection = CollectionSerializer(read_only=True, many=False)
-    artist = ArtistSerializer(many=False, read_only=True)
+    artist = SimpleArtistSerializer(many=False, read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     genre = GenreSerializer(many=False, read_only=True)
     voucher = VoucherSerializer(many=False, read_only=True)

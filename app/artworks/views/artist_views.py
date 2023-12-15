@@ -37,6 +37,9 @@ class ArtistSimilarArtists(views.APIView):
         )
         similar_artist = (
             Artist.objects.get_for_user(request.user)
+            .filter(
+                similar_artists__in=[artist],
+            )
             .select_related('origin', 'user')
             .prefetch_related(
                 'favorites',
