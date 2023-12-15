@@ -248,13 +248,21 @@ class ArtistSerializer(serializers.ModelSerializer, IsFollowingMixin):
         return obj.user.first_name + ' ' + obj.user.last_name
 
 
-class SimpleArtistSerializer(IsFollowingMixin, serializers.ModelSerializer):
+class SimpleArtistWithoutFollowingSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
     origin = OriginSerializer(many=False, read_only=True)
 
     class Meta:
         model = Artist
-        fields = ('_id', 'name', 'origin', 'photo', 'is_following', 'birthday')
+        fields = ('_id', 'name', 'origin', 'photo', 'birthday')
+
+    def get_name(self, obj):
+        return obj.user.first_name + ' ' + obj.user.last_name
+
+
+class SimpleArtistSerializer(IsFollowingMixin, SimpleArtistWithoutFollowingSerializer):
+    class Meta(SimpleArtistWithoutFollowingSerializer.Meta):
+        fields = SimpleArtistWithoutFollowingSerializer.Meta.fields + ('is_following',)
 
     def get_name(self, obj):
         return obj.user.first_name + ' ' + obj.user.last_name
@@ -262,7 +270,7 @@ class SimpleArtistSerializer(IsFollowingMixin, serializers.ModelSerializer):
 
 class SimpleArtworkSerializer(serializers.ModelSerializer):
     image_medium_quality = serializers.SerializerMethodField(read_only=True)
-    artist = SimpleArtistSerializer(many=False, read_only=True)
+    artist = SimpleArtistWithoutFollowingSerializer(many=False, read_only=True)
 
     class Meta:
         model = Artwork

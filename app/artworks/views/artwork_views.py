@@ -118,6 +118,9 @@ class ArtworkViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.
 
     default_serializer_class = ArtworkSerializer
 
+    def get_serializer_class(self):
+        return self.serializer_classes.get(self.action, self.default_serializer_class)
+
     def get_queryset(self):
         if self.action == 'list':
             return (
