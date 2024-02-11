@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
-from artworks.models import MyUser
+from artworks.models import Artwork, MyUser
 
 
 # when email is changed user name is changed
@@ -20,3 +20,9 @@ pre_save.connect(updateUser, sender=User)
 def user_post_save(sender, instance, created, **kwargs):
     if created:
         Cart.objects.create(user=instance)
+
+
+@receiver(post_save, sender=Artwork)
+def artwork_sign(sender, instance, created, **kwargs):
+    if created or instance.signature:
+        instance.sign()

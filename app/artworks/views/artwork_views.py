@@ -174,6 +174,7 @@ class SignArtwork(views.APIView):
     def post(self, request, id):
         artwork = get_object_or_404(Artwork.objects, pk=id)
         artwork.sign()
+        artwork.refresh_from_db()
         return Response(data=SimpleArtworkSerializer(artwork, context={"request": request}).data)
 
     @swagger_auto_schema(
@@ -183,8 +184,8 @@ class SignArtwork(views.APIView):
     )
     def delete(self, request, id):
         artwork = get_object_or_404(Artwork.objects, pk=id)
-        artwork.signature = None
-        artwork.save()
+        Artwork.objects.filter(pk=self.pk).update(signature=None)
+        artwork.refresh_from_db()
         return Response(data=SimpleArtworkSerializer(artwork, context={"request": request}).data)
 
 

@@ -387,15 +387,16 @@ class Artwork(models.Model):
         if self.is_sold_out:
             raise HTTPValidationError(code='Artwork sold out')
 
-        self.signature = sign(
+        signature = sign(
             artist_address=self.artist.wallet_address,
-            artwork_id=self._id,
+            artwork_id=self.pk,
             price_dollar=self.price,
             uri=self.uri,
             vadee_fee=self.artist.vadee_fee,
             royalty_fee=self.artist.royalty_fee,
         )
-        self.save(update_fields=('signature',))
+
+        Artwork.objects.filter(pk=self.pk).update(signature=signature)
 
 
 class TheToken(models.Model):
