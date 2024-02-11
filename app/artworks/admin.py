@@ -20,7 +20,6 @@ from .models import (
     TheMarketPlace,
     Theme,
     TheToken,
-    Voucher,
 )
 
 
@@ -179,4 +178,3 @@ admin.site.register(Article)
 admin.site.register(Origin)
 admin.site.register(TheMarketPlace)
 admin.site.register(TheToken)
-admin.site.register(Voucher)

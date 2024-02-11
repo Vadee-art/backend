@@ -20,6 +20,8 @@ from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFit
 from rest_framework.exceptions import ValidationError as HTTPValidationError
 
+from artworks.sign import sign
+
 
 class TheMarketPlace(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
@@ -250,38 +252,6 @@ class Artist(models.Model):
         return str(self.user)
 
 
-class Voucher(models.Model):
-    _id = models.AutoField(primary_key=True, editable=False)
-    title = models.CharField(max_length=350)
-    artwork_id = models.ForeignKey('Artwork', on_delete=models.CASCADE, related_name='vouchers')
-    edition = models.IntegerField()
-    price_wei = models.IntegerField()
-    price_dollar = models.IntegerField()
-    content = models.CharField(max_length=350, default="")
-    signature = models.CharField(max_length=350)
-    is_sold = models.BooleanField(default=False)
-
-    class Meta:
-        verbose_name = "voucher"
-
-    def __str__(self):
-        return self.token_uri
-
-    @property
-    def token_uri(self):
-        return urljoin(settings.DOMAIN, f'/tokens/{self._id}')
-
-    def delete(self, *args, **kwargs):
-        if self.is_sold:
-            raise HTTPValidationError('Cannot delete sold vouchers')
-        return super().delete(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
-        if self.is_sold:
-            raise HTTPValidationError('Cannot update sold vouchers')
-        return super().save(*args, **kwargs)
-
-
 class Collection(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     title = models.CharField(max_length=350, blank=True)
@@ -350,7 +320,6 @@ class Artwork(models.Model):
     depth = models.IntegerField(null=True, blank=True)
     unit = models.CharField(max_length=2, choices=UNITS, default="")
     frame = models.CharField(max_length=200, null=True, blank=True)
-    price = models.DecimalField(max_digits=12, decimal_places=0)
     about_work = models.TextField(blank=True)
     # origin = models.ForeignKey(Origin, on_delete=models.SET_NULL, null=True)
     edition_number = models.IntegerField(null=False, default=1)
@@ -359,7 +328,9 @@ class Artwork(models.Model):
     price = models.IntegerField(null=False)
     quantity = models.IntegerField(default=1)
 
-    # price_eth = models.CharField(max_length=200, null=True, blank=True)
+    uri = models.CharField(max_length=128, null=True, blank=True)
+    signature = models.CharField(max_length=256, null=True, blank=True)
+
     # favorite_artworks = models.ManyToManyField(MyUser, related_name="user_favorite_artworks", default=None, blank=True)
     is_minted = models.BooleanField(default=False)
     on_market = models.BooleanField(default=False)
@@ -412,6 +383,20 @@ class Artwork(models.Model):
     def get_absolute_url(self):
         return reverse("artworks: artwork_detail", args=[self.slug])
 
+    def sign(self):
+        if self.is_sold_out:
+            raise HTTPValidationError(code='Artwork sold out')
+
+        self.signature = sign(
+            artist_address=self.artist.wallet_address,
+            artwork_id=self._id,
+            price_dollar=self.price,
+            uri=self.uri,
+            vadee_fee=self.artist.vadee_fee,
+            royalty_fee=self.artist.royalty_fee,
+        )
+        self.save(update_fields=('signature',))
+
 
 class TheToken(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
@@ -422,17 +407,11 @@ class TheToken(models.Model):
         null=True,
         blank=True,
     )
-    token_id = models.CharField(max_length=250, null=True, blank=True, unique=True)
-    market_item_id = models.CharField(max_length=250, null=True, blank=True)
     holder = models.ForeignKey(MyUser, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    contract = models.CharField(max_length=250, null=True, blank=True)
 
     class Meta:
         verbose_name = "NFT"
-
-    def __str__(self):
-        return str(self.token_id)
 
 
 class Order(models.Model):

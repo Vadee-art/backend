@@ -30,7 +30,6 @@ from .models import (
     TheMarketPlace,
     Theme,
     TheToken,
-    Voucher,
 )
 
 
@@ -184,17 +183,6 @@ class TagSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class VoucherSerializer(serializers.ModelSerializer):
-    token_uri = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = Voucher
-        fields = '__all__'
-
-    def get_token_uri(self, obj):
-        return obj.token_uri
-
-
 class TheTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = TheToken
@@ -274,7 +262,16 @@ class SimpleArtworkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Artwork
-        fields = ('_id', 'price', 'image', 'title', 'artist', 'image_medium_quality')
+        fields = (
+            '_id',
+            'price',
+            'image',
+            'title',
+            'artist',
+            'image_medium_quality',
+            'signature',
+            'uri',
+        )
 
     def get_image_medium_quality(self, obj):
         return self.context['request'].build_absolute_uri(obj.image_medium_quality.url)
@@ -286,7 +283,6 @@ class ArtworkSerializer(serializers.ModelSerializer):
     artist = SimpleArtistSerializer(many=False, read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     genre = GenreSerializer(many=False, read_only=True)
-    voucher = VoucherSerializer(many=False, read_only=True)
     image_medium_quality = serializers.SerializerMethodField(read_only=True)
     theme = ThemeSerializer(many=False, read_only=True)
     technique = TechniqueSerializer(many=False, read_only=True)

@@ -304,6 +304,8 @@ SWAGGER_SETTINGS = {
 
 CITIES_LIGHT_INDEX_SEARCH_NAMES = False
 
+
+# BLOCKCHAIN
 if IS_PROD:
     WEB3_PROVIDER = None
     VADEE_ADDRESS = None
@@ -314,6 +316,14 @@ else:
     WEB3_PROVIDER = 'enc:fb9b1dd48f0f82257ad145f99d713322d3815c0ee49a32f0d1f803593826b667435836128773209ce42433309008c7be4ec1fa63e43dfe8e4d1948dd10fbe481c29403e4c3d597ff19e6bddd2c1256af'
     VADEE_ADDRESS = '0x77305d566841b9ED0614dc5bF23Fe8858c3D4ab6'
 
+
+CHAIN_ID = 1 if IS_PROD else 11155111  # Sepolia
+CONTRACT_ADDRESS = "" if IS_PROD else "0xf8cDA62506A38EcC3d0E9649150ADC38D63DdA41"
+SIGNER_PRIVATE_KEY = (
+    ""
+    if IS_PROD
+    else "enc:af57a0d5f7713f6db524aed7cd97186bd6368cccb821e5fb2ca0f1016f7cad4c67607c0f2ea0ce8148d983cc7fa2ebdf04523bdfcff6a9d5256376d90a616b488be02b3b30f1a0153b79a99357e06c14"
+)
 
 ## ##################################################################
 ## this must be at the bottom of settings.py
