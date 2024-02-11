@@ -1,6 +1,10 @@
+import json
 from datetime import date
+from pathlib import Path
+from tempfile import NamedTemporaryFile
 from urllib.parse import urljoin
 
+from backend.ipfs import pin_file_to_ipfs
 from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser,
@@ -328,6 +332,8 @@ class Artwork(models.Model):
     price = models.IntegerField(null=False)
     quantity = models.IntegerField(default=1)
 
+    metadata_ipfs_hash = models.CharField(max_length=128, null=True, blank=True)
+    image_ipfs_hash = models.CharField(max_length=128, null=True, blank=True)
     uri = models.CharField(max_length=128, null=True, blank=True)
     signature = models.CharField(max_length=256, null=True, blank=True)
 
@@ -379,15 +385,54 @@ class Artwork(models.Model):
     def __str__(self):
         return str(self._id)
 
+    @property
+    def metadata(self):
+        return {
+            'name': self.title,
+            'description': self.about_work,
+            'external_url': self.get_client_url(),
+            'image': self.ipfs_image_url,
+            'attributes': [
+                {
+                    'trait_type': 'Artist',
+                    'value': self.artist.user.get_full_name(),
+                },
+                {
+                    'trait_type': 'Edition',
+                    'value': self.edition_number,
+                },
+                {
+                    'trait_type': 'Year',
+                    'value': self.year,
+                },
+                {
+                    'trait_type': 'Genre',
+                    'value': self.genre.name,
+                },
+                {
+                    'trait_type': 'Theme',
+                    'value': self.theme.name,
+                },
+                {
+                    'trait_type': 'Technique',
+                    'value': self.technique.name,
+                },
+            ],
+        }
+
+    @property
+    def ipfs_image_url(self):
+        return 'ipfs://' + self.image_ipfs_hash
+
     # e.g in django template,get URL links for all artworks by calling this
-    def get_absolute_url(self):
-        return reverse("artworks: artwork_detail", args=[self.slug])
+    def get_client_url(self):
+        return str(Path(settings.DOMAIN) / 'artworks' / str(self.pk))
 
     def sign(self):
         if self.is_sold_out:
             raise HTTPValidationError(code='Artwork sold out')
 
-        signature = sign(
+        self.signature = sign(
             artist_address=self.artist.wallet_address,
             artwork_id=self.pk,
             price_dollar=self.price,
@@ -396,7 +441,18 @@ class Artwork(models.Model):
             royalty_fee=self.artist.royalty_fee,
         )
 
-        Artwork.objects.filter(pk=self.pk).update(signature=signature)
+        Artwork.objects.filter(pk=self.pk).update(signature=self.signature)
+
+    def upload_image_to_ipfs(self):
+        self.image_ipfs_hash = pin_file_to_ipfs(self.image.path)
+        Artwork.objects.filter(pk=self.pk).update(image_ipfs_hash=self.image_ipfs_hash)
+
+    def upload_metadata_to_ipfs(self):
+        with NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+            f.write(json.dumps(self.metadata))
+
+        self.metadata_ipfs_hash = pin_file_to_ipfs(f.name)
+        Artwork.objects.filter(pk=self.pk).update(metadata_ipfs_hash=self.metadata_ipfs_hash)
 
 
 class TheToken(models.Model):

@@ -25,6 +25,12 @@ def get_secret(key, default):
     return value
 
 
+def get_key(prod, staging):
+    if IS_PROD:
+        return prod
+    return staging
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -317,12 +323,16 @@ else:
     VADEE_ADDRESS = '0x77305d566841b9ED0614dc5bF23Fe8858c3D4ab6'
 
 
-CHAIN_ID = 1 if IS_PROD else 11155111  # Sepolia
-CONTRACT_ADDRESS = "" if IS_PROD else "0xf8cDA62506A38EcC3d0E9649150ADC38D63DdA41"
-SIGNER_PRIVATE_KEY = (
-    ""
-    if IS_PROD
-    else "enc:af57a0d5f7713f6db524aed7cd97186bd6368cccb821e5fb2ca0f1016f7cad4c67607c0f2ea0ce8148d983cc7fa2ebdf04523bdfcff6a9d5256376d90a616b488be02b3b30f1a0153b79a99357e06c14"
+CHAIN_ID = get_key(1, staging=11155111)
+CONTRACT_ADDRESS = get_key('', staging='0xf8cDA62506A38EcC3d0E9649150ADC38D63DdA41')
+SIGNER_PRIVATE_KEY = get_key(
+    '',
+    staging='enc:af57a0d5f7713f6db524aed7cd97186bd6368cccb821e5fb2ca0f1016f7cad4c67607c0f2ea0ce8148d983cc7fa2ebdf04523bdfcff6a9d5256376d90a616b488be02b3b30f1a0153b79a99357e06c14',
+)
+PINATA_API_KEY = get_key('1e94a6b66b2c74a88de0', staging='1e94a6b66b2c74a88de0')
+PINATA_SECRET_KEY = get_key(
+    'enc:77ae02462f9268d6e7023048fea79801e59957f2968e4475966e7a73027ecdef67873d34bf8a4a807835abd9b1ddfd7e96027d56b85eed53438de76d6844ab1a2bcde1ce7e658be1eaa08793559db124',
+    'enc:77ae02462f9268d6e7023048fea79801e59957f2968e4475966e7a73027ecdef67873d34bf8a4a807835abd9b1ddfd7e96027d56b85eed53438de76d6844ab1a2bcde1ce7e658be1eaa08793559db124',
 )
 
 ## ##################################################################

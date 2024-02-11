@@ -185,7 +185,6 @@ class SignArtwork(views.APIView):
     def delete(self, request, id):
         artwork = get_object_or_404(Artwork.objects, pk=id)
         Artwork.objects.filter(pk=self.pk).update(signature=None)
-        artwork.refresh_from_db()
         return Response(data=SimpleArtworkSerializer(artwork, context={"request": request}).data)
 
 

@@ -27,3 +27,4 @@ web3
 django_safe_settings
 coincurve==15.0.1
 eip712-structs==1.1.0
+pinatapy-vourhey
