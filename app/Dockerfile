@@ -17,6 +17,7 @@ RUN apk add -u libpq jpeg-dev zlib-dev libjpeg
 
 # install dependencies
 RUN pip install --upgrade pip
+RUN pip install wheel
 COPY ./requirements.txt .
 RUN pip install -U -r requirements.txt
 
