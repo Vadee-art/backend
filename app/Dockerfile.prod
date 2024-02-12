@@ -19,8 +19,11 @@ RUN apk update \
 # this is for Pillow
 RUN apk add -u zlib-dev jpeg-dev
 
-# lint
+# this is for coincurve
+RUN apk add autoconf automake build-base libffi-dev libtool pkgconfig python3-dev
+
 RUN pip install --upgrade pip
+RUN pip install wheel
 
 # install dependencies
 COPY ./requirements.txt .
