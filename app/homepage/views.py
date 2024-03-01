@@ -28,7 +28,7 @@ class HomepageView(APIView):
             .prefetch_related("achievements", "favorites")[:6]
         )
         featured_genres = Genre.objects.filter(is_featured=True)[:5]
-        last_artworks = artwork_query.order_by("-created_at")[:3]
+        last_artwork = artwork_query.order_by("-created_at").first()
         talented_artwork = artwork_query.filter(is_artist_talented=True).first()
         themes = Theme.objects.filter(is_featured=True).order_by("-created_at")[:5]
         techniques = Technique.objects.filter(is_featured=True).order_by("-created_at")[:5]
@@ -42,9 +42,7 @@ class HomepageView(APIView):
             featuredGenres=GenreSerializer(
                 featured_genres, many=True, context={"request": request}
             ).data,
-            lastArtworks=SimpleArtworkSerializer(
-                last_artworks, context={"request": request}, many=True
-            ).data,
+            lastArtwork=SimpleArtworkSerializer(last_artwork, context={"request": request}).data,
             talentedArtwork=SimpleArtworkSerializer(
                 talented_artwork, context={"request": request}
             ).data,
