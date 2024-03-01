@@ -19,7 +19,6 @@ class HomepageView(APIView):
         ).all()
 
         carousels = artwork_query.filter(is_carousel=True)[:5]
-
         artists = (
             Artist.objects.get_for_user(self.request.user)
             .filter(is_featured=True)
