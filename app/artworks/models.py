@@ -334,7 +334,7 @@ class Artwork(models.Model):
 
     metadata_ipfs_hash = models.CharField(max_length=128, null=True, blank=True)
     image_ipfs_hash = models.CharField(max_length=128, null=True, blank=True)
-    uri = models.CharField(max_length=128, null=True, blank=True)
+    # uri = models.CharField(max_length=128, null=True, blank=True)
     signature = models.CharField(max_length=256, null=True, blank=True)
 
     # favorite_artworks = models.ManyToManyField(MyUser, related_name="user_favorite_artworks", default=None, blank=True)
@@ -423,6 +423,10 @@ class Artwork(models.Model):
     @property
     def ipfs_image_url(self):
         return 'ipfs://' + self.image_ipfs_hash
+
+    @property
+    def uri(self):
+        return 'ipfs://' + self.metadata_ipfs_hash
 
     # e.g in django template,get URL links for all artworks by calling this
     def get_client_url(self):

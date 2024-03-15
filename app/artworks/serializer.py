@@ -284,6 +284,7 @@ class ArtworkSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     genre = GenreSerializer(many=False, read_only=True)
     image_medium_quality = serializers.SerializerMethodField(read_only=True)
+    voucher = serializers.SerializerMethodField(read_only=True)
     theme = ThemeSerializer(many=False, read_only=True)
     technique = TechniqueSerializer(many=False, read_only=True)
     similar_artworks = SimpleArtworkSerializer(many=True)
@@ -294,6 +295,17 @@ class ArtworkSerializer(serializers.ModelSerializer):
 
     def get_image_medium_quality(self, obj):
         return self.context['request'].build_absolute_uri(obj.image_medium_quality.url)
+
+    def get_voucher(self, obj: Artwork):
+        return {
+            'artist': obj.artist.wallet_address,
+            'artworkId': obj.pk,
+            'priceDollar': obj.price,
+            'tokenUri': obj.uri,
+            'vadeeFee': obj.artist.vadee_fee,
+            'royaltyFee': obj.artist.royalty_fee,
+            'signature': obj.signature,
+        }
 
 
 class ArtworkWithoutArtistSerializer(SimpleArtworkSerializer):
