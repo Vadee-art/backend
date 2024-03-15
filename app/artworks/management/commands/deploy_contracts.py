@@ -10,3 +10,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for artist in Artist.objects.all():
             deploy_artist_contract(artist)
+
