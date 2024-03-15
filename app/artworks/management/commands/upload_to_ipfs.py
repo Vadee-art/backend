@@ -1,3 +1,4 @@
+from backend.sentry import report_exception
 from django.core.management.base import BaseCommand
 
 from artworks.models import Artwork
@@ -16,4 +17,5 @@ class Command(BaseCommand):
                     artwork.upload_metadata_to_ipfs()
                     print(f'Uploaded metadata of {artwork.pk}')
             except Exception as ex:
+                report_exception()
                 print(ex)
