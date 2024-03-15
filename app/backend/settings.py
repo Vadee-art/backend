@@ -79,6 +79,14 @@ ALLOWED_HOSTS_ENV = os.environ.get("ALLOWED_HOSTS")
 if ALLOWED_HOSTS_ENV:
     ALLOWED_HOSTS.extend(ALLOWED_HOSTS_ENV.split(","))
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://sapi.vadee.art",
+    "https://vadee.art",
+    "https://www.vadee.art",
+    "https://www.vadee.art",
+]
+
+
 # Application definition
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
