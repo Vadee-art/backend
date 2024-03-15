@@ -245,7 +245,7 @@ class Artist(models.Model):
     vadee_fee = models.IntegerField(default=10)
     royalty_fee = models.IntegerField(default=10)
     is_featured = models.BooleanField(default=False)
-    similar_artists = models.ManyToManyField('Artist', symmetrical=True, null=True, blank=True)
+    similar_artists = models.ManyToManyField('Artist', symmetrical=True, blank=True)
 
     objects = ArtistManager()
 
@@ -372,7 +372,7 @@ class Artwork(models.Model):
         options={'quality': 95},
     )
 
-    similar_artworks = models.ManyToManyField('Artwork', symmetrical=True, null=True, blank=True)
+    similar_artworks = models.ManyToManyField('Artwork', symmetrical=True, blank=True)
 
     objects = ArtworkManager()
     # objects = SimpleArtworkManager()
@@ -422,10 +422,14 @@ class Artwork(models.Model):
 
     @property
     def ipfs_image_url(self):
+        if not self.image_ipfs_hash:
+            return None
         return 'ipfs://' + self.image_ipfs_hash
 
     @property
     def uri(self):
+        if not self.metadata_ipfs_hash:
+            return None
         return 'ipfs://' + self.metadata_ipfs_hash
 
     # e.g in django template,get URL links for all artworks by calling this
@@ -435,6 +439,8 @@ class Artwork(models.Model):
     def sign(self):
         if self.is_sold_out:
             raise HTTPValidationError(code='Artwork sold out')
+        if not self.image_ipfs_hash or not self.metadata_ipfs_hash:
+            raise HTTPValidationError(code='Unsignable without image and metadata hash')
 
         self.signature = sign(
             artist_address=self.artist.wallet_address,
