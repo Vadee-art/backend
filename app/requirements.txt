@@ -1,6 +1,6 @@
 wheel
 coreapi
-Django~=3.2
+Django<5
 django-admin-searchable-dropdown
 django-cors-headers
 django-dotenv
