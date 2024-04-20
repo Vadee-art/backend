@@ -24,11 +24,13 @@ def user_post_save(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Artwork)
 def artwork_post_save(sender, instance, created, **kwargs):
-    if not instance.image_ipfs_hash:
-        instance.upload_image_to_ipfs()
-
-    if not instance.metadata_ipfs_hash:
-        instance.upload_metadata_to_ipfs()
-
-    if created or instance.signature:
-        instance.sign()
+    pass
+    # TODO: convert this to task
+#    if not instance.image_ipfs_hash:
+#        instance.upload_image_to_ipfs()
+#
+#    if not instance.metadata_ipfs_hash:
+#        instance.upload_metadata_to_ipfs()
+#
+#    if created or instance.signature:
+#        instance.sign()
